@@ -22,6 +22,8 @@ const GeoLayout jrb_geo_000AFC[] = {
                GEO_ASM(JRB_MOVTEX_SUNKEN_SHIP_WATER, geo_movtex_draw_water_regions),
                GEO_RENDER_OBJ(),
                GEO_ASM(ENVFX_SNOW_WATER, geo_envfx_main),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_DIRECTIONAL, 127, 127, 155, 0, 1, 0),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 25, 25, 55, 1, 0, 800),
             GEO_CLOSE_NODE(),
          GEO_CLOSE_NODE(),
       GEO_CLOSE_NODE(),

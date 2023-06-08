@@ -2871,6 +2871,10 @@ void update_lakitu(struct Camera *c) {
  * Gets controller input, checks for cutscenes, handles mode changes, and moves the camera
  */
 void update_camera(struct Camera *c) {
+#if PUPPYPRINT_DEBUG
+    OSTime first   = osGetTime();
+    OSTime colTime = collisionTime[perfIteration];
+#endif
     gCamera = c;
     update_camera_hud_status(c);
     if (c->cutscene == CUTSCENE_NONE
@@ -3113,6 +3117,10 @@ void update_camera(struct Camera *c) {
     }
 #endif
     gLakituState.lastFrameAction = sMarioCamState->action;
+#if PUPPYPRINT_DEBUG
+    profiler_update(cameraTime, first);
+    cameraTime[perfIteration] -= collisionTime[perfIteration]-colTime;
+#endif
 }
 
 /**
@@ -3250,19 +3258,19 @@ void init_camera(struct Camera *c) {
 
 #ifdef ENABLE_VANILLA_CAM_PROCESSING
         //! Hardcoded position checks determine which cutscene to play when Mario enters castle grounds.
-        case LEVEL_CASTLE_GROUNDS:
-            if (is_within_100_units_of_mario(-1328.f, 260.f, 4664.f) != 1) {
-                marioOffset[0] = -400.f;
-                marioOffset[2] = -800.f;
-            }
-            if (is_within_100_units_of_mario(-6901.f, 2376.f, -6509.f) == 1) {
-                start_cutscene(c, CUTSCENE_EXIT_WATERFALL);
-            }
-            if (is_within_100_units_of_mario(5408.f, 4500.f, 3637.f) == 1) {
-                start_cutscene(c, CUTSCENE_EXIT_FALL_WMOTR);
-            }
-            gLakituState.mode = CAMERA_MODE_FREE_ROAM;
-            break;
+        // case LEVEL_CASTLE_GROUNDS:
+        //     if (is_within_100_units_of_mario(-1328.f, 260.f, 4664.f) != 1) {
+        //         marioOffset[0] = -400.f;
+        //         marioOffset[2] = -800.f;
+        //     }
+        //     if (is_within_100_units_of_mario(-6901.f, 2376.f, -6509.f) == 1) {
+        //         start_cutscene(c, CUTSCENE_EXIT_WATERFALL);
+        //     }
+        //     if (is_within_100_units_of_mario(5408.f, 4500.f, 3637.f) == 1) {
+        //         start_cutscene(c, CUTSCENE_EXIT_FALL_WMOTR);
+        //     }
+        //     gLakituState.mode = CAMERA_MODE_FREE_ROAM;
+        //     break;
         case LEVEL_SA:
             marioOffset[2] = 200.f;
             break;
@@ -4257,7 +4265,7 @@ s32 is_pos_in_bounds(Vec3f pos, Vec3f center, Vec3f bounds, s16 boundsYaw) {
             -bounds[2] < rel[2] && rel[2] < bounds[2]);
 }
 
-s16 calculate_pitch(Vec3f from, Vec3f to) {
+s32 calculate_pitch(Vec3f from, Vec3f to) {
     f32 dx = to[0] - from[0];
     f32 dy = to[1] - from[1];
     f32 dz = to[2] - from[2];
@@ -4266,7 +4274,7 @@ s16 calculate_pitch(Vec3f from, Vec3f to) {
     return pitch;
 }
 
-s16 calculate_yaw(Vec3f from, Vec3f to) {
+s32 calculate_yaw(Vec3f from, Vec3f to) {
     f32 dx = to[0] - from[0];
     // UNUSED f32 dy = to[1] - from[1];
     f32 dz = to[2] - from[2];
@@ -6058,6 +6066,12 @@ struct CameraTrigger sCamBBH[] = {
  *
  * Each table is terminated with NULL_TRIGGER
  */
+struct CameraTrigger sCamCastleGrounds[] = {
+	NULL_TRIGGER
+};
+struct CameraTrigger sCamJRB[] = {
+	NULL_TRIGGER
+};
 struct CameraTrigger *sCameraTriggers[LEVEL_COUNT + 1] = {
     NULL,
     #include "levels/level_defines.h"
@@ -6194,6 +6208,8 @@ s16 camera_course_processing(struct Camera *c) {
     Vec3f center, bounds;
     u32 insideBounds = FALSE;
     u8 oldMode = c->mode;
+
+    return oldMode;
 
     if (c->mode == CAMERA_MODE_C_UP) {
         c->mode = sModeInfo.lastMode;
@@ -10393,26 +10409,26 @@ u8 sDanceCutsceneIndexTable[][4] = {
  * and if the result is non-zero, the camera will zoom out.
  */
 u8 sZoomOutAreaMasks[] = {
-    ZOOMOUT_AREA_MASK(0,0,0,0, 0,0,0,0), // Unused         | Unused
-    ZOOMOUT_AREA_MASK(0,0,0,0, 0,0,0,0), // Unused         | Unused
-    ZOOMOUT_AREA_MASK(0,0,0,0, 1,0,0,0), // BBH            | CCM
-    ZOOMOUT_AREA_MASK(0,0,0,0, 0,0,0,0), // CASTLE_INSIDE  | HMC
-    ZOOMOUT_AREA_MASK(1,0,0,0, 1,0,0,0), // SSL            | BOB
-    ZOOMOUT_AREA_MASK(1,0,0,0, 1,0,0,0), // SL             | WDW
-    ZOOMOUT_AREA_MASK(0,0,0,0, 1,1,0,0), // JRB            | THI
-    ZOOMOUT_AREA_MASK(0,0,0,0, 1,0,0,0), // TTC            | RR
-    ZOOMOUT_AREA_MASK(1,0,0,0, 1,0,0,0), // CASTLE_GROUNDS | BITDW
-    ZOOMOUT_AREA_MASK(0,0,0,0, 1,0,0,0), // VCUTM          | BITFS
-    ZOOMOUT_AREA_MASK(0,0,0,0, 1,0,0,0), // SA             | BITS
-    ZOOMOUT_AREA_MASK(1,0,0,0, 0,0,0,0), // LLL            | DDD
-    ZOOMOUT_AREA_MASK(1,0,0,0, 0,0,0,0), // WF             | ENDING
-    ZOOMOUT_AREA_MASK(0,0,0,0, 0,0,0,0), // COURTYARD      | PSS
-    ZOOMOUT_AREA_MASK(0,0,0,0, 1,0,0,0), // COTMC          | TOTWC
-    ZOOMOUT_AREA_MASK(1,0,0,0, 1,0,0,0), // BOWSER_1       | WMOTR
-    ZOOMOUT_AREA_MASK(0,0,0,0, 1,0,0,0), // Unused         | BOWSER_2
-    ZOOMOUT_AREA_MASK(1,0,0,0, 0,0,0,0), // BOWSER_3       | Unused
-    ZOOMOUT_AREA_MASK(1,0,0,0, 0,0,0,0), // TTM            | Unused
-    ZOOMOUT_AREA_MASK(0,0,0,0, 0,0,0,0), // Unused         | Unused
+	ZOOMOUT_AREA_MASK(0, 0, 0, 0, 0, 0, 0, 0), // Unused         | Unused
+	ZOOMOUT_AREA_MASK(0, 0, 0, 0, 0, 0, 0, 0), // Unused         | Unused
+	ZOOMOUT_AREA_MASK(0, 0, 0, 0, 1, 0, 0, 0), // BBH            | CCM
+	ZOOMOUT_AREA_MASK(0, 0, 0, 0, 0, 0, 0, 0), // CASTLE_INSIDE  | HMC
+	ZOOMOUT_AREA_MASK(1, 0, 0, 0, 1, 0, 0, 0), // SSL            | BOB
+	ZOOMOUT_AREA_MASK(1, 0, 0, 0, 1, 0, 0, 0), // SL             | WDW
+	ZOOMOUT_AREA_MASK(0, 0, 0, 0, 1, 1, 0, 0), // JRB            | THI
+	ZOOMOUT_AREA_MASK(0, 0, 0, 0, 1, 0, 0, 0), // TTC            | RR
+	ZOOMOUT_AREA_MASK(0, 0, 0, 0, 1, 0, 0, 0), // CASTLE_GROUNDS | BITDW
+	ZOOMOUT_AREA_MASK(0, 0, 0, 0, 1, 0, 0, 0), // VCUTM          | BITFS
+	ZOOMOUT_AREA_MASK(0, 0, 0, 0, 1, 0, 0, 0), // SA             | BITS
+	ZOOMOUT_AREA_MASK(1, 0, 0, 0, 0, 0, 0, 0), // LLL            | DDD
+	ZOOMOUT_AREA_MASK(1, 0, 0, 0, 0, 0, 0, 0), // WF             | ENDING
+	ZOOMOUT_AREA_MASK(0, 0, 0, 0, 0, 0, 0, 0), // COURTYARD      | PSS
+	ZOOMOUT_AREA_MASK(0, 0, 0, 0, 1, 0, 0, 0), // COTMC          | TOTWC
+	ZOOMOUT_AREA_MASK(1, 0, 0, 0, 1, 0, 0, 0), // BOWSER_1       | WMOTR
+	ZOOMOUT_AREA_MASK(0, 0, 0, 0, 1, 0, 0, 0), // Unused         | BOWSER_2
+	ZOOMOUT_AREA_MASK(1, 0, 0, 0, 0, 0, 0, 0), // BOWSER_3       | Unused
+	ZOOMOUT_AREA_MASK(1, 0, 0, 0, 0, 0, 0, 0), // TTM            | Unused
+	ZOOMOUT_AREA_MASK(0, 0, 0, 0, 0, 0, 0, 0), // Unused         | Unused
 };
 
 STATIC_ASSERT(ARRAY_COUNT(sZoomOutAreaMasks) - 1 == LEVEL_MAX / 2, "Make sure you edit sZoomOutAreaMasks when adding / removing courses.");

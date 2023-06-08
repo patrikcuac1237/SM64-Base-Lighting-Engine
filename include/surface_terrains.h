@@ -12,16 +12,16 @@ enum SurfaceTypes {
     SURFACE_NEW_WATER_BOTTOM,           // 0x0003 // Custom water surface bottom marker
     SURFACE_0004,                       // 0x0004 // Unused, has no function and has parameters
     SURFACE_HANGABLE,                   // 0x0005 // Ceiling that Mario can climb on
-    SURFACE_0006,                       // 0x0006 // Unused
-    SURFACE_0007,                       // 0x0007 // Unused
-    SURFACE_0008,                       // 0x0008 // Unused
+    SURFACE_WOOD,                       // 0x0006 // DEFAULT Wood Floor in any terrain
+    SURFACE_WOOD_SLIPPERY,              // 0x0007 // SLIPPERY Wood floor in any terrain
+    SURFACE_CLIMBABLE_WOOD,             // 0x0008 // Not-Slippery wood floor
     SURFACE_SLOW,                       // 0x0009 // Slow down Mario, unused
     SURFACE_DEATH_PLANE,                // 0x000A // Death floor
     SURFACE_CLOSE_CAMERA,               // 0x000B // Close camera
-    SURFACE_000C,                       // 0x000C // unused
+    SURFACE_METAL,                      // 0x000C // Default Sound (used for metal, until i discover how to add more sounds)
     SURFACE_WATER,                      // 0x000D // Water, has no action, used on some waterboxes below
     SURFACE_FLOWING_WATER,              // 0x000E // Water (flowing), has parameters
-    SURFACE_000F,                       // 0x000F // Unused
+    SURFACE_SAND,                       // 0x000F // Sand
     SURFACE_0010,                       // 0x0010 // Unused
     SURFACE_0011,                       // 0x0011 // Unused
     SURFACE_INTANGIBLE,                 // 0x0012 // Intangible (Separates BBH mansion from merry-go-round, for room usage)
@@ -29,7 +29,7 @@ enum SurfaceTypes {
     SURFACE_SLIPPERY,                   // 0x0014 // Slippery
     SURFACE_NOT_SLIPPERY,               // 0x0015 // Non-slippery, climbable
     SURFACE_TTM_VINES,                  // 0x0016 // TTM vines, has no action defined
-    SURFACE_0017,                       // 0x0017 // Unused
+    SURFACE_STONE,                      // 0x0017 // Stone in any terrain
     SURFACE_0018,                       // 0x0018 // Unused
     SURFACE_0019,                       // 0x0019 // Unused
     SURFACE_MGR_MUSIC,                  // 0x001A // Plays the Merry go round music, see handle_merry_go_round_music in bbh_merry_go_round.inc.c for more details
@@ -244,7 +244,7 @@ enum SurfaceTypes {
 
 enum SurfaceClass {
     SURFACE_CLASS_DEFAULT,
-    SURFACE_CLASS_VERY_SLIPPERY,
+    SURFACE_CLASS_VERY_SLIPPERY = 0x0013,
     SURFACE_CLASS_SLIPPERY,
     SURFACE_CLASS_NOT_SLIPPERY
 };

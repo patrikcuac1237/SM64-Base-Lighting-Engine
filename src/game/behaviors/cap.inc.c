@@ -38,6 +38,7 @@ void cap_check_quicksand(void) {
     switch (sObjFloor->type) {
         case SURFACE_DEATH_PLANE:
             o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+            save_file_clear_flags(ACTIVE_FLAG_DEACTIVATED);
             break;
 
         case SURFACE_SHALLOW_QUICKSAND:
@@ -202,8 +203,8 @@ void bhv_normal_cap_init(void) {
 }
 
 void normal_cap_set_save_flags(void) {
-    save_file_clear_flags(SAVE_FLAG_CAP_ON_GROUND);
 
+    save_file_set_flags(SAVE_FLAG_CAP_ON_GROUND);
     switch (gCurrCourseNum) {
         case COURSE_SSL:
             save_file_set_flags(SAVE_FLAG_CAP_ON_KLEPTO);
@@ -216,9 +217,8 @@ void normal_cap_set_save_flags(void) {
         case COURSE_TTM:
             save_file_set_flags(SAVE_FLAG_CAP_ON_UKIKI);
             break;
-
         default:
-            save_file_set_flags(SAVE_FLAG_CAP_ON_KLEPTO);
+            save_file_set_flags(SAVE_FLAG_CAP_ON_GROUND);
             break;
     }
 }
@@ -272,5 +272,5 @@ void bhv_vanish_cap_init(void) {
     o->oGravity = 1.2f;
     o->oFriction = 0.999f;
     o->oBuoyancy = 0.9f;
-    o->oOpacity = 150;
+    o->oOpacity = 50;
 }

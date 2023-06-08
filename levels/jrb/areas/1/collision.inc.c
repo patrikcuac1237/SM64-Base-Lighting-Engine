@@ -815,7 +815,7 @@ const Collision jrb_seg7_area_1_collision[] = {
     COL_TRI(237, 328, 238),
     COL_TRI(239, 329, 326),
     COL_TRI(239, 327, 329),
-    COL_TRI_INIT(SURFACE_NOT_SLIPPERY, 45),
+    COL_TRI_INIT(SURFACE_SAND, 45),
     COL_TRI(17, 19, 18),
     COL_TRI(8, 9, 10),
     COL_TRI(10, 11, 12),

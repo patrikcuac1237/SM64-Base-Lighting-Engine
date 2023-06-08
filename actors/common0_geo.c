@@ -27,3 +27,8 @@
 #include "metal_box/geo.inc.c"
 #include "exclamation_box_outline/geo.inc.c"
 #include "koopa_shell/geo.inc.c"
+
+#include "black_bobomb/geo.inc.c"
+#include "bobomb_buddy/geo.inc.c"
+#include "breakable_box_no_shadow/geo.inc.c"
+#include "floating_platform/geo.inc.c"

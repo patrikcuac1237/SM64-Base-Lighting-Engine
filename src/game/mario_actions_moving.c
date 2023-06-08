@@ -1615,17 +1615,23 @@ s32 common_ground_knockback_action(struct MarioState *m, s32 animation, s32 chec
 }
 
 s32 act_hard_backward_ground_kb(struct MarioState *m) {
-    s32 animFrame =
-        common_ground_knockback_action(m, MARIO_ANIM_FALL_OVER_BACKWARDS, 43, TRUE, m->actionArg);
-    if (animFrame == 43 && m->health < 0x100) {
+    s32 val04 =
+        common_ground_knockback_action(m, MARIO_ANIM_FALL_OVER_BACKWARDS, 0x2B, TRUE, m->actionArg);
+    if (val04 == 0x2B && m->health < 0x100) {
         set_mario_action(m, ACT_DEATH_ON_BACK, 0);
     }
 
-    if (animFrame == 54 && m->prevAction == ACT_SPECIAL_DEATH_EXIT) {
-        play_sound(SOUND_MARIO_MAMA_MIA, m->marioObj->header.gfx.cameraToObject);
+    if (val04 == 0x44) {
+        play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING);
     }
 
-    if (animFrame == 69) {
+#ifndef VERSION_JP
+    if (val04 == 0x36 && m->prevAction == ACT_SPECIAL_DEATH_EXIT) {
+        play_sound(SOUND_MARIO_MAMA_MIA, m->marioObj->header.gfx.cameraToObject);
+    }
+#endif
+
+    if (val04 == 0x45) {
         play_mario_landing_sound_once(m, SOUND_ACTION_TERRAIN_LANDING);
     }
 
@@ -1633,22 +1639,30 @@ s32 act_hard_backward_ground_kb(struct MarioState *m) {
 }
 
 s32 act_hard_forward_ground_kb(struct MarioState *m) {
-    s32 animFrame =
-        common_ground_knockback_action(m, MARIO_ANIM_LAND_ON_STOMACH, 21, TRUE, m->actionArg);
-    if (animFrame == 23 && m->health < 0x100) {
+    s32 val04 = common_ground_knockback_action(m, MARIO_ANIM_LAND_ON_STOMACH, 0x15, TRUE, m->actionArg);
+    if (val04 == 0x17 && m->health < 0x100) {
         set_mario_action(m, ACT_DEATH_ON_STOMACH, 0);
+    }
+
+    if (val04 == 0x48) {
+        play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING);
     }
 
     return FALSE;
 }
-
 s32 act_backward_ground_kb(struct MarioState *m) {
-    common_ground_knockback_action(m, MARIO_ANIM_BACKWARD_KB, 22, TRUE, m->actionArg);
+    s32 val04 = common_ground_knockback_action(m, MARIO_ANIM_BACKWARD_KB, 0x16, TRUE, m->actionArg);
+    if (val04 == 0x14) {
+        play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING);
+    }
     return FALSE;
 }
 
 s32 act_forward_ground_kb(struct MarioState *m) {
-    common_ground_knockback_action(m, MARIO_ANIM_FORWARD_KB, 20, TRUE, m->actionArg);
+    s32 val04 = common_ground_knockback_action(m, MARIO_ANIM_FORWARD_KB, 0x14, TRUE, m->actionArg);
+    if (val04 == 0x14) {
+        play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING);
+    }
     return FALSE;
 }
 

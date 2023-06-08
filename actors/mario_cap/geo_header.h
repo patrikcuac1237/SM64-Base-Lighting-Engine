@@ -1,0 +1,16 @@
+extern const GeoLayout mario_cap_001_switch_opt1[];
+extern const GeoLayout marios_cap_geo[];
+extern u8 mario_cap_marios_cap_logo_rgba16_ci8[];
+extern u8 mario_cap_marios_cap_logo_rgba16_ci8_pal_rgba16[];
+extern u8 mario_cap_marios_hair_ci4[];
+extern u8 mario_cap_marios_hair_ci4_pal_rgba16[];
+extern Vtx mario_cap_000_displaylist_mesh_layer_1_vtx_0[54];
+extern Gfx mario_cap_000_displaylist_mesh_layer_1_tri_0[];
+extern Vtx mario_cap_000_displaylist_mesh_layer_1_vtx_1[10];
+extern Gfx mario_cap_000_displaylist_mesh_layer_1_tri_1[];
+extern Gfx mat_mario_cap_f3dlite_material_001[];
+extern Gfx mat_revert_mario_cap_f3dlite_material_001[];
+extern Gfx mat_mario_cap_f3dlite_material[];
+extern Gfx mat_revert_mario_cap_f3dlite_material[];
+extern Gfx mario_cap_000_displaylist_mesh_layer_1[];
+extern Gfx mario_cap_material_revert_render_settings[];

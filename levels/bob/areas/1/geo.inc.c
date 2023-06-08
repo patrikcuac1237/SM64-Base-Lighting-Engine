@@ -23,6 +23,8 @@ const GeoLayout bob_geo_000488[] = {
                GEO_DISPLAY_LIST(LAYER_OPAQUE, bob_seg7_dl_0700E338),
                GEO_RENDER_OBJ(),
                GEO_ASM(ENVFX_MODE_NONE, geo_envfx_main),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_DIRECTIONAL, 255, 255, 255, 0, 90, 45),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 125, 125, 125, 1, 0, 8),
             GEO_CLOSE_NODE(),
          GEO_CLOSE_NODE(),
       GEO_CLOSE_NODE(),

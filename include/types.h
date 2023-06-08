@@ -30,6 +30,7 @@ struct Config {
     s16 widescreen;
 #endif
     u8 tvType;
+    u8 cheats;
 };
 
 struct Controller {
@@ -97,6 +98,12 @@ typedef void (*ObjActionFunc)(void);
 typedef s8  ObjAction8;
 typedef s32 ObjAction32;
 typedef s16 ColFlags;
+
+// -- Angle --
+typedef s16 Angle;
+typedef u16 UAngle;
+typedef s32 Angle32;
+typedef Angle Vec3a[3];
 
 // -- Collision --
 typedef ROOM_DATA_TYPE RoomData;
@@ -434,6 +441,7 @@ struct MarioState {
     /*0x3C*/ Vec3f pos;
     /*0x48*/ Vec3f vel;
     /*0x54*/ f32 forwardVel;
+    /*0x055*/f32 FVelocity;
     /*0x58*/ f32 slideVelX;
     /*0x5C*/ f32 slideVelZ;
     /*0x60*/ struct Surface *wall;
@@ -483,10 +491,10 @@ struct MarioState {
            Vec3f prevPos;
              f32 lateralSpeed;
              f32 moveSpeed;
-             s16 movePitch;
-             s16 moveYaw;
-             s16 ceilYaw;
-             s16 wallYaw;
+           Angle movePitch;
+           Angle moveYaw;
+           Angle ceilYaw;
+           Angle wallYaw;
     // -- HackerSM64 MarioState fields end --
 };
 

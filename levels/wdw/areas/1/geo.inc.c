@@ -24,6 +24,8 @@ const GeoLayout wdw_geo_000658[] = {
                GEO_ASM(WDW_MOVTEX_AREA1_WATER, geo_movtex_draw_water_regions),
                GEO_RENDER_OBJ(),
                GEO_ASM(ENVFX_MODE_NONE,        geo_envfx_main),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 100, 100, 127, 0, 0, 0),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_DIRECTIONAL, 200, 200, 255, 0, 1, 0),
             GEO_CLOSE_NODE(),
          GEO_CLOSE_NODE(),
       GEO_CLOSE_NODE(),

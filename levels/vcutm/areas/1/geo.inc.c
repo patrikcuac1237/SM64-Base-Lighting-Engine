@@ -19,6 +19,7 @@ const GeoLayout vcutm_geo_000208[] = {
                GEO_DISPLAY_LIST(LAYER_OPAQUE, vcutm_seg7_dl_07008E10),
                GEO_DISPLAY_LIST(LAYER_OPAQUE, vcutm_seg7_dl_070093E8),
                GEO_DISPLAY_LIST(LAYER_ALPHA,  vcutm_seg7_dl_070080D0),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 40, 40, 40, 0, 0, 0),
                GEO_RENDER_OBJ(),
                GEO_ASM(ENVFX_MODE_NONE, geo_envfx_main),
             GEO_CLOSE_NODE(),

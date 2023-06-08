@@ -5,6 +5,8 @@ const GeoLayout castle_geo_001958[] = {
       GEO_DISPLAY_LIST(LAYER_OPAQUE, inside_castle_seg7_dl_0705E088),
       GEO_DISPLAY_LIST(LAYER_ALPHA, inside_castle_seg7_dl_0705E2A0),
       GEO_DISPLAY_LIST(LAYER_TRANSPARENT, inside_castle_seg7_dl_0705E450),
+      GEO_SCENE_LIGHT(LIGHT_TYPE_DIRECTIONAL, 0, 0, 0, 0, 0, 0),
+      GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 50, 50, 50, 1, 0, 800),
    GEO_CLOSE_NODE(),
    GEO_RETURN(),
 };
@@ -20,6 +22,8 @@ const GeoLayout castle_geo_001980[] = {
       GEO_ASM( PAINTING_ID(5, 1), geo_painting_draw),
       GEO_ASM(   0, geo_movtex_pause_control),
       GEO_ASM(INSIDE_CASTLE_MOVTEX_GREEN_ROOM_WATER, geo_movtex_draw_water_regions),
+      GEO_SCENE_LIGHT(LIGHT_TYPE_DIRECTIONAL, 0, 0, 0, 0, 0, 0),
+      GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 50, 50, 50, 1, 0, 800),
    GEO_CLOSE_NODE(),
    GEO_RETURN(),
 };
@@ -32,6 +36,8 @@ const GeoLayout castle_geo_0019C8[] = {
       GEO_DISPLAY_LIST(LAYER_ALPHA, inside_castle_seg7_dl_07064D58),
       GEO_ASM(0, geo_painting_update),
       GEO_ASM(PAINTING_ID(6, 1), geo_painting_draw),
+      GEO_SCENE_LIGHT(LIGHT_TYPE_DIRECTIONAL, 0, 0, 0, 0, 0, 0),
+      GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 50, 50, 50, 1, 0, 800),
    GEO_CLOSE_NODE(),
    GEO_RETURN(),
 };
@@ -45,6 +51,8 @@ const GeoLayout castle_geo_0019F8[] = {
       GEO_DISPLAY_LIST(LAYER_ALPHA, inside_castle_seg7_dl_07066FA0),
       GEO_ASM(   0, geo_movtex_pause_control),
       GEO_ASM(INSIDE_CASTLE_MOVTEX_MOAT_WATER, geo_movtex_draw_water_regions),
+      GEO_SCENE_LIGHT(LIGHT_TYPE_DIRECTIONAL, 0, 0, 0, 0, 0, 0),
+      GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 50, 50, 50, 1, 0, 800),
    GEO_CLOSE_NODE(),
    GEO_RETURN(),
 };
@@ -54,6 +62,8 @@ const GeoLayout castle_geo_001A30[] = {
    GEO_NODE_START(),
    GEO_OPEN_NODE(),
       GEO_DISPLAY_LIST(LAYER_OPAQUE, inside_castle_seg7_dl_07068850),
+      GEO_SCENE_LIGHT(LIGHT_TYPE_DIRECTIONAL, 0, 0, 0, 0, 0, 0),
+      GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 50, 50, 50, 1, 0, 800),
       GEO_ASM(  0, geo_painting_update),
       GEO_ASM(PAINTING_ID(7, 1), geo_painting_draw),
    GEO_CLOSE_NODE(),
@@ -74,6 +84,8 @@ const GeoLayout castle_geo_001A58[] = {
       GEO_ASM( PAINTING_ID(5, 1), geo_painting_draw),
       GEO_ASM(   0, geo_movtex_pause_control),
       GEO_ASM(INSIDE_CASTLE_MOVTEX_GREEN_ROOM_WATER,  geo_movtex_draw_water_regions),
+      GEO_SCENE_LIGHT(LIGHT_TYPE_DIRECTIONAL, 0, 0, 0, 0, 0, 0),
+      GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 50, 50, 50, 1, 0, 800),
    GEO_CLOSE_NODE(),
    GEO_RETURN(),
 };
@@ -88,6 +100,8 @@ const GeoLayout castle_geo_001AB8[] = {
       GEO_DISPLAY_LIST(LAYER_OPAQUE, inside_castle_seg7_dl_07068850),
       GEO_ASM(  0, geo_painting_update),
       GEO_ASM(PAINTING_ID(7, 1), geo_painting_draw),
+      GEO_SCENE_LIGHT(LIGHT_TYPE_DIRECTIONAL, 0, 0, 0, 0, 0, 0),
+      GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 50, 50, 50, 1, 0, 800),
    GEO_CLOSE_NODE(),
    GEO_RETURN(),
 };
@@ -104,6 +118,8 @@ const GeoLayout castle_geo_001AF8[] = {
       GEO_DISPLAY_LIST(LAYER_ALPHA, inside_castle_seg7_dl_07066FA0),
       GEO_ASM(   0, geo_movtex_pause_control),
       GEO_ASM(INSIDE_CASTLE_MOVTEX_MOAT_WATER, geo_movtex_draw_water_regions),
+      GEO_SCENE_LIGHT(LIGHT_TYPE_DIRECTIONAL, 0, 0, 0, 0, 0, 0),
+      GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 50, 50, 50, 1, 0, 800),
    GEO_CLOSE_NODE(),
    GEO_RETURN(),
 };
@@ -123,6 +139,8 @@ const GeoLayout castle_geo_001B48[] = {
       GEO_ASM(   0, geo_movtex_pause_control),
       GEO_ASM(INSIDE_CASTLE_MOVTEX_GREEN_ROOM_WATER, geo_movtex_draw_water_regions),
       GEO_ASM(INSIDE_CASTLE_MOVTEX_MOAT_WATER, geo_movtex_draw_water_regions),
+      GEO_SCENE_LIGHT(LIGHT_TYPE_DIRECTIONAL, 0, 0, 0, 0, 0, 0),
+      GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 50, 50, 50, 1, 0, 800),
    GEO_CLOSE_NODE(),
    GEO_RETURN(),
 };
@@ -141,6 +159,7 @@ const GeoLayout castle_geo_001BB0[] = {
       GEO_ASM( PAINTING_ID(6, 1), geo_painting_draw),
       GEO_ASM(   0, geo_movtex_pause_control),
       GEO_ASM(INSIDE_CASTLE_MOVTEX_GREEN_ROOM_WATER,  geo_movtex_draw_water_regions),
+      GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 100, 100, 100, 1, 0, 800),
    GEO_CLOSE_NODE(),
    GEO_RETURN(),
 };
@@ -174,6 +193,8 @@ const GeoLayout castle_geo_001C10[] = {
                   GEO_BRANCH(1, castle_geo_001AF8), // 0x0E001AF8
                   GEO_BRANCH(1, castle_geo_001B48), // 0x0E001B48
                   GEO_BRANCH(1, castle_geo_001BB0), // 0x0E001BB0
+                  GEO_SCENE_LIGHT(LIGHT_TYPE_DIRECTIONAL, 0, 0, 0, 0, 0, 0),
+                  GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 50, 50, 50, 1, 0, 800),
                GEO_CLOSE_NODE(),
                GEO_RENDER_OBJ(),
                GEO_ASM(ENVFX_MODE_NONE, geo_envfx_main),

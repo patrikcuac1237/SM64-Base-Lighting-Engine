@@ -21,7 +21,7 @@ const Collision poundable_pole_collision_wooden_post[] = {
     COL_VERTEX(-39, -19, 97),
     COL_VERTEX(40, -19, 97),
 
-    COL_TRI_INIT(SURFACE_NO_CAM_COLLISION, 22),
+    COL_TRI_INIT(SURFACE_WOOD, 22),
     COL_TRI(8, 6, 12),
     COL_TRI(0, 1, 2),
     COL_TRI(3, 1, 0),

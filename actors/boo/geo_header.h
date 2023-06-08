@@ -1,0 +1,15 @@
+extern const GeoLayout boo_geo[];
+extern u8 boo_boo_mouth_rgba16_ci8[];
+extern u8 boo_boo_mouth_rgba16_ci8_pal_rgba16[];
+extern u8 boo_boo_eyes_rgba16_ci8[];
+extern u8 boo_boo_eyes_rgba16_ci8_pal_rgba16[];
+extern Vtx boo_000_displaylist_mesh_layer_1_vtx_0[6];
+extern Gfx boo_000_displaylist_mesh_layer_1_tri_0[];
+extern Vtx boo_000_displaylist_mesh_layer_1_vtx_1[62];
+extern Gfx boo_000_displaylist_mesh_layer_1_tri_1[];
+extern Gfx mat_boo_mouth[];
+extern Gfx mat_revert_boo_mouth[];
+extern Gfx mat_boo_eyes[];
+extern Gfx mat_revert_boo_eyes[];
+extern Gfx boo_000_displaylist_mesh_layer_1[];
+extern Gfx boo_material_revert_render_settings[];

@@ -10,7 +10,7 @@ const Collision bitfs_seg7_collision_07015928[] = {
     COL_VERTEX(-511, 26, 307),
     COL_VERTEX(-511, 26, -306),
     COL_VERTEX(-511, 179, -306),
-    COL_TRI_INIT(SURFACE_DEFAULT, 12),
+    COL_TRI_INIT(SURFACE_WOOD, 12),
     COL_TRI(0, 1, 2),
     COL_TRI(1, 3, 2),
     COL_TRI(1, 4, 3),

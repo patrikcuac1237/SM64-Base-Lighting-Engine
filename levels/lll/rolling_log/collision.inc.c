@@ -18,7 +18,7 @@ const Collision lll_seg7_collision_pitoune[] = {
     COL_VERTEX(-1023, 106, -255),
     COL_VERTEX(-1023, -105, -255),
     COL_VERTEX(-1023, -255, -105),
-    COL_TRI_INIT(SURFACE_NOT_SLIPPERY, 28),
+    COL_TRI_INIT(SURFACE_CLIMBABLE_WOOD, 28),
     COL_TRI(2, 9, 0),
     COL_TRI(0, 1, 2),
     COL_TRI(0, 3, 1),

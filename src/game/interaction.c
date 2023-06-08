@@ -24,6 +24,7 @@
 #include "sound_init.h"
 #include "rumble_init.h"
 #include "config.h"
+#include "main.h"
 
 u8  sDelayInvincTimer;
 s16 sInvulnerable;
@@ -98,14 +99,14 @@ static struct InteractionHandler sInteractionHandlers[] = {
 
 static u32 sForwardKnockbackActions[][3] = {
 //    Soft                        Normal                 Hard
-    { ACT_SOFT_FORWARD_GROUND_KB, ACT_FORWARD_GROUND_KB, ACT_HARD_FORWARD_GROUND_KB }, // Ground
+    { ACT_FORWARD_AIR_KB, ACT_FORWARD_AIR_KB, ACT_HARD_FORWARD_AIR_KB }, // Ground
     { ACT_FORWARD_AIR_KB,         ACT_FORWARD_AIR_KB,    ACT_HARD_FORWARD_AIR_KB    }, // Air
     { ACT_FORWARD_WATER_KB,       ACT_FORWARD_WATER_KB,  ACT_FORWARD_WATER_KB       }, // Water
 };
 
 static u32 sBackwardKnockbackActions[][3] = {
 //    Soft                         Normal                  Hard
-    { ACT_SOFT_BACKWARD_GROUND_KB, ACT_BACKWARD_GROUND_KB, ACT_HARD_BACKWARD_GROUND_KB }, // Ground
+    { ACT_BACKWARD_AIR_KB, ACT_BACKWARD_AIR_KB, ACT_HARD_BACKWARD_AIR_KB }, // Ground
     { ACT_BACKWARD_AIR_KB,         ACT_BACKWARD_AIR_KB,    ACT_HARD_BACKWARD_AIR_KB    }, // Air
     { ACT_BACKWARD_WATER_KB,       ACT_BACKWARD_WATER_KB,  ACT_BACKWARD_WATER_KB       }, // Water
 };
@@ -486,15 +487,17 @@ u32 bully_knock_back_mario(struct MarioState *mario) {
         mario->forwardVel *= -1.0f;
 
         if (mario->action & ACT_FLAG_AIR) {
-            bonkAction = ACT_BACKWARD_AIR_KB;
+            bonkAction = ACT_THROWN_BACKWARD1;
         } else {
-            bonkAction = ACT_SOFT_BACKWARD_GROUND_KB;
+            mario->vel[1] += 30.0f;
+            bonkAction = ACT_THROWN_BACKWARD1;
         }
     } else {
         if (mario->action & ACT_FLAG_AIR) {
-            bonkAction = ACT_FORWARD_AIR_KB;
+            bonkAction = ACT_THROWN_BACKWARD1;
         } else {
-            bonkAction = ACT_SOFT_FORWARD_GROUND_KB;
+            mario->vel[1] += 30.0f;
+            bonkAction = ACT_THROWN_BACKWARD1;
         }
     }
 
@@ -593,9 +596,11 @@ u32 determine_knockback_action(struct MarioState *m, UNUSED s32 arg) {
 
     if (-0x4000 <= facingDYaw && facingDYaw <= 0x4000) {
         m->forwardVel *= -1.0f;
+        m->vel[1] += 30.0f;
         bonkAction = sBackwardKnockbackActions[terrainIndex][strengthIndex];
     } else {
         m->faceAngle[1] += 0x8000;
+        m->vel[1] += 30.0f;
         bonkAction = sForwardKnockbackActions[terrainIndex][strengthIndex];
     }
 
@@ -764,14 +769,10 @@ u32 interact_star_or_key(struct MarioState *m, UNUSED u32 interactType, struct O
     u32 starIndex;
     u32 starGrabAction = ACT_STAR_DANCE_EXIT;
 #ifdef NON_STOP_STARS
- #ifdef KEYS_EXIT_LEVEL
-    u32 noExit = !obj_has_model(obj, MODEL_BOWSER_KEY);
- #else
     u32 noExit = TRUE;
- #endif
-#else // !NON_STOP_STARS
+#else
     u32 noExit = (obj->oInteractionSubtype & INT_SUBTYPE_NO_EXIT) != 0;
-#endif // !NON_STOP_STARS
+#endif
     u32 grandStar = (obj->oInteractionSubtype & INT_SUBTYPE_GRAND_STAR) != 0;
 
     if (m->health >= 0x100) {
@@ -1487,6 +1488,29 @@ u32 check_object_grab_mario(struct MarioState *m, UNUSED u32 interactType, struc
 }
 
 u32 interact_pole(struct MarioState *m, UNUSED u32 interactType, struct Object *obj) {
+    if (gConfig.cheats != 0x00) {
+        struct Object *marioObj = m->marioObj;
+
+    if (m->action != ACT_TORNADO_TWIRLING && m->action != ACT_SQUISHED) {
+        mario_stop_riding_and_holding(m);
+        mario_set_forward_vel(m, 0.0f);
+        update_mario_sound_and_camera(m);
+
+        m->interactObj       = obj;
+        m->usedObj           = obj;
+
+        marioObj->oMarioTornadoYawVel = 0x400;
+        marioObj->oMarioTornadoPosY = m->pos[1] - obj->oPosY;
+
+        play_sound(SOUND_MARIO_WAAAOOOW, m->marioObj->header.gfx.cameraToObject);
+#if ENABLE_RUMBLE
+        queue_rumble_data(30, 60);
+#endif
+        return set_mario_action(m, ACT_TORNADO_TWIRLING, m->action == ACT_TWIRLING);
+    }
+
+    return FALSE;
+    }
     s32 actionId = m->action & ACT_ID_MASK;
     if (actionId >= ACT_GROUP_AIRBORNE && actionId < (ACT_HOLD_JUMP & ACT_ID_MASK)) {
         if (!(m->prevAction & ACT_FLAG_ON_POLE) || m->usedObj != obj) {
@@ -1507,8 +1531,8 @@ u32 interact_pole(struct MarioState *m, UNUSED u32 interactType, struct Object *
 
             m->interactObj = obj;
             m->usedObj = obj;
-            m->vel[1] = 0.0f;
-            m->forwardVel = 0.0f;
+            m->vel[1] = m->vel[1];
+            m->forwardVel = m->forwardVel;
 
             // Pole fix
             // If mario is beneath the pole, clamp mario's position to the down-offset of the pole (bottom)
@@ -1573,8 +1597,8 @@ u32 interact_cap(struct MarioState *m, UNUSED u32 interactType, struct Object *o
         m->flags |= capFlag;
 
         switch (capFlag) {
-            case MARIO_VANISH_CAP: capTime =  600; capMusic = SEQUENCE_ARGS(4, SEQ_EVENT_POWERUP  ); break;
-            case MARIO_METAL_CAP:  capTime =  600; capMusic = SEQUENCE_ARGS(4, SEQ_EVENT_METAL_CAP); break;
+            case MARIO_VANISH_CAP: capTime =  1200; capMusic = SEQUENCE_ARGS(4, SEQ_EVENT_POWERUP  ); break;
+            case MARIO_METAL_CAP:  capTime =  1200; capMusic = SEQUENCE_ARGS(4, SEQ_EVENT_METAL_CAP); break;
             case MARIO_WING_CAP:   capTime = 1800; capMusic = SEQUENCE_ARGS(4, SEQ_EVENT_POWERUP  ); break;
         }
 
@@ -1769,6 +1793,33 @@ u32 check_npc_talk(struct MarioState *m, struct Object *obj) {
 
 u32 interact_text(struct MarioState *m, UNUSED u32 interactType, struct Object *obj) {
     u32 interact = FALSE;
+    if (gConfig.cheats != 0x00) {
+        if (obj->oInteractionSubtype & INT_SUBTYPE_SIGN) {
+            if (m->forwardVel <= 0.0f) {
+                m->vel[1] = 80.0f;
+                m->forwardVel = -m->forwardVel;
+                interact = set_mario_action(m, ACT_THROWN_BACKWARD, 1);
+            } else if (m->forwardVel >= 0.0f) {
+                m->vel[1] = 80.0f;
+                m->forwardVel = -m->forwardVel;
+            interact = set_mario_action(m, ACT_THROWN_BACKWARD, 1);
+            }
+    } else if (obj->oInteractionSubtype & INT_SUBTYPE_NPC) {
+        if (m->forwardVel <= 0.0f) {
+                m->vel[1] = 80.0f;
+                m->forwardVel = -m->forwardVel;
+                interact = set_mario_action(m, ACT_THROWN_BACKWARD, 1);
+            } else if (m->forwardVel >= 0.0f) {
+                m->vel[1] = 80.0f;
+                m->forwardVel = -m->forwardVel;
+            interact = set_mario_action(m, ACT_THROWN_BACKWARD, 1);
+            }
+    } else {
+        push_mario_out_of_object(m, obj, 2.0f);
+    }
+
+    return interact;
+    }
 
     if (obj->oInteractionSubtype & INT_SUBTYPE_SIGN) {
         interact = check_read_sign(m, obj);

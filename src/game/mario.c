@@ -394,6 +394,7 @@ s32 mario_get_floor_class(struct MarioState *m) {
             case SURFACE_NOT_SLIPPERY:
             case SURFACE_HARD_NOT_SLIPPERY:
             case SURFACE_SWITCH:
+            case SURFACE_CLIMBABLE_WOOD:
                 floorClass = SURFACE_CLASS_NOT_SLIPPERY;
                 break;
 
@@ -411,6 +412,7 @@ s32 mario_get_floor_class(struct MarioState *m) {
             case SURFACE_NOISE_VERY_SLIPPERY_74:
             case SURFACE_NOISE_VERY_SLIPPERY:
             case SURFACE_NO_CAM_COL_VERY_SLIPPERY:
+            case SURFACE_WOOD_SLIPPERY:
                 floorClass = SURFACE_CLASS_VERY_SLIPPERY;
                 break;
         }
@@ -425,23 +427,30 @@ s32 mario_get_floor_class(struct MarioState *m) {
 }
 
 // clang-format off
-s8 sTerrainSounds[7][6] = {
+s8 sTerrainSounds[10][10] = {
     // default,              hard,                 slippery,
     // very slippery,        noisy default,        noisy slippery
     { SOUND_TERRAIN_DEFAULT, SOUND_TERRAIN_STONE,  SOUND_TERRAIN_GRASS,
-      SOUND_TERRAIN_GRASS,   SOUND_TERRAIN_GRASS,  SOUND_TERRAIN_DEFAULT }, // TERRAIN_GRASS
+      SOUND_TERRAIN_GRASS,   SOUND_TERRAIN_GRASS,  SOUND_TERRAIN_GRASS,  
+      SOUND_TERRAIN_SPOOKY, SOUND_TERRAIN_DEFAULT, SOUND_TERRAIN_STONE,  SOUND_TERRAIN_SAND }, // TERRAIN_GRASS
     { SOUND_TERRAIN_STONE,   SOUND_TERRAIN_STONE,  SOUND_TERRAIN_STONE,
-      SOUND_TERRAIN_STONE,   SOUND_TERRAIN_GRASS,  SOUND_TERRAIN_GRASS }, // TERRAIN_STONE
+      SOUND_TERRAIN_STONE,   SOUND_TERRAIN_GRASS,  SOUND_TERRAIN_GRASS,  
+      SOUND_TERRAIN_SPOOKY, SOUND_TERRAIN_DEFAULT, SOUND_TERRAIN_STONE,  SOUND_TERRAIN_SAND }, // TERRAIN_STONE
     { SOUND_TERRAIN_SNOW,    SOUND_TERRAIN_ICE,    SOUND_TERRAIN_SNOW,
-      SOUND_TERRAIN_ICE,     SOUND_TERRAIN_STONE,  SOUND_TERRAIN_STONE }, // TERRAIN_SNOW
+      SOUND_TERRAIN_ICE,     SOUND_TERRAIN_STONE,  SOUND_TERRAIN_STONE,  
+      SOUND_TERRAIN_SPOOKY, SOUND_TERRAIN_DEFAULT, SOUND_TERRAIN_STONE,  SOUND_TERRAIN_SAND }, // TERRAIN_SNOW
     { SOUND_TERRAIN_SAND,    SOUND_TERRAIN_STONE,  SOUND_TERRAIN_SAND,
-      SOUND_TERRAIN_SAND,    SOUND_TERRAIN_STONE,  SOUND_TERRAIN_STONE }, // TERRAIN_SAND
+      SOUND_TERRAIN_SAND,    SOUND_TERRAIN_STONE,  SOUND_TERRAIN_STONE,  
+      SOUND_TERRAIN_SPOOKY, SOUND_TERRAIN_DEFAULT, SOUND_TERRAIN_STONE,  SOUND_TERRAIN_SAND }, // TERRAIN_SAND
     { SOUND_TERRAIN_SPOOKY,  SOUND_TERRAIN_SPOOKY, SOUND_TERRAIN_SPOOKY,
-      SOUND_TERRAIN_SPOOKY,  SOUND_TERRAIN_STONE,  SOUND_TERRAIN_STONE }, // TERRAIN_SPOOKY
+      SOUND_TERRAIN_SPOOKY,  SOUND_TERRAIN_STONE,  SOUND_TERRAIN_STONE,  
+      SOUND_TERRAIN_SPOOKY, SOUND_TERRAIN_DEFAULT, SOUND_TERRAIN_STONE,  SOUND_TERRAIN_SAND }, // TERRAIN_SPOOKY
     { SOUND_TERRAIN_DEFAULT, SOUND_TERRAIN_STONE,  SOUND_TERRAIN_GRASS,
-      SOUND_TERRAIN_ICE,     SOUND_TERRAIN_STONE,  SOUND_TERRAIN_ICE }, // TERRAIN_WATER
+      SOUND_TERRAIN_ICE,     SOUND_TERRAIN_STONE,  SOUND_TERRAIN_ICE,  
+      SOUND_TERRAIN_SPOOKY, SOUND_TERRAIN_DEFAULT, SOUND_TERRAIN_STONE,  SOUND_TERRAIN_SAND }, // TERRAIN_WATER
     { SOUND_TERRAIN_STONE,   SOUND_TERRAIN_STONE,  SOUND_TERRAIN_STONE,
-      SOUND_TERRAIN_STONE,   SOUND_TERRAIN_ICE,    SOUND_TERRAIN_ICE }, // TERRAIN_SLIDE
+      SOUND_TERRAIN_STONE,   SOUND_TERRAIN_ICE,    SOUND_TERRAIN_ICE,  
+      SOUND_TERRAIN_SPOOKY, SOUND_TERRAIN_DEFAULT, SOUND_TERRAIN_STONE,  SOUND_TERRAIN_SAND }, // TERRAIN_SLIDE
 };
 // clang-format on
 
@@ -472,7 +481,6 @@ u32 mario_get_terrain_sound_addend(struct MarioState *m) {
                 case SURFACE_NOT_SLIPPERY:
                 case SURFACE_HARD:
                 case SURFACE_HARD_NOT_SLIPPERY:
-                case SURFACE_SWITCH:
                     floorSoundType = 1;
                     break;
 
@@ -498,6 +506,20 @@ u32 mario_get_terrain_sound_addend(struct MarioState *m) {
 
                 case SURFACE_NOISE_SLIPPERY:
                     floorSoundType = 5;
+                    break;
+                case SURFACE_WOOD:
+                case SURFACE_WOOD_SLIPPERY:
+                case SURFACE_CLIMBABLE_WOOD:
+                    floorSoundType = 6;
+                    break;
+                case SURFACE_METAL:
+                    floorSoundType = 7;
+                    break;
+                case SURFACE_SWITCH:
+                    floorSoundType = 8;
+                    break;
+                case SURFACE_SAND:
+                    floorSoundType = 9;
                     break;
             }
 
@@ -536,10 +558,10 @@ u32 mario_floor_is_slippery(struct MarioState *m) {
     }
 
     switch (mario_get_floor_class(m)) {
-        case SURFACE_CLASS_VERY_SLIPPERY: normY = COS10; break;
-        case SURFACE_CLASS_SLIPPERY:      normY = COS20; break;
-        default:                          normY = COS38; break;
-        case SURFACE_CLASS_NOT_SLIPPERY:  normY = 0.0f;  break;
+        case SURFACE_VERY_SLIPPERY: normY = COS10; break;
+        case SURFACE_SLIPPERY:      normY = COS20; break;
+        default:                    normY = COS38; break;
+        case SURFACE_NOT_SLIPPERY:  normY = 0.0f;  break;
     }
 
     return m->floor->normal.y <= normY;
@@ -557,10 +579,10 @@ s32 mario_floor_is_slope(struct MarioState *m) {
     }
 
     switch (mario_get_floor_class(m)) {
-        case SURFACE_CLASS_VERY_SLIPPERY: normY = COS5;  break;
-        case SURFACE_CLASS_SLIPPERY:      normY = COS10; break;
-        default:                          normY = COS15; break;
-        case SURFACE_CLASS_NOT_SLIPPERY:  normY = COS20; break;
+        case SURFACE_VERY_SLIPPERY: normY = COS5;  break;
+        case SURFACE_SLIPPERY:      normY = COS10; break;
+        default:                    normY = COS15; break;
+        case SURFACE_NOT_SLIPPERY:  normY = COS20; break;
     }
 
     return m->floor->normal.y <= normY;
@@ -584,10 +606,10 @@ s32 mario_floor_is_steep(struct MarioState *m) {
     // This does not matter in vanilla game practice.
     if (!mario_facing_downhill(m, FALSE)) {
         switch (mario_get_floor_class(m)) {
-            case SURFACE_CLASS_VERY_SLIPPERY: normY = COS15; break;
-            case SURFACE_CLASS_SLIPPERY:      normY = COS20; break;
-            default:                          normY = COS30; break;
-            case SURFACE_CLASS_NOT_SLIPPERY:  normY = COS30; break;
+            case SURFACE_VERY_SLIPPERY: normY = COS15; break;
+            case SURFACE_SLIPPERY:      normY = COS20; break;
+            default:                    normY = COS30; break;
+            case SURFACE_NOT_SLIPPERY:  normY = COS30; break;
         }
 
         return m->floor->normal.y <= normY;
@@ -754,12 +776,12 @@ u32 set_mario_action_airborne(struct MarioState *m, u32 action, u32 actionArg) {
             break;
 
         case ACT_TRIPLE_JUMP:
-            set_mario_y_vel_based_on_fspeed(m, 69.0f, 0.0f);
+            set_mario_y_vel_based_on_fspeed(m, 69.0f, 0.25f);
             m->forwardVel *= 0.8f;
             break;
 
         case ACT_FLYING_TRIPLE_JUMP:
-            set_mario_y_vel_based_on_fspeed(m, 82.0f, 0.0f);
+            set_mario_y_vel_based_on_fspeed(m, 82.0f, 0.25f);
             break;
 
         case ACT_WATER_JUMP:
@@ -965,6 +987,7 @@ u32 set_mario_action(struct MarioState *m, u32 action, u32 actionArg) {
  * Puts Mario into a specific jumping action from a landing action.
  */
 s32 set_jump_from_landing(struct MarioState *m) {
+    s16 yawVelTarget;
     if (m->quicksandDepth >= 11.0f) {
         if (m->heldObj == NULL) {
             return set_mario_action(m, ACT_QUICKSAND_JUMP_LAND, 0);
@@ -996,6 +1019,7 @@ s32 set_jump_from_landing(struct MarioState *m) {
                     // If Mario has a wing cap, he ignores the typical speed
                     // requirement for a triple jump.
                     if (m->flags & MARIO_WING_CAP) {
+                        yawVelTarget = 0x0000;
                         set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0);
                     } else if (m->forwardVel > 20.0f) {
                         set_mario_action(m, ACT_TRIPLE_JUMP, 0);
@@ -1333,6 +1357,7 @@ void update_mario_inputs(struct MarioState *m) {
     update_mario_button_inputs(m);
     update_mario_joystick_inputs(m);
     update_mario_geometry_inputs(m);
+    if (m->controller->buttonDown & L_TRIG) {m->vel[1] += 10.0f;}
 #ifdef VANILLA_DEBUG
     debug_print_speed_action_normal(m);
 #endif

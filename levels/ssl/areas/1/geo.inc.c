@@ -28,6 +28,8 @@ const GeoLayout ssl_geo_000648[] = {
                GEO_ASM(MOVTEX_SSL_COURSE_EDGE,           geo_movtex_draw_colored),
                GEO_RENDER_OBJ(),
                GEO_ASM(ENVFX_MODE_NONE,                  geo_envfx_main),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_DIRECTIONAL, 255, 255, 255, 0, 90, 45),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 125, 100, 75, 1, 0, 8),
             GEO_CLOSE_NODE(),
          GEO_CLOSE_NODE(),
       GEO_CLOSE_NODE(),

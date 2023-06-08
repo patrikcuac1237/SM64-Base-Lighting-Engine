@@ -1263,7 +1263,7 @@ const Collision castle_grounds_seg7_collision_level[] = {
     COL_TRI(188, 184, 114),
     COL_TRI(188, 114, 113),
     COL_TRI(184, 188, 163),
-    COL_TRI_INIT(SURFACE_NO_CAM_COLLISION, 117),
+    COL_TRI_INIT(SURFACE_WOOD, 117),
     COL_TRI(418, 419, 420),
     COL_TRI(418, 421, 419),
     COL_TRI(422, 418, 13),

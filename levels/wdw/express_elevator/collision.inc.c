@@ -10,7 +10,7 @@ const Collision wdw_seg7_collision_express_elevator_platform[] = {
     COL_VERTEX(-357, 0, 384),
     COL_VERTEX(512, 51, 384),
     COL_VERTEX(-357, 51, 384),
-    COL_TRI_INIT(SURFACE_DEFAULT, 12),
+    COL_TRI_INIT(SURFACE_WOOD_SLIPPERY, 12),
     COL_TRI(0, 1, 2),
     COL_TRI(0, 2, 3),
     COL_TRI(0, 4, 5),

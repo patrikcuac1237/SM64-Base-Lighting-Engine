@@ -23,6 +23,8 @@ const GeoLayout wf_geo_000BF8[] = {
                GEO_ASM(0,               geo_movtex_pause_control),
                GEO_ASM(WF_MOVTEX_WATER, geo_movtex_draw_water_regions),
                GEO_ASM(ENVFX_MODE_NONE, geo_envfx_main),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_DIRECTIONAL, 255, 255, 255, 0, 90, -25),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 125, 125, 125, 1, 0, 8),
             GEO_CLOSE_NODE(),
          GEO_CLOSE_NODE(),
       GEO_CLOSE_NODE(),

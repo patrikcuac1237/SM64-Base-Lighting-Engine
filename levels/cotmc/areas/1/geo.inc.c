@@ -20,6 +20,8 @@ const GeoLayout cotmc_geo_0001A0[] = {
                GEO_ASM(    0, geo_movtex_pause_control),
                GEO_ASM(MOVTEX_COTMC_WATER, geo_movtex_draw_nocolor),
                GEO_DISPLAY_LIST(LAYER_TRANSPARENT, cotmc_seg7_dl_0700A4B8),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_DIRECTIONAL, 127, 127, 127, 0, 0, 90),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 25, 50, 40, 0, 0, 0),
                GEO_RENDER_OBJ(),
                GEO_ASM(ENVFX_MODE_NONE, geo_envfx_main),
             GEO_CLOSE_NODE(),

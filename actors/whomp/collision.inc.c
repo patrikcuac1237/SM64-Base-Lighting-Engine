@@ -13,7 +13,7 @@ const Collision whomp_seg6_collision_06020A0C[] = {
     COL_VERTEX(150, 50, -3),
     COL_VERTEX(-150, 430, -3),
 
-    COL_TRI_INIT(SURFACE_NO_CAM_COLLISION, 12),
+    COL_TRI_INIT(SURFACE_METAL, 12),
     COL_TRI(2, 1, 0),
     COL_TRI(3, 2, 0),
     COL_TRI(6, 5, 4),

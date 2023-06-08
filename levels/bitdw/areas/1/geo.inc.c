@@ -18,6 +18,8 @@ const GeoLayout geo_bitdw_000618[] = {
                GEO_DISPLAY_LIST(LAYER_ALPHA, bitdw_seg7_dl_070020C8),
                GEO_RENDER_OBJ(),
                GEO_ASM(ENVFX_MODE_NONE, geo_envfx_main),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_DIRECTIONAL, 255, 255, 255, 1, 2, 5),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 50, 75, 50, 1, 0, 8),
             GEO_CLOSE_NODE(),
          GEO_CLOSE_NODE(),
       GEO_CLOSE_NODE(),

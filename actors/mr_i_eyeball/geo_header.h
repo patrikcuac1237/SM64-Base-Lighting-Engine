@@ -1,0 +1,15 @@
+extern const GeoLayout mr_i_geo[];
+extern u8 mr_i_eyeball_mr_i_eyeball_left_side_rgba16_ci8[];
+extern u8 mr_i_eyeball_mr_i_eyeball_left_side_rgba16_ci8_pal_rgba16[];
+extern u8 mr_i_eyeball_mr_i_eyeball_right_side_rgba16_ci8[];
+extern u8 mr_i_eyeball_mr_i_eyeball_right_side_rgba16_ci8_pal_rgba16[];
+extern Vtx mr_i_eyeball_000_displaylist_mesh_layer_4_vtx_0[4];
+extern Gfx mr_i_eyeball_000_displaylist_mesh_layer_4_tri_0[];
+extern Vtx mr_i_eyeball_000_displaylist_mesh_layer_4_vtx_1[4];
+extern Gfx mr_i_eyeball_000_displaylist_mesh_layer_4_tri_1[];
+extern Gfx mat_mr_i_eyeball_f3dlite_material[];
+extern Gfx mat_revert_mr_i_eyeball_f3dlite_material[];
+extern Gfx mat_mr_i_eyeball_f3dlite_material_001[];
+extern Gfx mat_revert_mr_i_eyeball_f3dlite_material_001[];
+extern Gfx mr_i_eyeball_000_displaylist_mesh_layer_4[];
+extern Gfx mr_i_eyeball_material_revert_render_settings[];

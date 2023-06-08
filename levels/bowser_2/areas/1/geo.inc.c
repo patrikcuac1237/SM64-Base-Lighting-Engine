@@ -18,6 +18,8 @@ const GeoLayout bowser_2_geo_000188[] = {
                GEO_DISPLAY_LIST(LAYER_OPAQUE, bowser_2_seg7_dl_07001930),
                GEO_RENDER_OBJ(),
                GEO_ASM(ENVFX_LAVA_BUBBLES, geo_envfx_main),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_DIRECTIONAL, 255, 200, 200, 1, 2, 5),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 125, 75, 75, 1, 0, 800),
             GEO_CLOSE_NODE(),
          GEO_CLOSE_NODE(),
       GEO_CLOSE_NODE(),

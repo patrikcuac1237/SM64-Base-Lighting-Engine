@@ -3,11 +3,9 @@
 // Copy of geo_update_projectile_pos_from_parent
 Gfx *geo_update_held_mario_pos(s32 callContext, UNUSED struct GraphNode *node, Mat4 mtx) {
     if (callContext == GEO_CONTEXT_RENDER) {
-        Mat4 mtx2;
         struct Object *obj = (struct Object *) gCurGraphNodeObject;
         if (obj->prevObj != NULL) {
-            create_transformation_from_matrices(mtx2, mtx, *gCurGraphNodeCamera->matrixPtr);
-            obj_update_pos_from_parent_transformation(mtx2, obj->prevObj);
+            obj_update_pos_from_parent_transformation(mtx, obj->prevObj);
             obj_set_gfx_pos_from_pos(obj->prevObj);
         }
     }
@@ -351,7 +349,7 @@ void king_bobomb_move(void) {
     cur_obj_call_action_function(sKingBobombActions);
     exec_anim_sound_state(sKingBobombSoundStates);
 
-    if (o->oDistanceToMario < 5000.0f) { //! oDrawingDistance?
+    if (o->oDistanceToMario < 5000.0f) { //! //?
         cur_obj_enable_rendering();
     } else {
         cur_obj_disable_rendering();

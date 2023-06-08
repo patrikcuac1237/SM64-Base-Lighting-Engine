@@ -294,4 +294,20 @@ extern const Gfx wooden_signpost_seg3_dl_0302DCD0[];
 extern const Gfx wooden_signpost_seg3_dl_0302DD08[];
 extern const Collision wooden_signpost_seg3_collision_0302DD80[];
 
+#include "marios_metal_cap/geo_header.h"
+
+#include "mario_cap/geo_header.h"
+
+#include "marios_wing_cap/geo_header.h"
+
+#include "marios_winged_metal_cap/geo_header.h"
+
+#include "star/geo_header.h"
+
+#include "transparent_star/geo_header.h"
+
+#include "wooden_signpost/geo_header.h"
+
+#include "warp_pipe/geo_header.h"
+
 #endif

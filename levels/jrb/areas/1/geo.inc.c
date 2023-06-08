@@ -27,6 +27,8 @@ const GeoLayout jrb_geo_000A18[] = {
                GEO_ASM(JRB_MOVTEX_INITIAL_MIST, geo_movtex_draw_water_regions),
                GEO_RENDER_OBJ(),
                GEO_ASM(ENVFX_JETSTREAM_BUBBLES, geo_envfx_main),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_DIRECTIONAL, 255, 255, 255, 0, 90, 45),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 125, 125, 125, 1, 0, 800),
             GEO_CLOSE_NODE(),
          GEO_CLOSE_NODE(),
       GEO_CLOSE_NODE(),

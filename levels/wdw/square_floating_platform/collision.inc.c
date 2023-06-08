@@ -10,7 +10,7 @@ const Collision wdw_seg7_collision_square_floating_platform[] = {
     COL_VERTEX(-255, 64, 256),
     COL_VERTEX(-255, 64, -255),
     COL_VERTEX(256, 64, -255),
-    COL_TRI_INIT(SURFACE_DEFAULT, 12),
+    COL_TRI_INIT(SURFACE_WOOD_SLIPPERY, 12),
     COL_TRI(0, 1, 2),
     COL_TRI(0, 2, 3),
     COL_TRI(0, 4, 5),

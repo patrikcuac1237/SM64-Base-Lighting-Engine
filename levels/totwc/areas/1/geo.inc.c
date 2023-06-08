@@ -18,6 +18,8 @@ const GeoLayout totwc_geo_000188[] = {
                GEO_DISPLAY_LIST(LAYER_OPAQUE,      totwc_seg7_dl_07005D28),
                GEO_DISPLAY_LIST(LAYER_TRANSPARENT, totwc_seg7_dl_07007048),
                GEO_DISPLAY_LIST(LAYER_TRANSPARENT, totwc_seg7_dl_070078B8),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_DIRECTIONAL, 255, 255, 255, 0, 90, -20),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 127, 127, 127, 0, 0, 0),
                GEO_RENDER_OBJ(),
                GEO_ASM(ENVFX_MODE_NONE, geo_envfx_main),
             GEO_CLOSE_NODE(),

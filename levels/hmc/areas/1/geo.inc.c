@@ -327,6 +327,8 @@ const GeoLayout hmc_geo_000B90[] = {
                GEO_CLOSE_NODE(),
                GEO_RENDER_OBJ(),
                GEO_ASM(ENVFX_MODE_NONE, geo_envfx_main),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_DIRECTIONAL, 0, 0, 0, 0, 0, 0),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 15, 15, 15, 1, 0, 8),
             GEO_CLOSE_NODE(),
          GEO_CLOSE_NODE(),
       GEO_CLOSE_NODE(),

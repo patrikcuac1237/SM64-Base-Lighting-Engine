@@ -29,6 +29,8 @@ const GeoLayout thi_geo_0006D4[] = {
                GEO_ASM(THI_MOVTEX_AREA2_WATER, geo_movtex_draw_water_regions),
                GEO_RENDER_OBJ(),
                GEO_ASM(ENVFX_MODE_NONE,        geo_envfx_main),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_DIRECTIONAL, 255, 255, 255, 0, 90, 45),
+			      GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 127, 127, 127, 0, 0, 0),
             GEO_CLOSE_NODE(),
          GEO_CLOSE_NODE(),
       GEO_CLOSE_NODE(),

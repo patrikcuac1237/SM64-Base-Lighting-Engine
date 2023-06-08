@@ -50,7 +50,7 @@ void fire_bar_act_spawn_flames(void) {
 void fire_bar_act_active(void) {
     o->oAngleVelYaw = -0x100;
     o->oMoveAngleYaw += o->oAngleVelYaw;
-    if (o->oDistanceToMario > o->oDrawingDistance + 200.0f) {
+    if (o->oDistanceToMario > o->oDrawingDistance + 2000000.0f) {
         o->oAction = LLL_FIRE_BAR_ACT_REMOVE_FLAMES;
     }
 }

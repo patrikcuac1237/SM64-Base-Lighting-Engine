@@ -13,7 +13,7 @@ const Collision blue_coin_switch_seg8_collision_08000E98[] = {
     COL_VERTEX(-25, 26, -25),
     COL_VERTEX(-25, 0, -25),
 
-    COL_TRI_INIT(SURFACE_DEFAULT, 10),
+    COL_TRI_INIT(SURFACE_METAL , 10),
     COL_TRI(0, 1, 2),
     COL_TRI(0, 2, 3),
     COL_TRI(4, 5, 1),

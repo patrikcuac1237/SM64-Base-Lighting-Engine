@@ -9,6 +9,7 @@
 #include "surface_collision.h"
 #include "surface_load.h"
 #include "game/puppyprint.h"
+#include "math_util.h"
 
 /**************************************************
  *                      WALLS                     *
@@ -175,10 +176,16 @@ s32 find_wall_collisions(struct WallCollisionData *colData) {
     s32 numCollisions = 0;
     s32 x = colData->x;
     s32 z = colData->z;
+#if PUPPYPRINT_DEBUG
+    OSTime first = osGetTime();
+#endif
 
     colData->numWalls = 0;
 
     if (is_outside_level_bounds(x, z)) {
+#if PUPPYPRINT_DEBUG
+        collisionTime[perfIteration] += osGetTime() - first;
+#endif
         return numCollisions;
     }
 
@@ -200,6 +207,9 @@ s32 find_wall_collisions(struct WallCollisionData *colData) {
 #ifdef VANILLA_DEBUG
     // Increment the debug tracker.
     gNumCalls.wall++;
+#endif
+#if PUPPYPRINT_DEBUG
+    collisionTime[perfIteration] += osGetTime() - first;
 #endif
 
     return numCollisions;
@@ -317,12 +327,18 @@ static struct Surface *find_ceil_from_list(struct SurfaceNode *surfaceNode, s32 
 f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil) {
     f32 height        = CELL_HEIGHT_LIMIT;
     f32 dynamicHeight = CELL_HEIGHT_LIMIT;
+#if PUPPYPRINT_DEBUG
+    OSTime first = osGetTime();
+#endif
     s32 x = posX;
     s32 y = posY;
     s32 z = posZ;
     *pceil = NULL;
 
     if (is_outside_level_bounds(x, z)) {
+#if PUPPYPRINT_DEBUG
+        collisionTime[perfIteration] += (osGetTime() - first);
+#endif
         return height;
     }
 
@@ -363,6 +379,9 @@ f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil) {
 #ifdef VANILLA_DEBUG
     // Increment the debug tracker.
     gNumCalls.ceil++;
+#endif
+#if PUPPYPRINT_DEBUG
+    collisionTime[perfIteration] += osGetTime() - first;
 #endif
 
     return height;
@@ -429,7 +448,7 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
         height = get_surface_height_at_location(x, z, surf);
 
         // Exclude floors lower than the previous highest floor.
-        if (height <= *pheight) continue;
+        if (height < *pheight) continue;
 
         // Checks for floor interaction with a FIND_FLOOR_BUFFER unit buffer.
         if (bufferY < height) continue;
@@ -545,6 +564,10 @@ f32 unused_find_dynamic_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfl
  * Find the highest floor under a given position and return the height.
  */
 f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
+#if PUPPYPRINT_DEBUG
+    OSTime first = osGetTime();
+#endif
+
     f32 height        = FLOOR_LOWER_LIMIT;
     f32 dynamicHeight = FLOOR_LOWER_LIMIT;
 
@@ -558,6 +581,9 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
     *pfloor = NULL;
 
     if (is_outside_level_bounds(x, z)) {
+#if PUPPYPRINT_DEBUG
+        collisionTime[perfIteration] += (osGetTime() - first);
+#endif
         return height;
     }
     // Each level is split into cells to limit load, find the appropriate cell.
@@ -601,6 +627,9 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
 #ifdef VANILLA_DEBUG
     // Increment the debug tracker.
     gNumCalls.floor++;
+#endif
+#if PUPPYPRINT_DEBUG
+    collisionTime[perfIteration] += (osGetTime() - first);
 #endif
     return height;
 }
@@ -654,6 +683,9 @@ s32 find_water_level_and_floor(s32 x, s32 y, s32 z, struct Surface **pfloor) {
     s32 loX, hiX, loZ, hiZ;
     TerrainData *p = gEnvironmentRegions;
     struct Surface *floor = NULL;
+#if PUPPYPRINT_DEBUG
+    OSTime first = osGetTime();
+#endif
     s32 waterLevel = find_water_floor(x, y, z, &floor);
 
     if (p != NULL && waterLevel == FLOOR_LOWER_LIMIT) {
@@ -679,6 +711,9 @@ s32 find_water_level_and_floor(s32 x, s32 y, s32 z, struct Surface **pfloor) {
         *pfloor = floor;
     }
 
+#if PUPPYPRINT_DEBUG
+    collisionTime[perfIteration] += (osGetTime() - first);
+#endif
     return waterLevel;
 }
 
@@ -690,6 +725,9 @@ s32 find_water_level(s32 x, s32 z) { // TODO: Allow y pos
     s32 loX, hiX, loZ, hiZ;
     TerrainData *p = gEnvironmentRegions;
     struct Surface *floor = NULL;
+#if PUPPYPRINT_DEBUG
+    OSTime first = osGetTime();
+#endif
     s32 waterLevel = find_water_floor(x, ((gCollisionFlags & COLLISION_FLAG_CAMERA) ? gLakituState.pos[1] : gMarioState->pos[1]), z, &floor);
 
     if ((p != NULL) && (waterLevel == FLOOR_LOWER_LIMIT)) {
@@ -704,7 +742,7 @@ s32 find_water_level(s32 x, s32 z) { // TODO: Allow y pos
 
             // If the location is within a water box and it is a water box.
             // Water is less than 50 val only, while above is gas and such.
-            if (loX <= x && x <= hiX && loZ <= z && z <= hiZ && val < 50) {
+            if (loX < x && x < hiX && loZ < z && z < hiZ && val < 50) {
                 // Set the water height. Since this breaks, only return the first height.
                 waterLevel = *p;
                 break;
@@ -712,6 +750,10 @@ s32 find_water_level(s32 x, s32 z) { // TODO: Allow y pos
             p++;
         }
     }
+
+#if PUPPYPRINT_DEBUG
+    collisionTime[perfIteration] += osGetTime() - first;
+#endif
 
     return waterLevel;
 }
@@ -724,6 +766,9 @@ s32 find_poison_gas_level(s32 x, s32 z) {
     s32 loX, hiX, loZ, hiZ;
     s32 gasLevel = FLOOR_LOWER_LIMIT;
     TerrainData *p = gEnvironmentRegions;
+#if PUPPYPRINT_DEBUG
+    OSTime first = osGetTime();
+#endif
 
     if (p != NULL) {
         s32 numRegions = *p++;
@@ -749,6 +794,10 @@ s32 find_poison_gas_level(s32 x, s32 z) {
             p += 6;
         }
     }
+
+#if PUPPYPRINT_DEBUG
+    collisionTime[perfIteration] += osGetTime() - first;
+#endif
 
     return gasLevel;
 }
@@ -866,3 +915,108 @@ s32 unused_resolve_floor_or_ceil_collisions(s32 checkCeil, f32 *px, f32 *py, f32
 
     return 0;
 }
+
+#define EPSILON 0.0001f
+#define VEC3_DOT(a,b) ((a)[0] * (b)[0] + (a)[1] * (b)[1] + (a)[2] * (b)[2])
+#define VEC3_COPY(out,a) \
+    {(out)[0] = (a)[0];           (out)[1] = (a)[1];           (out)[2] = (a)[2];}
+#define VEC3_SCALE(out,a,scale) \
+    {(out)[0] = (a)[0] * (scale); (out)[1] = (a)[1] * (scale); (out)[2] = (a)[2] * (scale);}
+#define VEC3_ADD(out,a,b)  \
+    {(out)[0] = (a)[0] + (b)[0];  (out)[1] = (a)[1] + (b)[1];  (out)[2] = (a)[2] + (b)[2];}
+#define VEC3_DIFF(out,a,b) \
+    {(out)[0] = (a)[0] - (b)[0];  (out)[1] = (a)[1] - (b)[1];  (out)[2] = (a)[2] - (b)[2];}
+#define ABSI(x) ((x) > 0 ? (x) : -(x))
+#define NORMAL_SCALE 1024
+
+f32 ray_surf_intersect(Vec3f rayStart, Vec3f rayDir, f32 rayDist, Vec3f intersectionOut, struct Surface* surf)
+{
+    f32 denom;
+    f32 distOnRay;
+    s16 u[3], v[3]; // Edge vectors
+    s16 w[3]; // Intersection point - vertex1
+    f32 uu, uv, vv, wu, wv; // Dot products
+    f32 s, t; // Barycentric coordinates
+    // Intersect the ray with the plane that the surface lies in
+    // a = -(originOffset + normal dot rayStart) / (normal dot rayDir)
+
+    denom = VEC3_DOT(&surf->normal.x, rayDir);
+    // Prevent division by zero and throw out collision with backfaces (negative denominator)
+    if (denom != denom && denom > -EPSILON)
+    {
+        return -1;
+    }
+    distOnRay = -((surf->originOffset) + VEC3_DOT(&surf->normal.x, rayStart)) / denom;
+    if (distOnRay > rayDist)
+    {
+        return -2;
+    }
+    if (distOnRay < 0)
+    {
+        return -3;
+    }
+
+    // Calculate the intersection point from the calculated distance
+    VEC3_SCALE(intersectionOut, rayDir, distOnRay);
+    VEC3_ADD(intersectionOut, rayStart, intersectionOut);
+
+    // Calculate the barycentric coordinates of the triangle vertices and intersection point
+    VEC3_DIFF(u, surf->vertex2, surf->vertex1); // These 2 could be precalculated :(
+    VEC3_DIFF(v, surf->vertex3, surf->vertex1);
+
+    VEC3_DIFF(w, intersectionOut, surf->vertex1);
+
+    // Calculate the various dot products
+    uu = VEC3_DOT(u, u); // These 3 could also be precalculated :(
+    uv = VEC3_DOT(u, v);
+    vv = VEC3_DOT(v, v);
+    
+    wu = VEC3_DOT(w, u);
+    wv = VEC3_DOT(w, v);
+
+    // Calculate and check the barycentric coordinates
+    denom = (uv * uv - uu * vv); // Doesn't need to be checked for 0 (assuming non-degenerate triangles)
+    s = (uv * wv - vv * wu) / denom;
+    if (s < 0 || s > 1)
+    {
+        return -4;
+    }
+    t = (uv * wu - uu * wv) / denom;
+    if (t < 0 || (s + t) > 1)
+    {
+        return -5;
+    }
+    return distOnRay;
+}
+
+f32 raycast(Vec3f rayStart, Vec3f rayDir, f32 rayDist, Vec3f intersection, struct Surface** surfHit)
+{
+    Vec3f dirNorm;
+    f32 intDist = -1.0f;
+    s32 cellX, cellZ;
+    struct SurfaceNode *node;
+    vec3f_copy(dirNorm, rayDir);
+    vec3f_normalize(dirNorm);
+    for (cellX = 0; cellX < 16; cellX++)
+    {
+        for (cellZ = 0; cellZ < 16; cellZ++)
+        {
+            node = gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WALLS].next;
+            while (node)
+            {
+                Vec3f curHit;
+                f32 curDist;
+                curDist = ray_surf_intersect(rayStart, dirNorm, rayDist, curHit, node->surface);
+                if (curDist >= 0 && (intDist < 0 || curDist < intDist))
+                {
+                    intDist = curDist;
+                    vec3f_copy(intersection, curHit);
+                    *surfHit = node->surface;
+                }
+                node = node->next;
+            }
+        }
+    }
+    return intDist;
+}
+

@@ -22,6 +22,8 @@ const GeoLayout castle_courtyard_geo_000218[] = {
                GEO_ASM(CASTLE_COURTYARD_MOVTEX_STAR_STATUE_WATER, geo_movtex_draw_water_regions),
                GEO_RENDER_OBJ(),
                GEO_ASM(ENVFX_MODE_NONE, geo_envfx_main),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_DIRECTIONAL, 255, 255, 255, 0, 90, 45),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 125, 125, 125, 1, 0, 800),
             GEO_CLOSE_NODE(),
          GEO_CLOSE_NODE(),
       GEO_CLOSE_NODE(),

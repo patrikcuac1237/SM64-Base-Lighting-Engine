@@ -12,7 +12,7 @@ const Collision wf_seg7_collision_clocklike_rotation[] = {
     COL_VERTEX(768, -127, 0),
     COL_VERTEX(768, 0, -101),
     COL_VERTEX(768, 0, 102),
-    COL_TRI_INIT(SURFACE_DEFAULT, 15),
+    COL_TRI_INIT(SURFACE_WOOD, 15),
     COL_TRI(0, 1, 2),
     COL_TRI(0, 2, 3),
     COL_TRI(0, 3, 4),

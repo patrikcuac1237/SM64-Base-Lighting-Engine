@@ -24,6 +24,8 @@ const GeoLayout ddd_geo_000570[] = {
                GEO_ASM(   0, geo_movtex_pause_control),
                GEO_ASM(DDD_MOVTEX_AREA2_WATER,  geo_movtex_draw_water_regions),
                GEO_RENDER_OBJ(),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_DIRECTIONAL, 55, 55, 55, 0, 1, 0),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 25, 25, 25, 1, 0, 800),
                GEO_ASM(ENVFX_JETSTREAM_BUBBLES, geo_envfx_main),
             GEO_CLOSE_NODE(),
          GEO_CLOSE_NODE(),

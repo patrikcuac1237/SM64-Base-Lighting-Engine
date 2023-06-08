@@ -85,6 +85,9 @@ else ifeq ($(VERSION),sh)
   DEFINES += VERSION_SH=1
 endif
 
+# FIXLIGHTS - converts light objects to light color commands for assets, needed for vanilla-style lighting
+FIXLIGHTS ?= 1
+
 DEBUG_MAP_STACKTRACE_FLAG := -D DEBUG_MAP_STACKTRACE
 
 TARGET := sm64
@@ -135,14 +138,10 @@ LINK_LIBRARIES = $(foreach i,$(LIBRARIES),-l$(i))
 
 # Default non-gcc opt flags
 DEFAULT_OPT_FLAGS = -Ofast
-# Note: -fno-associative-math is used here to suppress warnings, ideally we would enable this as an optimization but
-# this conflicts with -ftrapping-math apparently.
-# TODO: Figure out how to allow -fassociative-math to be enabled
-SAFETY_OPT_FLAGS = -ftrapping-math -fno-associative-math
 
 # Main opt flags
 GCC_MAIN_OPT_FLAGS = \
-  $(DEFAULT_OPT_FLAGS) $(SAFETY_OPT_FLAGS) \
+  -Ofast \
   --param case-values-threshold=20 \
   --param max-completely-peeled-insns=10 \
   --param max-unrolled-insns=10 \
@@ -153,7 +152,7 @@ GCC_MAIN_OPT_FLAGS = \
 
 # Surface Collision
 GCC_COLLISION_OPT_FLAGS = \
-  $(DEFAULT_OPT_FLAGS) $(SAFETY_OPT_FLAGS) \
+  -Ofast \
   --param case-values-threshold=20 \
   --param max-completely-peeled-insns=100 \
   --param max-unrolled-insns=100 \
@@ -166,7 +165,7 @@ GCC_COLLISION_OPT_FLAGS = \
 
 # Math Util
 GCC_MATH_UTIL_OPT_FLAGS = \
-  $(DEFAULT_OPT_FLAGS) $(SAFETY_OPT_FLAGS) \
+  -Ofast \
   -fno-unroll-loops \
   -fno-peel-loops \
   --param case-values-threshold=20  \
@@ -178,7 +177,7 @@ GCC_MATH_UTIL_OPT_FLAGS = \
 
 # Rendering graph node
 GCC_GRAPH_NODE_OPT_FLAGS = \
-  $(DEFAULT_OPT_FLAGS) $(SAFETY_OPT_FLAGS) \
+  -Ofast \
   --param case-values-threshold=20 \
   --param max-completely-peeled-insns=100 \
   --param max-unrolled-insns=100 \
@@ -427,8 +426,8 @@ DEP_FILES := $(O_FILES:.o=.d) $(LIBZ_O_FILES:.o=.d) $(GODDARD_O_FILES:.o=.d) $(B
 # detect prefix for MIPS toolchain
 ifneq ($(call find-command,mips64-elf-ld),)
   CROSS := mips64-elf-
-else ifneq ($(call find-command,mips-n64-ld),)
-  CROSS := mips-n64-
+# else ifneq ($(call find-command,mips-n64-ld),)
+#   CROSS := mips-n64-
 else ifneq ($(call find-command,mips64-ld),)
   CROSS := mips64-
 else ifneq ($(call find-command,mips-linux-gnu-ld),)
@@ -517,6 +516,7 @@ AIFF_EXTRACT_CODEBOOK := $(TOOLS_DIR)/aiff_extract_codebook
 VADPCM_ENC            := $(TOOLS_DIR)/vadpcm_enc
 EXTRACT_DATA_FOR_MIO  := $(TOOLS_DIR)/extract_data_for_mio
 SKYCONV               := $(TOOLS_DIR)/skyconv
+FIXLIGHTS_PY          := $(TOOLS_DIR)/fixlights.py
 ifeq ($(GZIPVER),std)
 GZIP                  := gzip
 else
@@ -634,8 +634,7 @@ $(BUILD_DIR)/src/usb/usb.o: CFLAGS += -Wno-unused-variable -Wno-sign-compare -Wn
 $(BUILD_DIR)/src/usb/debug.o: OPT_FLAGS := -O0
 $(BUILD_DIR)/src/usb/debug.o: CFLAGS += -Wno-unused-parameter -Wno-maybe-uninitialized
 # File specific opt flags
-$(BUILD_DIR)/src/audio/heap.o:          OPT_FLAGS := -Os -fno-jump-tables
-$(BUILD_DIR)/src/audio/synthesis.o:     OPT_FLAGS := -Os -fno-jump-tables
+$(BUILD_DIR)/src/audio/*.o:                   OPT_FLAGS := -Os -fno-jump-tables
 
 $(BUILD_DIR)/src/engine/surface_collision.o:  OPT_FLAGS := $(COLLISION_OPT_FLAGS)
 $(BUILD_DIR)/src/engine/math_util.o:          OPT_FLAGS := $(MATH_UTIL_OPT_FLAGS)
@@ -693,11 +692,9 @@ $(BUILD_DIR)/%.ci4.inc.c: %.ci4.png
 $(BUILD_DIR)/%.elf: $(BUILD_DIR)/%.o
 	$(call print,Linking ELF file:,$<,$@)
 	$(V)$(LD) -e 0 -Ttext=$(SEGMENT_ADDRESS) -Map $@.map -o $@ $<
-# Override for leveldata.elf, which otherwise matches the above pattern.
-# Has to be a static pattern rule for make-4.4 and above to trigger the second
-# expansion.
+# Override for leveldata.elf, which otherwise matches the above pattern
 .SECONDEXPANSION:
-$(LEVEL_ELF_FILES): $(BUILD_DIR)/levels/%/leveldata.elf: $(BUILD_DIR)/levels/%/leveldata.o $(BUILD_DIR)/bin/$$(TEXTURE_BIN).elf
+$(BUILD_DIR)/levels/%/leveldata.elf: $(BUILD_DIR)/levels/%/leveldata.o $(BUILD_DIR)/bin/$$(TEXTURE_BIN).elf
 	$(call print,Linking ELF file:,$<,$@)
 	$(V)$(LD) -e 0 -Ttext=$(SEGMENT_ADDRESS) -Map $@.map --just-symbols=$(BUILD_DIR)/bin/$(TEXTURE_BIN).elf -o $@ $<
 
@@ -820,6 +817,11 @@ $(BUILD_DIR)/src/game/version_data.h: tools/make_version.sh
 #==============================================================================#
 
 # Compile C code
+ifeq ($(FIXLIGHTS),1)
+# This must not be run multiple times at once, so we run it ahead of time rather than in a rule
+DUMMY != $(FIXLIGHTS_PY) actors
+DUMMY != $(FIXLIGHTS_PY) levels
+endif
 $(BUILD_DIR)/%.o: %.c
 	$(call print,Compiling:,$<,$@)
 	$(V)$(CC) -c $(CFLAGS) -MMD -MF $(BUILD_DIR)/$*.d  -o $@ $<
@@ -876,16 +878,8 @@ $(ELF): $(BUILD_DIR)/sm64_prelim.elf $(BUILD_DIR)/asm/debug/map.o $(O_FILES) $(Y
 	$(V)$(LD) --gc-sections -L $(BUILD_DIR) -T undefined_syms.txt -T $(BUILD_DIR)/$(LD_SCRIPT) -T goddard.txt -Map $(BUILD_DIR)/sm64.$(VERSION).map --no-check-sections $(addprefix -R ,$(SEG_FILES)) -o $@ $(O_FILES) -L$(LIBS_DIR) -l$(ULTRALIB) -Llib $(LINK_LIBRARIES) -u sprintf -u osMapTLB -Llib/gcclib/$(LIBGCCDIR) -lgcc -lrtc
 
 # Build ROM
-ifeq (n,$(findstring n,$(firstword -$(MAKEFLAGS))))
-# run with -n / --dry-run
-$(ROM):
-	@$(PRINT) "$(BLUE)DRY RUNS ARE DISABLED$(NO_COL)\n"
-else
-# not running with -n / --dry-run
 $(ROM): $(ELF)
 	$(call print,Building ROM:,$<,$@)
-endif
-
 ifeq      ($(CONSOLE),n64)
 	$(V)$(OBJCOPY) --pad-to=0x101000 --gap-fill=0xFF $< $@ -O binary
 else ifeq ($(CONSOLE),bb)

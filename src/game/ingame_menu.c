@@ -43,6 +43,7 @@ s8 gRedCoinsCollected;
 u8 textCurrRatio43[] = { TEXT_HUD_CURRENT_RATIO_43 };
 u8 textCurrRatio169[] = { TEXT_HUD_CURRENT_RATIO_169 };
 u8 textPressL[] = { TEXT_HUD_PRESS_L };
+u8 textPressB[] = { TEXT_HUD_PRESS_B };
 #endif
 
 #if MULTILANG
@@ -87,6 +88,7 @@ enum DialogBoxType {
 #define DEFAULT_DIALOG_BOX_ANGLE 90.0f
 #define DEFAULT_DIALOG_BOX_SCALE 19.0f
 
+#if defined(VERSION_US) || defined(VERSION_EU)
 u8 gDialogCharWidths[256] = { // TODO: Is there a way to auto generate this?
     7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  6,  6,  6,  6,  6,  6,
     6,  6,  5,  6,  6,  5,  8,  8,  6,  6,  6,  6,  6,  5,  6,  6,
@@ -117,6 +119,7 @@ u8 gDialogCharWidths[256] = { // TODO: Is there a way to auto generate this?
 #endif
     0,  0,  5,  7,  7,  6,  6,  8,  0,  8, 10,  6,  4, 10,  0,  0
 };
+#endif
 
 s8 gDialogBoxState = DIALOG_STATE_OPENING;
 f32 gDialogBoxOpenTimer = DEFAULT_DIALOG_BOX_ANGLE;
@@ -1367,7 +1370,6 @@ void print_peach_letter_message(void) {
     void **dialogTable;
     gInGameLanguage = eu_get_language();
     switch (gInGameLanguage) {
-        default:
         case LANGUAGE_ENGLISH: dialogTable = segmented_to_virtual(dialog_table_eu_en); break;
         case LANGUAGE_FRENCH:  dialogTable = segmented_to_virtual(dialog_table_eu_fr); break;
         case LANGUAGE_GERMAN:  dialogTable = segmented_to_virtual(dialog_table_eu_de); break;
@@ -1387,15 +1389,10 @@ void print_peach_letter_message(void) {
     gDPSetEnvColor(gDisplayListHead++, 20, 20, 20, gCutsceneMsgFade);
 
     print_generic_string(STR_X, STR_Y, str);
-#ifdef VERSION_JP
-    gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
-#else
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
     gDPSetEnvColor(gDisplayListHead++, 200, 80, 120, gCutsceneMsgFade);
     gSPDisplayList(gDisplayListHead++, castle_grounds_seg7_us_dl_0700F2E8);
-#endif
 
     // at the start/end of message, reset the fade.
     if (gCutsceneMsgTimer == 0) {
@@ -1452,7 +1449,7 @@ void render_hud_cannon_reticle(void) {
     gSPDisplayList(gDisplayListHead++, dl_draw_triangle);
     gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
 
-    gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
+    // gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
 }
 
 void reset_red_coins_collected(void) {
@@ -1532,14 +1529,19 @@ void render_widescreen_setting(void) {
     if (!gConfig.widescreen) {
         print_generic_string(10, 20, textCurrRatio43);
         print_generic_string(10,  7, textPressL);
+        print_generic_string(200,  7, textPressB);
     } else {
         print_generic_string(10, 20, textCurrRatio169);
         print_generic_string(10,  7, textPressL);
+        print_generic_string(200,  7, textPressB);
     }
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
     if (gPlayer1Controller->buttonPressed & L_TRIG){
         gConfig.widescreen ^= 1;
         save_file_set_widescreen_mode(gConfig.widescreen);
+    }
+    if (gPlayer1Controller->buttonPressed & R_TRIG){
+        gConfig.cheats ^= 1;
     }
 }
 #endif

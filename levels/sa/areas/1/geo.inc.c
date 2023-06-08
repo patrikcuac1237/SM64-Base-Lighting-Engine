@@ -17,6 +17,8 @@ const GeoLayout sa_geo_000170[] = {
             GEO_OPEN_NODE(),
                GEO_DISPLAY_LIST(LAYER_OPAQUE,      sa_seg7_dl_07002DE8),
                GEO_DISPLAY_LIST(LAYER_TRANSPARENT, sa_seg7_dl_07002FD0),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_DIRECTIONAL, 50, 50, 75, 0, 90, 0),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 15, 15, 15, 0, 0, 0),
                GEO_RENDER_OBJ(),
                GEO_ASM(ENVFX_SNOW_WATER, geo_envfx_main),
             GEO_CLOSE_NODE(),

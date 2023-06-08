@@ -19,10 +19,10 @@ void floating_platform_act_move_to_home(void) {
         f32 dx = gMarioObject->header.gfx.pos[0] - o->oPosX;
         f32 dz = gMarioObject->header.gfx.pos[2] - o->oPosZ;
         f32 cy = coss(-o->oMoveAngleYaw);
-        f32 sy = sins(-o->oMoveAngleYaw);
-        o->oFaceAnglePitch = ((dz * cy) + (dx * sy)) * 2;
-        o->oFaceAngleRoll = -((dx * cy) + (dz * sy)) * 2;
-        o->oVelY -= 1.0f;
+        f32 sy = sins(o->oMoveAngleYaw);
+        o->oFaceAnglePitch = ((dz * cy) + (dx * sy)) * 0.5;
+        o->oFaceAngleRoll = -((dx * cy) + (dz * sy)) * 0.5;
+        o->oVelY -= 10.0f;
         if (o->oVelY < 0.0f) {
             o->oVelY = 0.0f;
         }

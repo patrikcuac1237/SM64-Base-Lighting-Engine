@@ -25,6 +25,8 @@ const GeoLayout lll_geo_000EC0[] = {
                GEO_ASM(LLL_MOVTEX_VOLCANO_FLOOR_LAVA, geo_movtex_draw_water_regions),
                GEO_RENDER_OBJ(),
                GEO_ASM(ENVFX_MODE_NONE,               geo_envfx_main),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 75, 50, 50, 0, 0, 0),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 50, 0, 0, 1, 0, 8),
             GEO_CLOSE_NODE(),
          GEO_CLOSE_NODE(),
       GEO_CLOSE_NODE(),

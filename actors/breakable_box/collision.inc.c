@@ -13,7 +13,7 @@ const Collision breakable_box_seg8_collision[] = {
     COL_VERTEX(100, 200, -100),
     COL_VERTEX(-100, 200, -100),
 
-    COL_TRI_INIT(SURFACE_NO_CAM_COLLISION, 12),
+    COL_TRI_INIT(SURFACE_WOOD, 12),
     COL_TRI(0, 1, 2),
     COL_TRI(1, 3, 4),
     COL_TRI(1, 4, 2),

@@ -10,7 +10,7 @@ const Collision jrb_seg7_collision_floating_box[] = {
     COL_VERTEX(-101, 154, 77),
     COL_VERTEX(102, 154, -76),
     COL_VERTEX(-101, 154, -76),
-    COL_TRI_INIT(SURFACE_DEFAULT, 12),
+    COL_TRI_INIT(SURFACE_WOOD, 12),
     COL_TRI(0, 1, 2),
     COL_TRI(0, 2, 3),
     COL_TRI(3, 4, 5),
