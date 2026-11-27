@@ -10,7 +10,7 @@ const Collision lll_seg7_collision_0701D21C[] = {
     COL_VERTEX(-255, 154, 64),
     COL_VERTEX(256, 154, 64),
     COL_VERTEX(256, 0, 64),
-    COL_TRI_INIT(SURFACE_DEFAULT, 10),
+    COL_TRI_INIT(NEWTERRAIN(8, SPECFLAG_CLIMBABLE, 0, 0), 10),
     COL_TRI(0, 1, 2),
     COL_TRI(2, 1, 3),
     COL_TRI(2, 3, 4),

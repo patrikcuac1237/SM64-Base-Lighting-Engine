@@ -21,6 +21,17 @@ static struct ObjectHitbox sAmpHitbox = {
 /**
  * Homing amp initialization function.
  */
+s32 canLight = TRUE;
+
+void AddAmpLight(void) 
+{
+    o->oLightColor = 0xFFEE0000;
+    o->oLightMaxDist = 1500.f;
+    o->oLightBrightness = 7.5;
+    o->oLightCanOcclude = TRUE;
+    
+}
+
 void bhv_homing_amp_init(void) {
     vec3f_copy(&o->oHomeVec, &o->oPosVec);
     o->oGravity = 0.0f;
@@ -34,6 +45,8 @@ void bhv_homing_amp_init(void) {
 
     // Hide the amp (until Mario gets near).
     o->header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE;
+    canLight = FALSE;
+    o->oFlags &= ~OBJ_FLAG_EMIT_LIGHT;
 }
 
 /**
@@ -73,10 +86,14 @@ static void homing_amp_appear_loop(void) {
     // except for the first frame (when oTimer == 0) because the expression in cur_obj_scale
     // evaluates to 0.1, which is the same as it was before. After 30 frames, it ends at
     // a scale factor of 0.97. The amp remains at 97% of its real height for 60 more frames.
+    canLight = FALSE;
+    o->oFlags &= ~OBJ_FLAG_EMIT_LIGHT;
     if (o->oTimer < 30) {
         cur_obj_scale(0.1f + 0.9f * (f32)(o->oTimer / 30.0f));
     } else {
         o->oAnimState = 1;
+        canLight = TRUE;
+        o->oFlags |= OBJ_FLAG_EMIT_LIGHT;
     }
 
     // Once the timer becomes greater than 90, i.e. 91 frames have passed,
@@ -85,6 +102,8 @@ static void homing_amp_appear_loop(void) {
         cur_obj_scale(1.0f);
         o->oAction = HOMING_AMP_ACT_CHASE;
         o->oAmpYPhase = 0;
+        canLight = TRUE;
+        o->oFlags |= OBJ_FLAG_EMIT_LIGHT;
     }
 }
 
@@ -159,6 +178,8 @@ static void homing_amp_give_up_loop(void) {
         o->oAnimState = 0;
         o->oForwardVel = 0.0f;
         o->oHomingAmpAvgY = o->oHomeY;
+        canLight = FALSE;
+        o->oFlags &= ~OBJ_FLAG_EMIT_LIGHT;
     }
 }
 
@@ -174,12 +195,16 @@ static void amp_attack_cooldown_loop(void) {
 
     if (o->oTimer > 30) {
         o->oAnimState = 0;
+        canLight = FALSE;
+        o->oFlags &= ~OBJ_FLAG_EMIT_LIGHT;
     }
 
     if (o->oTimer > 90) {
         o->oAnimState = 1;
         cur_obj_become_tangible();
         o->oAction = HOMING_AMP_ACT_CHASE;
+        canLight = TRUE;
+        o->oFlags |= OBJ_FLAG_EMIT_LIGHT;
     }
 }
 
@@ -193,16 +218,22 @@ void bhv_homing_amp_loop(void) {
                 // Make the amp start to appear, and un-hide it.
                 o->oAction = HOMING_AMP_ACT_APPEAR;
                 o->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
+                canLight = FALSE;
+                o->oFlags &= ~OBJ_FLAG_EMIT_LIGHT;
             }
             break;
 
         case HOMING_AMP_ACT_APPEAR:
             homing_amp_appear_loop();
+            canLight = TRUE;
+            o->oFlags |= OBJ_FLAG_EMIT_LIGHT;
             break;
 
         case HOMING_AMP_ACT_CHASE:
             homing_amp_chase_loop();
             cur_obj_play_sound_1(SOUND_AIR_AMP_BUZZ);
+            canLight = TRUE;
+            o->oFlags |= OBJ_FLAG_EMIT_LIGHT;
             break;
 
         case HOMING_AMP_ACT_GIVE_UP:
@@ -212,6 +243,9 @@ void bhv_homing_amp_loop(void) {
         case HOMING_AMP_ACT_ATTACK_COOLDOWN:
             amp_attack_cooldown_loop();
             break;
+    }
+    if (canLight == TRUE || canLight != FALSE) {
+        AddAmpLight();
     }
 
     object_step();
@@ -248,7 +282,7 @@ void bhv_circling_amp_init(void) {
     // Choose a random point along the amp's circle.
     // The amp's move angle represents its angle along the circle.
     o->oMoveAngleYaw = random_u16();
-
+    o->oDrawingDistance = 2000;
     o->oAction = AMP_ACT_IDLE;
 }
 
@@ -316,15 +350,20 @@ static void circling_amp_idle_loop(void) {
 void bhv_circling_amp_loop(void) {
     switch (o->oAction) {
         case AMP_ACT_IDLE:
-            if (o->oBehParams2ndByte == AMP_BP_ROT_RADIUS_0) {
-                fixed_circling_amp_idle_loop();
-            } else {
-                circling_amp_idle_loop();
-            }
-            break;
-
+        if (o->oBehParams2ndByte == AMP_BP_ROT_RADIUS_0) {
+            fixed_circling_amp_idle_loop();
+        } else {
+            circling_amp_idle_loop();
+        }
+        canLight = TRUE;
+        o->oFlags |= OBJ_FLAG_EMIT_LIGHT;
+        break;
+        
         case AMP_ACT_ATTACK_COOLDOWN:
             amp_attack_cooldown_loop();
-            break;
+        break;
+        }
+        if (canLight == TRUE || canLight != FALSE) {
+            AddAmpLight();
+        }
     }
-}

@@ -8,5 +8,6 @@ void bhv_invisible_objects_under_bridge_init(void) {
 #endif
         gEnvironmentRegions[6] = -800;
         gEnvironmentRegions[12] = -800;
+        o->header.gfx.pos[1] = -720;
     }
 }

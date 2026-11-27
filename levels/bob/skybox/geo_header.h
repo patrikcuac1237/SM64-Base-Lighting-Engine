@@ -1,0 +1,13 @@
+extern const GeoLayout bob_skybox_geo[];
+extern u8 skybox_cloud_ia4_ia16[];
+extern Vtx skybox_geolayout_mesh_layer_1_vtx_0[154];
+extern Gfx skybox_geolayout_mesh_layer_1_tri_0[];
+extern Vtx skybox_geolayout_mesh_layer_5_vtx_0[72];
+extern Gfx skybox_geolayout_mesh_layer_5_tri_0[];
+extern Gfx mat_skybox_sky[];
+extern Gfx mat_revert_skybox_sky[];
+extern Gfx mat_skybox_f3dlite_material[];
+extern Gfx mat_revert_skybox_f3dlite_material[];
+extern Gfx skybox_geolayout_mesh_layer_1[];
+extern Gfx skybox_geolayout_mesh_layer_5[];
+extern Gfx skybox_material_revert_render_settings[];

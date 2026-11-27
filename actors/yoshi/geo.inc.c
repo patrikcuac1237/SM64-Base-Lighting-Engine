@@ -3,7 +3,7 @@
 const GeoLayout yoshi_000_switch_opt1[] = {
 	GEO_NODE_START(),
 	GEO_OPEN_NODE(),
-		GEO_DISPLAY_LIST(LAYER_OPAQUE, yoshi_000_displaylist_mesh_layer_1_mat_override_f3dlite_material_0),
+		GEO_DISPLAY_LIST(LAYER_OPAQUE, yoshi_000_displaylist_mesh_layer_1_mat_override__5_0),
 	GEO_CLOSE_NODE(),
 	GEO_RETURN(),
 };
@@ -25,7 +25,7 @@ const GeoLayout yoshi_geo[] = {
 							GEO_OPEN_NODE(),
 								GEO_ANIMATED_PART(LAYER_OPAQUE, -146, 49, 0, NULL),
 								GEO_OPEN_NODE(),
-									GEO_ANIMATED_PART(LAYER_OPAQUE, 0, 0, 0, yoshi_000_offset_005_mesh_layer_1),
+									GEO_ANIMATED_PART(LAYER_OPAQUE, 0, 0, 0, NULL),
 								GEO_CLOSE_NODE(),
 								GEO_SWITCH_CASE(2, geo_switch_anim_state),
 								GEO_OPEN_NODE(),
@@ -68,6 +68,7 @@ const GeoLayout yoshi_geo[] = {
 								GEO_DISPLAY_LIST(LAYER_OPAQUE, yoshi_000_offset_013_skinned_mesh_layer_1),
 								GEO_ANIMATED_PART(LAYER_OPAQUE, 100, 0, 0, yoshi_000_offset_013_mesh_layer_1),
 								GEO_OPEN_NODE(),
+									GEO_DISPLAY_LIST(LAYER_OPAQUE, yoshi_000_offset_014_skinned_mesh_layer_1),
 									GEO_ANIMATED_PART(LAYER_OPAQUE, 95, 0, 0, yoshi_000_offset_014_mesh_layer_1),
 								GEO_CLOSE_NODE(),
 							GEO_CLOSE_NODE(),
@@ -84,6 +85,7 @@ const GeoLayout yoshi_geo[] = {
 								GEO_DISPLAY_LIST(LAYER_OPAQUE, yoshi_000_offset_017_skinned_mesh_layer_1),
 								GEO_ANIMATED_PART(LAYER_OPAQUE, 100, 0, 0, yoshi_000_offset_017_mesh_layer_1),
 								GEO_OPEN_NODE(),
+									GEO_DISPLAY_LIST(LAYER_OPAQUE, yoshi_000_offset_018_skinned_mesh_layer_1),
 									GEO_ANIMATED_PART(LAYER_OPAQUE, 95, 0, 0, yoshi_000_offset_018_mesh_layer_1),
 								GEO_CLOSE_NODE(),
 							GEO_CLOSE_NODE(),

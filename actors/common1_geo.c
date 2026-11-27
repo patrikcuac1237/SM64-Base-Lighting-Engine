@@ -26,6 +26,10 @@
 #include "wooden_signpost/geo.inc.c"
 #include "tree/geo.inc.c"
 
+#include "bubbly_tree/geo.inc.c"
+#include "sand/geo.inc.c"
+#include "spiky_tree/geo.inc.c"
+#include "snow_tree/geo.inc.c"
 #include "marios_metal_cap/geo.inc.c"
 #include "marios_wing_cap/geo.inc.c"
-#include "marios_winged_metal_cap/geo.inc.c"
+#include "cartoon_star/geo.inc.c"

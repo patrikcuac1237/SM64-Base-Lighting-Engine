@@ -40,3 +40,4 @@ UNUSED static const u64 binid_5 = 5;
 UNUSED static const u64 binid_6 = 6;
 
 #include "koopa_without_shell/model.inc.c"
+//#include "koopa_with_shell/model.inc.c"

@@ -14,3 +14,5 @@
 #include "levels/pss/header.h"
 
 #include "levels/pss/areas/1/geo.inc.c"
+#include "pss_level/geo.inc.c"
+#include "pss_black_background/geo.inc.c"

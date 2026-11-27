@@ -531,20 +531,18 @@ s32 act_debug_free_move(struct MarioState *m) {
         pos[1] -= 16.0f * speed;
     }
     if (gPlayer1Controller->buttonPressed & A_BUTTON) {
-        vec3_zero(m->vel);
-        m->forwardVel = 0.0f;
-
+        m->vel[1] = 60.0f;
         set_camera_mode(m->area->camera, m->area->camera->defMode, 1);
         m->input &= ~INPUT_A_PRESSED;
         if (m->pos[1] <= (m->waterLevel - 100)) {
             return set_mario_action(m, ACT_WATER_IDLE, 0);
         } else if (m->pos[1] <= m->floorHeight) {
-            return set_mario_action(m, ACT_IDLE, 0);
+            return set_mario_action(m, ACT_THROWN_BACKWARD, 1);
         } else {
             // slight upwards boost to get you some hover time
-            m->vel[1] = 20.0f;
+            m->vel[1] = 60.0f;
             gPlayer1Controller->buttonDown &= ~U_JPAD;
-            return set_mario_action(m, ACT_FREEFALL, 0);
+            return set_mario_action(m, ACT_THROWN_BACKWARD, 1);
         }
     }
 

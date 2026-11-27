@@ -1,0 +1,13 @@
+extern const GeoLayout jrb_geo_000948[];
+extern Lights1 floating_platform_f3dlite_material_lights;
+extern u8 floating_platform_jrb_textures_0A800_rgba16_rgba16[];
+extern u8 floating_platform_jrb_textures_0A000_rgba16_rgba16[];
+extern Vtx floating_platform_000_displaylist_mesh_layer_1_vtx_0[8];
+extern Gfx floating_platform_000_displaylist_mesh_layer_1_tri_0[];
+extern Vtx floating_platform_000_displaylist_mesh_layer_1_vtx_1[16];
+extern Gfx floating_platform_000_displaylist_mesh_layer_1_tri_1[];
+extern Gfx mat_floating_platform_f3dlite_material[];
+extern Gfx mat_floating_platform_f3dlite_material_001[];
+extern Gfx mat_revert_floating_platform_f3dlite_material_001[];
+extern Gfx floating_platform_000_displaylist_mesh_layer_1[];
+extern Gfx floating_platform_material_revert_render_settings[];

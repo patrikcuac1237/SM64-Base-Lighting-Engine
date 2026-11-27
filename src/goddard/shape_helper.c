@@ -1450,7 +1450,7 @@ struct ObjGroup *Unknown8019AB98(UNUSED u32 a0) {
     light1->position.z = 300.0f;
 
     light1->diffuse.r = 1.0f;
-    light1->diffuse.g = 0.0f;
+    light1->diffuse.g = 1.0f;
     light1->diffuse.b = 0.0f;
 
     light1->unk30 = 1.0f;
@@ -1468,7 +1468,7 @@ struct ObjGroup *Unknown8019AB98(UNUSED u32 a0) {
     light2->position.z = 300.0f;
 
     light2->diffuse.r = 0.0f;
-    light2->diffuse.g = 0.0f;
+    light2->diffuse.g = 1.0f;
     light2->diffuse.b = 1.0f;
 
     light2->unk30 = 1.0f;

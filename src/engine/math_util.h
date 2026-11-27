@@ -426,9 +426,11 @@ extern f32 gSineTable[];
     MAT4_DOT_PROD((R), (A), (B), 3, 3); \
 }
 
-#define MTXF_END(mtx) {                         \
-    (mtx)[0][3] = (mtx)[1][3] = (mtx)[2][3] = 0;\
-    ((u32 *)(mtx))[15] = FLOAT_ONE;             \
+#define MTXF_END(mtx) {                 \
+    (mtx)[0][3] = 0.0f;                 \
+    (mtx)[1][3] = 0.0f;                 \
+    (mtx)[2][3] = 0.0f;                 \
+    (mtx)[3][3] = 1.0f;                 \
 }
 
 #define NAME_INVMAG(v) v##_invmag
@@ -463,13 +465,14 @@ ALWAYS_INLINE s32 roundf(f32 in) {
 #define round_float(in) roundf(in)
 
 /// Absolute value
-ALWAYS_INLINE f32 absf(f32 in) {
-    f32 out;
-    __asm__("abs.s %0,%1" : "=f" (out) : "f" (in));
-    return out;
+static ALWAYS_INLINE float absf(f32 x) {
+    float ret;
+    __asm__("abs.s %0,%1" : "=f" (ret) : "f" (x));
+    return ret;
 }
-ALWAYS_INLINE s32 absi(s32 in) {
-    return ABS(in);
+static ALWAYS_INLINE s32 absi(s32 a0) {
+    register s32 t0 = a0 >> 31;
+    return ((a0 ^ t0) - t0);
 }
 #define abss absi
 
@@ -489,7 +492,7 @@ void min_max_3f(f32 a, f32 b, f32 c, f32 *min, f32 *max);
 void min_max_3i(s32 a, s32 b, s32 c, s32 *min, s32 *max);
 void min_max_3s(s16 a, s16 b, s16 c, s16 *min, s16 *max);
 
-void vec3f_copy    (Vec3f dest, const Vec3f src);
+void *vec3f_copy    (Vec3f dest, const Vec3f src);
 void vec3i_copy    (Vec3i dest, const Vec3i src);
 void vec3s_copy    (Vec3s dest, const Vec3s src);
 void vec3s_to_vec3i(Vec3i dest, const Vec3s src);
@@ -503,7 +506,7 @@ void vec3f_copy_y_off(Vec3f dest, Vec3f src, f32 yOff);
 
 void surface_normal_to_vec3f(Vec3f dest, struct Surface *surf);
 
-void vec3f_set(Vec3f dest, const f32 x, const f32 y, const f32 z);
+void *vec3f_set(Vec3f dest, f32 x, f32 y, f32 z);
 void vec3i_set(Vec3i dest, const s32 x, const s32 y, const s32 z);
 void vec3s_set(Vec3s dest, const s16 x, const s16 y, const s16 z);
 

@@ -16,6 +16,8 @@
 #include "sound_init.h"
 #include "surface_terrains.h"
 #include "rumble_init.h"
+#include "config.h"
+#include "main.h"
 
 s32 check_common_idle_cancels(struct MarioState *m) {
     mario_drop_held_object(m);
@@ -124,8 +126,6 @@ s32 act_idle(struct MarioState *m) {
 #ifndef NO_SLEEP
         if ((m->area->terrainType & TERRAIN_MASK) == TERRAIN_SNOW) {
             return set_mario_action(m, ACT_SHIVERING, 0);
-        } else {
-            return set_mario_action(m, ACT_START_SLEEPING, 0);
         }
 #endif
     }
@@ -676,6 +676,10 @@ s32 act_start_crouching(struct MarioState *m) {
     }
 
     if (m->input & INPUT_A_PRESSED) {
+        if (gConfig.cheats !=0x00) {
+            m->forwardVel = -m->forwardVel;
+            return set_jumping_action(m, ACT_BACKFLIP, 0);
+        }
         return set_jumping_action(m, ACT_BACKFLIP, 0);
     }
 
@@ -701,6 +705,10 @@ s32 act_stop_crouching(struct MarioState *m) {
     }
 
     if (m->input & INPUT_A_PRESSED) {
+        if (gConfig.cheats !=0x00) {
+            m->forwardVel = -m->forwardVel;
+            return set_jumping_action(m, ACT_BACKFLIP, 0);
+        }
         return set_jumping_action(m, ACT_BACKFLIP, 0);
     }
 
@@ -776,7 +784,8 @@ s32 act_shockwave_bounce(struct MarioState *m) {
         queue_rumble_data(70, 40);
 #endif
         if (m->marioObj->oInteractStatus & INT_STATUS_MARIO_KNOCKBACK_DMG) {
-            return hurt_and_set_mario_action(m, ACT_BACKWARD_GROUND_KB, 0, 0xc);
+            m->bIsForward = FALSE;
+            return hurt_and_set_mario_action(m, ACT_GROUND_KNOCKBACK, 0, 0xc);
         }
     }
 
@@ -1020,15 +1029,16 @@ s32 act_ground_pound_land(struct MarioState *m) {
     if (m->input & INPUT_ABOVE_SLIDE) {
         return set_mario_action(m, ACT_BUTT_SLIDE, 0);
     }
-
+if (gConfig.MovesChange) {
     if (m->input & INPUT_A_PRESSED) {
         if (m->flags & MARIO_WING_CAP) {
-            m->vel[1] = 120.0f;
+            m->vel[1] = -m->vel[1] + 20.0f;
             return set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0);
         } else
-        m->vel[1] = 80.0f;
+        m->vel[1] = -m->vel[1];
         return set_mario_action(m, ACT_TRIPLE_JUMP, 0);
     }
+}
 
     landing_step(m, MARIO_ANIM_GROUND_POUND_LANDING, ACT_BUTT_SLIDE_STOP);
     return FALSE;
@@ -1107,7 +1117,6 @@ s32 mario_execute_stationary_action(struct MarioState *m) {
         case ACT_SLEEPING:                cancel = act_sleeping(m);                         break;
         case ACT_WAKING_UP:               cancel = act_waking_up(m);                        break;
         case ACT_PANTING:                 cancel = act_panting(m);                          break;
-        case ACT_HOLD_PANTING_UNUSED:     cancel = act_hold_panting_unused(m);              break;
         case ACT_HOLD_IDLE:               cancel = act_hold_idle(m);                        break;
         case ACT_HOLD_HEAVY_IDLE:         cancel = act_hold_heavy_idle(m);                  break;
         case ACT_IN_QUICKSAND:            cancel = act_in_quicksand(m);                     break;

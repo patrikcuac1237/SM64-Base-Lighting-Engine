@@ -21,7 +21,7 @@
 #include "game/rumble_init.h"
 #include "sm64.h"
 #include "text_strings.h"
-
+extern struct Config gConfig;
 #include "eu_translation.h"
 #if MULTILANG
 #undef LANGUAGE_FUNCTION
@@ -182,7 +182,9 @@ void beh_yellow_background_menu_init(void) {
  * Properly scales the background in the main menu.
  */
 void beh_yellow_background_menu_loop(void) {
-    cur_obj_scale(9.0f);
+    gCurrentObject->header.gfx.scale[1] = gCurrentObject->oMenuButtonScale;
+    gCurrentObject->header.gfx.scale[0] = gConfig.widescreen ? (((gCurrentObject->oMenuButtonScale)/4)*3) : gCurrentObject->oMenuButtonScale;
+    gCurrentObject->header.gfx.scale[2] = gCurrentObject->oMenuButtonScale;
 }
 
 /**
@@ -191,7 +193,7 @@ void beh_yellow_background_menu_loop(void) {
  */
 s32 check_clicked_button(s16 x, s16 y, f32 depth) {
     f32 a = 52.4213f;
-    f32 newX = ((f32) x * 160.0f) / (a * depth);
+    f32 newX = ((f32) x * (gConfig.widescreen ? 220.0f : 160.0f)) / (a * depth);
     f32 newY = ((f32) y * 120.0f) / (a * 3 / 4 * depth);
     s16 maxX = newX + 25.0f;
     s16 minX = newX - 25.0f;
@@ -419,7 +421,30 @@ void bhv_menu_button_loop(void) {
             sCursorClickingTimer = 4;
             break;
     }
-    cur_obj_scale(gCurrentObject->oMenuButtonScale);
+    if (gConfig.widescreen)
+    {   
+        gCurrentObject->header.gfx.scale[0] = gCurrentObject->oMenuButtonScale;
+        if ((sCurrentMenuLevel != MENU_LAYER_SUBMENU) && (gCurrentObject->oMenuButtonState == MENU_BUTTON_STATE_DEFAULT || gCurrentObject->oMenuButtonState == MENU_BUTTON_STATE_GROWING || gCurrentObject->oMenuButtonState == MENU_BUTTON_STATE_ZOOM_IN || gCurrentObject->oMenuButtonState == MENU_BUTTON_STATE_ZOOM_OUT || gCurrentObject->oMenuButtonState == MENU_BUTTON_STATE_ZOOM_IN_OUT || gCurrentObject->oMenuButtonState == MENU_BUTTON_STATE_SHRINKING)) {
+            if (gCurrentObject->oFaceAngleYaw == 0)
+            {
+                gCurrentObject->header.gfx.scale[0] = (((gCurrentObject->oMenuButtonScale)/4)*3);
+            } else if (gCurrentObject->oMenuButtonState == MENU_BUTTON_STATE_GROWING || gCurrentObject->oMenuButtonState == MENU_BUTTON_STATE_SHRINKING)
+            {
+                gCurrentObject->header.gfx.scale[0] = (((gCurrentObject->oMenuButtonScale)/4)*3);
+            }
+        }
+        if (gCurrentObject->oMenuButtonState == MENU_BUTTON_STATE_FULLSCREEN) {
+            if  (!(gCurrentObject->header.gfx.sharedChild == gLoadedGraphNodes[MODEL_MAIN_MENU_MARIO_SAVE_BUTTON_FADE] || gCurrentObject->header.gfx.sharedChild == gLoadedGraphNodes[MODEL_MAIN_MENU_MARIO_SAVE_BUTTON] || gCurrentObject->header.gfx.sharedChild == gLoadedGraphNodes[MODEL_MAIN_MENU_MARIO_SAVE_BUTTON]))
+            {
+                gCurrentObject->header.gfx.scale[0] = (((gCurrentObject->oMenuButtonScale)/4)*3);
+            }
+        }
+        gCurrentObject->header.gfx.scale[1] = gCurrentObject->oMenuButtonScale;
+        gCurrentObject->header.gfx.scale[2] = gCurrentObject->oMenuButtonScale;
+        
+    } else {
+        cur_obj_scale(gCurrentObject->oMenuButtonScale);
+    }
 }
 
 /**
@@ -459,7 +484,7 @@ static const Vec3s sSaveFileButtonPositions[] = {
     sSaveFileButtonPositions[saveFile][1],                                                              \
     sSaveFileButtonPositions[saveFile][2],                                                              \
     0x0, -0x8000, 0x0)
-
+    
 #define MENU_BUTTON_SCALE 0.11111111f
 
 /**
@@ -1064,6 +1089,21 @@ static const Vec3s sSaveFileButtonInitPositions[] = {
                               sSaveFileButtonInitPositions[saveFile][2],                                                                        \
                               0x0, 0x0, 0x0)
 
+static const Vec3s sSaveFileButtonInitPositionsWidescreen[] = {
+    { -4550, 2800, 0 }, // SAVE_FILE_A
+    {  1500, 2800, 0 }, // SAVE_FILE_B
+    { -4550,    0, 0 }, // SAVE_FILE_C
+    {  1500,    0, 0 }, // SAVE_FILE_D
+};
+
+#define SPAWN_FILE_SELECT_FILE_BUTTON_INIT_WIDESCREEN(saveFile)                                                                                            \
+    spawn_object_rel_with_rot(o, (save_file_exists(saveFile) ? MODEL_MAIN_MENU_MARIO_SAVE_BUTTON_FADE : MODEL_MAIN_MENU_MARIO_NEW_BUTTON_FADE), \
+                              bhvMenuButton,                                                                                                    \
+                              sSaveFileButtonInitPositionsWidescreen[saveFile][0],                                                                        \
+                              sSaveFileButtonInitPositionsWidescreen[saveFile][1],                                                                        \
+                              sSaveFileButtonInitPositionsWidescreen[saveFile][2],                                                                        \
+                              0x0, 0x0, 0x0)
+
 /**
  * Menu Buttons Menu Manager Initial Action
  * Creates models of the buttons in the menu. For the Mario buttons it
@@ -1072,36 +1112,36 @@ static const Vec3s sSaveFileButtonInitPositions[] = {
  */
 void bhv_menu_button_manager_init(void) {
     // File A
-    sMainMenuButtons[MENU_BUTTON_PLAY_FILE_A] = SPAWN_FILE_SELECT_FILE_BUTTON_INIT(SAVE_FILE_A);
+    sMainMenuButtons[MENU_BUTTON_PLAY_FILE_A] = gConfig.widescreen ? SPAWN_FILE_SELECT_FILE_BUTTON_INIT_WIDESCREEN(SAVE_FILE_A) : SPAWN_FILE_SELECT_FILE_BUTTON_INIT(SAVE_FILE_A);
     sMainMenuButtons[MENU_BUTTON_PLAY_FILE_A]->oMenuButtonScale = 1.0f;
     // File B
-    sMainMenuButtons[MENU_BUTTON_PLAY_FILE_B] = SPAWN_FILE_SELECT_FILE_BUTTON_INIT(SAVE_FILE_B);
+    sMainMenuButtons[MENU_BUTTON_PLAY_FILE_B] = gConfig.widescreen ? SPAWN_FILE_SELECT_FILE_BUTTON_INIT_WIDESCREEN(SAVE_FILE_B) : SPAWN_FILE_SELECT_FILE_BUTTON_INIT(SAVE_FILE_B);
     sMainMenuButtons[MENU_BUTTON_PLAY_FILE_B]->oMenuButtonScale = 1.0f;
     // File C
-    sMainMenuButtons[MENU_BUTTON_PLAY_FILE_C] = SPAWN_FILE_SELECT_FILE_BUTTON_INIT(SAVE_FILE_C);
+    sMainMenuButtons[MENU_BUTTON_PLAY_FILE_C] = gConfig.widescreen ? SPAWN_FILE_SELECT_FILE_BUTTON_INIT_WIDESCREEN(SAVE_FILE_C) : SPAWN_FILE_SELECT_FILE_BUTTON_INIT(SAVE_FILE_C);
     sMainMenuButtons[MENU_BUTTON_PLAY_FILE_C]->oMenuButtonScale = 1.0f;
     // File D
-    sMainMenuButtons[MENU_BUTTON_PLAY_FILE_D] = SPAWN_FILE_SELECT_FILE_BUTTON_INIT(SAVE_FILE_D);
+    sMainMenuButtons[MENU_BUTTON_PLAY_FILE_D] = gConfig.widescreen ? SPAWN_FILE_SELECT_FILE_BUTTON_INIT_WIDESCREEN(SAVE_FILE_D) : SPAWN_FILE_SELECT_FILE_BUTTON_INIT(SAVE_FILE_D);
     sMainMenuButtons[MENU_BUTTON_PLAY_FILE_D]->oMenuButtonScale = 1.0f;
     // Score menu button
     sMainMenuButtons[MENU_BUTTON_SCORE] =
         spawn_object_rel_with_rot(o, MODEL_MAIN_MENU_GREEN_SCORE_BUTTON,
-                                  bhvMenuButton, -6400, -3500, 0, 0x0, 0x0, 0x0);
+                                  bhvMenuButton, gConfig.widescreen ? -4550 : -6400, -3500, 0, 0x0, 0x0, 0x0);
     sMainMenuButtons[MENU_BUTTON_SCORE]->oMenuButtonScale = 1.0f;
     // Copy menu button
     sMainMenuButtons[MENU_BUTTON_COPY] =
         spawn_object_rel_with_rot(o, MODEL_MAIN_MENU_BLUE_COPY_BUTTON,
-                                  bhvMenuButton, -2134, -3500, 0, 0x0, 0x0, 0x0);
+                                  bhvMenuButton, gConfig.widescreen ? -1543 : -2134, -3500, 0, 0x0, 0x0, 0x0);
     sMainMenuButtons[MENU_BUTTON_COPY]->oMenuButtonScale = 1.0f;
     // Erase menu button
     sMainMenuButtons[MENU_BUTTON_ERASE] =
         spawn_object_rel_with_rot(o, MODEL_MAIN_MENU_RED_ERASE_BUTTON,
-                                  bhvMenuButton,  2134, -3500, 0, 0x0, 0x0, 0x0);
+                                  bhvMenuButton,  gConfig.widescreen ? 1563 : 2134, -3500, 0, 0x0, 0x0, 0x0);
     sMainMenuButtons[MENU_BUTTON_ERASE]->oMenuButtonScale = 1.0f;
     // Sound mode menu button (Option Mode in EU)
     sMainMenuButtons[MENU_BUTTON_SOUND_MODE] =
         spawn_object_rel_with_rot(o, MODEL_MAIN_MENU_PURPLE_SOUND_BUTTON,
-                                  bhvMenuButton,  6400, -3500, 0, 0x0, 0x0, 0x0);
+                                  bhvMenuButton, gConfig.widescreen ? 4600 : 6400, -3500, 0, 0x0, 0x0, 0x0);
     sMainMenuButtons[MENU_BUTTON_SOUND_MODE]->oMenuButtonScale = 1.0f;
 
     sTextBaseAlpha = 0;
@@ -1409,8 +1449,8 @@ void print_save_file_star_count(s8 fileIndex, s16 x, s16 y) {
         // If star count is less than 100, print x icon and move
         // the star count text one digit to the right.
         if (starCount < 100) {
-            print_hud_lut_string(HUD_LUT_GLOBAL, x + 16, y, xIcon);
-            offset = 16;
+            print_hud_lut_string(HUD_LUT_GLOBAL, x + (gConfig.widescreen ? 12 : 16), y, xIcon);
+            offset = gConfig.widescreen ? 10 : 16;
         }
         // Print star count
         int_to_str(starCount, starCountText);
@@ -1444,9 +1484,9 @@ void print_main_menu_strings(void) {
     print_hud_lut_string(HUD_LUT_DIFF, SELECT_FILE_X, 35, textSelectFile);
     // Print file star counts
     print_save_file_star_count(SAVE_FILE_A, SAVEFILE_X1, 78);
-    print_save_file_star_count(SAVE_FILE_B, SAVEFILE_X2, 78);
+    print_save_file_star_count(SAVE_FILE_B, gConfig.widescreen ? SAVEFILE_X2 - 29 : SAVEFILE_X2, 78);
     print_save_file_star_count(SAVE_FILE_C, SAVEFILE_X1, 118);
-    print_save_file_star_count(SAVE_FILE_D, SAVEFILE_X2, 118);
+    print_save_file_star_count(SAVE_FILE_D,  gConfig.widescreen ? SAVEFILE_X2 - 29 : SAVEFILE_X2, 118);
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
     // Print menu names
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
@@ -1460,10 +1500,10 @@ void print_main_menu_strings(void) {
     // Print file names
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
-    print_menu_generic_string(MARIOTEXT_X1, 65, textMarioA);
-    print_menu_generic_string(MARIOTEXT_X2, 65, textMarioB);
-    print_menu_generic_string(MARIOTEXT_X1, 105, textMarioC);
-    print_menu_generic_string(MARIOTEXT_X2, 105, textMarioD);
+    print_menu_generic_string(gConfig.widescreen ? MARIOTEXT_X1 + 20 : MARIOTEXT_X1, 65, textMarioA);
+    print_menu_generic_string(gConfig.widescreen ? MARIOTEXT_X2 - 8 : MARIOTEXT_X2, 65, textMarioB);
+    print_menu_generic_string(gConfig.widescreen ? MARIOTEXT_X1 + 20 : MARIOTEXT_X1, 105, textMarioC);
+    print_menu_generic_string(gConfig.widescreen ? MARIOTEXT_X2 - 8 : MARIOTEXT_X2, 105, textMarioD);
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_end);
 }
 
@@ -1515,9 +1555,9 @@ void print_score_menu_strings(void) {
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
     print_save_file_star_count(SAVE_FILE_A, 90, 76);
-    print_save_file_star_count(SAVE_FILE_B, 211, 76);
+    print_save_file_star_count(SAVE_FILE_B, gConfig.widescreen ? 182 : 211, 76);
     print_save_file_star_count(SAVE_FILE_C, 90, 119);
-    print_save_file_star_count(SAVE_FILE_D, 211, 119);
+    print_save_file_star_count(SAVE_FILE_D, gConfig.widescreen ? 182 : 211, 119);
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 
     // Print menu names
@@ -1531,10 +1571,10 @@ void print_score_menu_strings(void) {
     // Print file names
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
-    print_menu_generic_string(89, 62, textMarioA);
-    print_menu_generic_string(211, 62, textMarioB);
-    print_menu_generic_string(89, 105, textMarioC);
-    print_menu_generic_string(211, 105, textMarioD);
+    print_menu_generic_string(gConfig.widescreen ? 109 : 89, 62, textMarioA);
+    print_menu_generic_string(gConfig.widescreen ? 199 : 211, 62, textMarioB);
+    print_menu_generic_string(gConfig.widescreen ? 109 : 89, 105, textMarioC);
+    print_menu_generic_string(gConfig.widescreen ? 199 : 211, 105, textMarioD);
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_end);
 }
 
@@ -1634,9 +1674,9 @@ void print_copy_menu_strings(void) {
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
     print_save_file_star_count(SAVE_FILE_A, 90, 76);
-    print_save_file_star_count(SAVE_FILE_B, 211, 76);
+    print_save_file_star_count(SAVE_FILE_B, gConfig.widescreen ? 179 : 211, 76);
     print_save_file_star_count(SAVE_FILE_C, 90, 119);
-    print_save_file_star_count(SAVE_FILE_D, 211, 119);
+    print_save_file_star_count(SAVE_FILE_D, gConfig.widescreen ? 179 : 211, 119);
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
     // Print menu names
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
@@ -1648,10 +1688,10 @@ void print_copy_menu_strings(void) {
     // Print file names
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
-    print_menu_generic_string(89, 62, textMarioA);
-    print_menu_generic_string(211, 62, textMarioB);
-    print_menu_generic_string(89, 105, textMarioC);
-    print_menu_generic_string(211, 105, textMarioD);
+    print_menu_generic_string(gConfig.widescreen ? 109 : 89, 62, textMarioA);
+    print_menu_generic_string(gConfig.widescreen ? 197 : 211, 62, textMarioB);
+    print_menu_generic_string(gConfig.widescreen ? 109 : 89, 105, textMarioC);
+    print_menu_generic_string(gConfig.widescreen ? 197 : 211, 105, textMarioD);
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_end);
 }
 
@@ -1833,9 +1873,9 @@ void print_erase_menu_strings(void) {
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
     print_save_file_star_count(SAVE_FILE_A, 90, 76);
-    print_save_file_star_count(SAVE_FILE_B, 211, 76);
+    print_save_file_star_count(SAVE_FILE_B, gConfig.widescreen ? 179 : 211, 76);
     print_save_file_star_count(SAVE_FILE_C, 90, 119);
-    print_save_file_star_count(SAVE_FILE_D, 211, 119);
+    print_save_file_star_count(SAVE_FILE_D, gConfig.widescreen ? 179 : 211, 119);
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 
     // Print menu names
@@ -1850,10 +1890,10 @@ void print_erase_menu_strings(void) {
     // Print file names
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
-    print_menu_generic_string(89, 62, textMarioA);
-    print_menu_generic_string(211, 62, textMarioB);
-    print_menu_generic_string(89, 105, textMarioC);
-    print_menu_generic_string(211, 105, textMarioD);
+    print_menu_generic_string(gConfig.widescreen ? 109 : 89, 62, textMarioA);
+    print_menu_generic_string(gConfig.widescreen ? 197 : 211, 62, textMarioB);
+    print_menu_generic_string(gConfig.widescreen ? 109 : 89, 105, textMarioC);
+    print_menu_generic_string(gConfig.widescreen ? 197 : 211, 105, textMarioD);
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_end);
 }
 
@@ -1888,7 +1928,7 @@ void print_sound_mode_menu_strings(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
 
     // Print sound mode names
-    for (mode = 0, textX = 90; mode < 3; textX += 70, mode++) {
+    for (mode = 0, textX = (gConfig.widescreen ? 80 : 90); mode < 3; textX += (gConfig.widescreen ? 80 : 70), mode++) {
         if (mode == sSoundMode) {
             gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
         } else {

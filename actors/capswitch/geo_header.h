@@ -1,0 +1,13 @@
+extern const GeoLayout capswitch_geo[];
+extern u8 capswitch_cap_switch_base_rgba16_rgba16[];
+extern u8 capswitch_exclamation_mark_ia8[];
+extern Vtx capswitch_000_displaylist_mesh_layer_1_vtx_0[28];
+extern Gfx capswitch_000_displaylist_mesh_layer_1_tri_0[];
+extern Vtx capswitch_000_displaylist_001_mesh_layer_1_vtx_0[34];
+extern Gfx capswitch_000_displaylist_001_mesh_layer_1_tri_0[];
+extern Gfx mat_capswitch_base[];
+extern Gfx mat_revert_capswitch_base[];
+extern Gfx mat_capswitch_color[];
+extern Gfx mat_revert_capswitch_color[];
+extern Gfx capswitch_000_displaylist_mesh_layer_1[];
+extern Gfx capswitch_000_displaylist_001_mesh_layer_1_with_revert[];

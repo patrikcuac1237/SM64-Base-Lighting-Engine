@@ -15,9 +15,9 @@ void fire_bar_spawn_flames(s16 yaw) {
     s32 i;
     f32 xOffset = sins(yaw) * 200.0f;
     f32 zOffset = coss(yaw) * 200.0f;
-    s32 amt = o->oBehParams2ndByte; // Amount of flames to spawn
+    s32 amt = o->oBehParams2ndByte; // Cantidad de flamas a spawnear
 
-    // Use the vanilla default value if the bparam is 0
+    // Usar el valor por defecto de 4 si el bparam es 0
     if (amt == 0) {
         amt = 4;
     }
@@ -28,6 +28,22 @@ void fire_bar_spawn_flames(s16 yaw) {
         flameObj->oLllRotatingHexFlameRelativePosY = o->oPosY - 200.0f;
         flameObj->oLllRotatingHexFlameRelativePosZ += zOffset;
         obj_scale(flameObj, 6.0f);
+
+        // =========================================================
+        // LÓGICA DE LUZ: Solo la flama del medio emite luz
+        // =========================================================
+        // Si amt es 4, i == 2 será la elegida. 
+        // Esto coloca la luz en el corazón de la barra.
+        if (i == amt / 2) {
+            flameObj->oFlags |= OBJ_FLAG_EMIT_LIGHT;
+            flameObj->oLightColor = 0xFF780000; // Color Naranja de fuego
+            
+            // Aumentamos un poco el radio ya que la barra es un objeto grande
+            flameObj->oLightMaxDist = 1200.0f; 
+            flameObj->oLightBrightness = 10;
+        }
+        // =========================================================
+
         xOffset += sins(yaw) * 150.0f;
         zOffset += coss(yaw) * 150.0f;
     }

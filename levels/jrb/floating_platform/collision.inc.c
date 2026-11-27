@@ -10,7 +10,7 @@ const Collision jrb_seg7_collision_floating_platform[] = {
     COL_VERTEX(256, 64, -639),
     COL_VERTEX(256, -63, -639),
     COL_VERTEX(256, 64, 640),
-    COL_TRI_INIT(SURFACE_WOOD, 12),
+    COL_TRI_INIT(NEWTERRAIN(8, 0, 0, 0), 12),
     COL_TRI(0, 1, 2),
     COL_TRI(0, 2, 3),
     COL_TRI(2, 4, 3),

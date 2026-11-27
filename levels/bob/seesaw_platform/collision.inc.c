@@ -10,7 +10,7 @@ const Collision bob_seg7_collision_bridge[] = {
     COL_VERTEX(181, 0, 905),
     COL_VERTEX(181, 51, -904),
     COL_VERTEX(181, 51, 905),
-    COL_TRI_INIT(SURFACE_WOOD, 12),
+    COL_TRI_INIT(NEWTERRAIN(8, 0, 0, 0), 12),
     COL_TRI(0, 1, 2),
     COL_TRI(3, 1, 0),
     COL_TRI(1, 4, 2),

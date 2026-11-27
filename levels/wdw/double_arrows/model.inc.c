@@ -23,6 +23,7 @@ static const Gfx wdw_seg7_dl_070128A8[] = {
     gsSP2Triangles( 4,  6,  5, 0x0,  4,  7,  6, 0x0),
     gsSP2Triangles( 6,  8,  5, 0x0,  7,  9,  6, 0x0),
     gsSP2Triangles(10,  0,  2, 0x0, 10, 11,  0, 0x0),
+    gsSPSetGeometryMode(G_LIGHTING),
     gsSP2Triangles(10,  2, 12, 0x0, 11, 13,  0, 0x0),
     gsSPEndDisplayList(),
 };

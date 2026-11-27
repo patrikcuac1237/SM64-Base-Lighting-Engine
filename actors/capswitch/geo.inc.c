@@ -1,15 +1,16 @@
-// 0x0C000048
-const GeoLayout cap_switch_geo[] = {
-   GEO_CULLING_RADIUS(600),
-   GEO_OPEN_NODE(),
-      GEO_DISPLAY_LIST(LAYER_TRANSPARENT_DECAL, cap_switch_exclamation_seg5_dl_05002E00),
-      GEO_SWITCH_CASE(4, geo_switch_anim_state),
-      GEO_OPEN_NODE(),
-         GEO_DISPLAY_LIST(LAYER_OPAQUE, capswitch_seg5_dl_05003350),
-         GEO_DISPLAY_LIST(LAYER_OPAQUE, capswitch_seg5_dl_05003370),
-         GEO_DISPLAY_LIST(LAYER_OPAQUE, capswitch_seg5_dl_05003390),
-         GEO_DISPLAY_LIST(LAYER_OPAQUE, capswitch_seg5_dl_050033B0),
-      GEO_CLOSE_NODE(),
-   GEO_CLOSE_NODE(),
-   GEO_END(),
+#include "src/game/envfx_snow.h"
+
+const GeoLayout capswitch_geo[] = {
+	GEO_NODE_START(),
+	GEO_OPEN_NODE(),
+		GEO_CULLING_RADIUS(600),
+		GEO_OPEN_NODE(),
+			GEO_OPEN_NODE(),
+				GEO_ASM(1, geo_apply_primitive_color),
+			GEO_CLOSE_NODE(),
+			GEO_ASM(0, geo_object_fix_2cycle_issue),
+			GEO_DISPLAY_LIST(LAYER_OPAQUE, capswitch_000_displaylist_001_mesh_layer_1_with_revert),
+		GEO_CLOSE_NODE(),
+	GEO_CLOSE_NODE(),
+	GEO_END(),
 };

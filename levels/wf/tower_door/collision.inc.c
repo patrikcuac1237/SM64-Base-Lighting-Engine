@@ -6,7 +6,7 @@ const Collision wf_seg7_collision_tower_door[] = {
     COL_VERTEX(0, 0, 108),
     COL_VERTEX(0, 205, 108),
     COL_VERTEX(0, 205, -107),
-    COL_TRI_INIT(SURFACE_DEFAULT, 2),
+    COL_TRI_INIT(NEWTERRAIN(3, 0, 0, 0), 2),
     COL_TRI(0, 1, 2),
     COL_TRI(0, 2, 3),
     COL_TRI_STOP(),

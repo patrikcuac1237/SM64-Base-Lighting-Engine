@@ -1,0 +1,13 @@
+extern const GeoLayout rotating_hexagonal_ring_geo[];
+extern u8 rotating_hexagonal_ring__6_2_rgba16_ci8[];
+extern u8 rotating_hexagonal_ring__6_2_rgba16_pal_rgba16[];
+extern u8 rotating_hexagonal_ring_lll_textures_06000_rgba16_i8[];
+extern Vtx rotating_hexagonal_ring_000_displaylist_mesh_layer_1_vtx_0[12];
+extern Gfx rotating_hexagonal_ring_000_displaylist_mesh_layer_1_tri_0[];
+extern Vtx rotating_hexagonal_ring_000_displaylist_mesh_layer_1_vtx_1[48];
+extern Gfx rotating_hexagonal_ring_000_displaylist_mesh_layer_1_tri_1[];
+extern Gfx mat_rotating_hexagonal_ring__1_layer1[];
+extern Gfx mat_revert_rotating_hexagonal_ring__1_layer1[];
+extern Gfx mat_rotating_hexagonal_ring__2_layer1[];
+extern Gfx mat_revert_rotating_hexagonal_ring__2_layer1[];
+extern Gfx rotating_hexagonal_ring_000_displaylist_mesh_layer_1_with_revert[];

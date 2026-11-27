@@ -1,0 +1,8 @@
+extern const GeoLayout rotating_block_fire_bars_geo[];
+extern u8 rotating_block_fire_bars__8_rgba16_ci4[];
+extern u8 rotating_block_fire_bars__8_rgba16_pal_rgba16[];
+extern Vtx rotating_block_fire_bars_000_displaylist_mesh_layer_1_vtx_0[38];
+extern Gfx rotating_block_fire_bars_000_displaylist_mesh_layer_1_tri_0[];
+extern Gfx mat_rotating_block_fire_bars_f3dlite_material[];
+extern Gfx mat_revert_rotating_block_fire_bars_f3dlite_material[];
+extern Gfx rotating_block_fire_bars_000_displaylist_mesh_layer_1_with_revert[];

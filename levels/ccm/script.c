@@ -18,6 +18,8 @@
 
 static const LevelScript script_func_local_1[] = {
     OBJECT(/*model*/ MODEL_CCM_ROPEWAY_LIFT, /*pos*/ 531, -4430, 6426,    /*angle*/ 0,   0, 0, /*behParam*/ 0x07120000, /*beh*/ bhvPlatformOnTrack),
+    OBJECT(MODEL_LEVEL_GEOMETRY_05, -4210, -1446,  1874, 0, 0, 0, 0x00000000, bhvSnowmansBaseCCM),
+    OBJECT(MODEL_LEVEL_GEOMETRY_05, 2560,  2560, -1023, 0, 0, 0, 0x00000000, bhvSnowmansBaseCCM),
     RETURN(),
 };
 
@@ -26,7 +28,7 @@ static const LevelScript script_func_local_2[] = {
     OBJECT(/*model*/ MODEL_PENGUIN,          /*pos*/  -555,  3470, -1000, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvSmallPenguin),
     OBJECT(/*model*/ MODEL_MR_BLIZZARD,      /*pos*/ -2376, -1589,  4256, /*angle*/ 0, 252, 0, /*behParam*/ 0x00010000, /*beh*/ bhvMrBlizzard),
     OBJECT(/*model*/ MODEL_MR_BLIZZARD,      /*pos*/  -394, -1589,  4878, /*angle*/ 0,  74, 0, /*behParam*/ 0x00010000, /*beh*/ bhvMrBlizzard),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_CCM_SNOWMAN_BASE, /*pos*/  2560,  2662, -1122, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvSnowmansBottom, /*acts*/ ACT_5),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_CCM_SNOWMAN_BASE, /*pos*/  2560,  2800, -1122, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvSnowmansBottom, /*acts*/ ACT_5),
     RETURN(),
 };
 
@@ -34,7 +36,7 @@ static const LevelScript script_func_local_3[] = {
     OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,             /*pos*/  2665, -4607,  4525, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCcmTouchedStarSpawn, /*acts*/ ALL_ACTS),
     OBJECT_WITH_ACTS(/*model*/ MODEL_PENGUIN,          /*pos*/  3450, -4700,  4550, /*angle*/ 0,   0, 0, /*behParam*/ 0x01000000, /*beh*/ bhvTuxiesMother,          /*acts*/ ALL_ACTS),
     OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,             /*pos*/  4200,  -927,   400, /*angle*/ 0,   0, 0, /*behParam*/ 0x03000000, /*beh*/ bhvHiddenRedCoinStar,   /*acts*/ ALL_ACTS),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_CCM_SNOWMAN_HEAD, /*pos*/ -4230, -1169,  1813, /*angle*/ 0, 270, 0, /*behParam*/ 0x04000000, /*beh*/ bhvSnowmansHead,          /*acts*/ ALL_ACTS),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_CCM_SNOWMAN_HEAD, /*pos*/ -4230, -709,  1813, /*angle*/ 0, 270, 0, /*behParam*/ 0x04000000, /*beh*/ bhvSnowmansHead,          /*acts*/ ALL_ACTS),
     OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,             /*pos*/ -2000, -2200, -3000, /*angle*/ 0,   0, 0, /*behParam*/ 0x05000000, /*beh*/ bhvStar,                   /*acts*/ ALL_ACTS),
     RETURN(),
 };
@@ -64,15 +66,11 @@ const LevelScript level_ccm_entry[] = {
     JUMP_LINK(script_func_global_1),
     JUMP_LINK(script_func_global_8),
     JUMP_LINK(script_func_global_17),
-    LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_03, ccm_geo_00042C),
-    LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_04, ccm_geo_00045C),
-    LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_05, ccm_geo_000494),
-    LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_06, ccm_geo_0004BC),
-    LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_07, ccm_geo_0004E4),
-    LOAD_MODEL_FROM_GEO(MODEL_CCM_CABIN_DOOR,    cabin_door_geo),
+    LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_05, ccm_geo_0003F0),
     LOAD_MODEL_FROM_GEO(MODEL_CCM_SNOW_TREE,     snow_tree_geo),
     LOAD_MODEL_FROM_GEO(MODEL_CCM_ROPEWAY_LIFT,  ccm_geo_0003D0),
-    LOAD_MODEL_FROM_GEO(MODEL_CCM_SNOWMAN_BASE,  ccm_geo_0003F0),
+    LOAD_MODEL_FROM_GEO(MODEL_CCM_CABIN_DOOR,    cabin_door_geo),
+    LOAD_MODEL_FROM_GEO(MODEL_CCM_SNOWMAN_BASE,  snowman_base_display_list),
     LOAD_MODEL_FROM_GEO(MODEL_CCM_SNOWMAN_HEAD,  ccm_geo_00040C),
 
     AREA(/*index*/ 1, ccm_geo_00051C),
@@ -99,16 +97,6 @@ const LevelScript level_ccm_entry[] = {
 
     AREA(/*index*/ 2, ccm_geo_0005E8),
         OBJECT(/*model*/ MODEL_NONE, /*pos*/ -5836, 7465, -6143, /*angle*/ 0, 90, 0, /*behParam*/ 0x000A0000, /*beh*/ bhvAirborneWarp),
-        OBJECT(/*model*/ MODEL_NONE, /*pos*/ -5836, 7465, -6143, /*angle*/ 0, 90, 0, /*behParam*/ 0x000A0000, /*beh*/ bhvCastleLight),
-        OBJECT(/*model*/ MODEL_NONE, /*pos*/ -5836, 7465, -6143, /*angle*/ 0, 90, 0, /*behParam*/ 0x000A0000, /*beh*/ bhvCastleLight),
-        OBJECT(/*model*/ MODEL_NONE, /*pos*/ -4136, 2875, -1003, /*angle*/ 0, 90, 0, /*behParam*/ 0x000A0000, /*beh*/ bhvCastleLight),
-        OBJECT(/*model*/ MODEL_NONE, /*pos*/ -5287, 3385, -3111, /*angle*/ 0, 90, 0, /*behParam*/ 0x000A0000, /*beh*/ bhvCastleLight),
-        OBJECT(/*model*/ MODEL_NONE, /*pos*/ -5032, 445, 6637, /*angle*/ 0, 90, 0, /*behParam*/ 0x000A0000, /*beh*/ bhvCastleLight),
-        OBJECT(/*model*/ MODEL_NONE, /*pos*/ -6237, -3575, -7225, /*angle*/ 0, 90, 0, /*behParam*/ 0x000A0000, /*beh*/ bhvCastleLight),
-        OBJECT(/*model*/ MODEL_NONE, /*pos*/ -6237, -3575, -7225, /*angle*/ 0, 90, 0, /*behParam*/ 0x000A0000, /*beh*/ bhvCastleLight),
-        OBJECT(/*model*/ MODEL_NONE, /*pos*/ -7056, -5135, -6929, /*angle*/ 0, 90, 0, /*behParam*/ 0x000A0000, /*beh*/ bhvCastleLight),
-        OBJECT(/*model*/ MODEL_NONE, /*pos*/ -7056, -5135, -6929, /*angle*/ 0, 90, 0, /*behParam*/ 0x000A0000, /*beh*/ bhvCastleLight),
-        OBJECT(/*model*/ MODEL_NONE, /*pos*/ -7056, -5135, -6929, /*angle*/ 0, 90, 0, /*behParam*/ 0x000A0000, /*beh*/ bhvCastleLight),
         WARP_NODE(/*id*/ 0x14, /*destLevel*/ LEVEL_CCM, /*destArea*/ 0x01, /*destNode*/ 0x14, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0x0A, /*destLevel*/ LEVEL_CCM, /*destArea*/ 0x02, /*destNode*/ 0x0A, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0xF0, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x01, /*destNode*/ 0x33, /*flags*/ WARP_NO_CHECKPOINT),

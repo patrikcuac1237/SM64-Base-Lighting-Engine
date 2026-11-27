@@ -23,6 +23,7 @@ enum SpatialPartitions {
     SPATIAL_PARTITION_CEILS,
     SPATIAL_PARTITION_WALLS,
     SPATIAL_PARTITION_WATER,
+    SPATIAL_PARTITION_SHADOWS, // <--- Nueva partición dedicada
     NUM_SPATIAL_PARTITIONS
 };
 

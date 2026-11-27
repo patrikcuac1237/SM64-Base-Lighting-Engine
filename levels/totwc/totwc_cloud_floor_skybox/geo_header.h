@@ -1,0 +1,7 @@
+extern const GeoLayout totwc_cloud_floor_skybox_geo[];
+extern u8 totwc_cloud_floor_skybox_cloud_floor_rgba16_rgba16[];
+extern Vtx totwc_cloud_floor_skybox_Icosphere_mesh_layer_1_vtx_0[684];
+extern Gfx totwc_cloud_floor_skybox_Icosphere_mesh_layer_1_tri_0[];
+extern Gfx mat_totwc_cloud_floor_skybox_sky[];
+extern Gfx mat_revert_totwc_cloud_floor_skybox_sky[];
+extern Gfx totwc_cloud_floor_skybox_Icosphere_mesh_layer_1_with_revert[];

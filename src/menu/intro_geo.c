@@ -12,7 +12,7 @@
 #include "buffers/framebuffers.h"
 #include "game/game_init.h"
 #include "audio/external.h"
-
+extern struct Config gConfig;
 // frame counts for the zoom in, hold, and zoom out of title model
 #define INTRO_STEPS_ZOOM_IN 20
 #define INTRO_STEPS_HOLD_1 75
@@ -69,10 +69,10 @@ Gfx *geo_intro_super_mario_64_logo(s32 callContext, struct GraphNode *node, UNUS
             // disappeared
             vec3_zero(scale);
         }
-        guScale(scaleMat, scale[0], scale[1], scale[2]);
+        guScale(scaleMat, gConfig.widescreen ?  (((scale[0]) / 4) * 3)  : scale[0], scale[1], scale[2]);
 
         gSPMatrix(dlIter++, scaleMat, G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH);
-        gSPDisplayList(dlIter++, &intro_seg7_dl_main_logo);  // draw model
+        gSPDisplayList(dlIter++, &intro_sm64_logo_intro_seg7_dl_logo_mesh_mesh_layer_1_with_revert);  // draw model
         gSPPopMatrix(dlIter++, G_MTX_MODELVIEW);
         gSPEndDisplayList(dlIter);
 

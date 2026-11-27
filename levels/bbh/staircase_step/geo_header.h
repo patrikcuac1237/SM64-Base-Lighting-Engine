@@ -1,0 +1,15 @@
+extern const GeoLayout geo_bbh_0005B0[];
+extern u8 staircase_step_bbh_textures_05000_rgba16_ci8[];
+extern u8 staircase_step_bbh_textures_05000_rgba16_ci8_pal_rgba16[];
+extern u8 staircase_step_bbh_textures_0A000_rgba16_ci8[];
+extern u8 staircase_step_bbh_textures_0A000_rgba16_ci8_pal_rgba16[];
+extern Vtx staircase_step_000_displaylist_mesh_layer_1_vtx_0[16];
+extern Gfx staircase_step_000_displaylist_mesh_layer_1_tri_0[];
+extern Vtx staircase_step_000_displaylist_mesh_layer_1_vtx_1[4];
+extern Gfx staircase_step_000_displaylist_mesh_layer_1_tri_1[];
+extern Gfx mat_staircase_step__0[];
+extern Gfx mat_revert_staircase_step__0[];
+extern Gfx mat_staircase_step__1[];
+extern Gfx mat_revert_staircase_step__1[];
+extern Gfx staircase_step_000_displaylist_mesh_layer_1[];
+extern Gfx staircase_step_material_revert_render_settings[];

@@ -11,7 +11,6 @@ static struct ObjectHitbox sCollectStarHitbox = {
     /* hurtboxRadius:     */ 0,
     /* hurtboxHeight:     */ 0,
 };
-
 void bhv_collect_star_init(void) {
     s8 starId = GET_BPARAM1(o->oBehParams);
 #ifdef GLOBAL_STAR_IDS
@@ -22,20 +21,21 @@ void bhv_collect_star_init(void) {
     if (currentLevelStarFlags & (1 << starId)) {
 #endif
         o->header.gfx.sharedChild = gLoadedGraphNodes[MODEL_TRANSPARENT_STAR];
+        o->oOpacity = 175;
     } else {
         o->header.gfx.sharedChild = gLoadedGraphNodes[MODEL_STAR];
+        AddStarLight();
     }
 
     obj_set_hitbox(o, &sCollectStarHitbox);
 }
-
 void bhv_collect_star_loop(void) {
     o->oFaceAngleYaw += 0x800;
-
     if (o->oInteractStatus & INT_STATUS_INTERACTED) {
         obj_mark_for_deletion(o);
         o->oInteractStatus = INT_STATUS_NONE;
     }
+    AddStarLight();
 }
 
 void bhv_star_spawn_init(void) {
@@ -55,13 +55,14 @@ void bhv_star_spawn_init(void) {
     } else {
         cutscene_object(CUTSCENE_RED_COIN_STAR_SPAWN, o);
     }
-
+    AddStarLight();
     set_time_stop_flags(TIME_STOP_ENABLED | TIME_STOP_MARIO_AND_DOORS);
     o->activeFlags |= ACTIVE_FLAG_INITIATED_TIME_STOP;
     cur_obj_become_intangible();
 }
 
 void bhv_star_spawn_loop(void) {
+    AddStarLight();
     switch (o->oAction) {
         case SPAWN_STAR_ARC_CUTSCENE_ACT_START:
             o->oFaceAngleYaw += 0x1000;
@@ -119,8 +120,8 @@ void bhv_star_spawn_loop(void) {
                 o->oInteractStatus = INT_STATUS_NONE;
             }
             break;
+        }
     }
-}
 
 struct Object *spawn_star(struct Object *starObj, f32 x, f32 y, f32 z) {
     starObj = spawn_object_abs_with_rot(o, 0, MODEL_STAR, bhvStarSpawnCoordinates, o->oPosX, o->oPosY, o->oPosZ, 0, 0, 0);
@@ -181,6 +182,9 @@ void bhv_hidden_red_coin_star_loop(void) {
             if (o->oTimer > 2) {
                 spawn_red_coin_cutscene_star(o->oPosX, o->oPosY, o->oPosZ);
                 spawn_mist_particles();
+                if (o->oFlags & GRAPH_RENDER_ACTIVE) {
+                    AddStarLight();
+                }
                 o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
             }
             break;

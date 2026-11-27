@@ -65,7 +65,7 @@ static const Gfx ddd_seg7_dl_07005EE0[] = {
 const Gfx ddd_seg7_dl_07005F78[] = {
     gsDPPipeSync(),
     gsDPSetEnvColor(255, 255, 255, 98),
-    gsSPClearGeometryMode(G_LIGHTING),
+gsSPSetGeometryMode(G_LIGHTING | G_CULL_BACK),
     gsDPSetCombineMode(G_CC_SHADEFADEA, G_CC_SHADEFADEA),
     gsSPDisplayList(ddd_seg7_dl_07005EE0),
     gsDPPipeSync(),

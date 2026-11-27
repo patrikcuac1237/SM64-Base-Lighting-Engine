@@ -10,7 +10,7 @@ const Collision bbh_seg7_collision_tilt_floor_platform[] = {
     COL_VERTEX(-306, -101, -255),
     COL_VERTEX(-306, 0, -255),
     COL_VERTEX(-306, -101, 256),
-    COL_TRI_INIT(SURFACE_DEFAULT, 12),
+    COL_TRI_INIT(NEWTERRAIN(4, 0, 0, 0), 12),
     COL_TRI(0, 1, 2),
     COL_TRI(2, 3, 0),
     COL_TRI(2, 4, 3),

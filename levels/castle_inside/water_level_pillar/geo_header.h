@@ -1,0 +1,15 @@
+extern const GeoLayout castle_geo_001940[];
+extern u8 water_level_pillar_inside_castle_textures_03000_rgba16_ci8[];
+extern u8 water_level_pillar_inside_castle_textures_03000_rgba16_ci8_pal_rgba16[];
+extern u8 water_level_pillar_inside_castle_textures_0B000_rgba16_ci8[];
+extern u8 water_level_pillar_inside_castle_textures_0B000_rgba16_ci8_pal_rgba16[];
+extern Vtx water_level_pillar_000_displaylist_mesh_layer_1_vtx_0[16];
+extern Gfx water_level_pillar_000_displaylist_mesh_layer_1_tri_0[];
+extern Vtx water_level_pillar_000_displaylist_mesh_layer_1_vtx_1[4];
+extern Gfx water_level_pillar_000_displaylist_mesh_layer_1_tri_1[];
+extern Gfx mat_water_level_pillar__0[];
+extern Gfx mat_revert_water_level_pillar__0[];
+extern Gfx mat_water_level_pillar__2[];
+extern Gfx mat_revert_water_level_pillar__2[];
+extern Gfx water_level_pillar_000_displaylist_mesh_layer_1[];
+extern Gfx water_level_pillar_material_revert_render_settings[];

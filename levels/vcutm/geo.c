@@ -15,3 +15,6 @@
 
 #include "levels/vcutm/seesaw/geo.inc.c"
 #include "levels/vcutm/areas/1/geo.inc.c"
+
+#include "levels/vcutm/vcutm_level/geo.inc.c"
+#include "levels/vcutm/level_death_floor/geo.inc.c"

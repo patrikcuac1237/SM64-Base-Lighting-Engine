@@ -1,13 +1,13 @@
 #include "src/game/envfx_snow.h"
 
-const GeoLayout koopa_000_switch_opt1[] = {
+const GeoLayout koopa_geo_opt_1[] = {
 	GEO_NODE_START(),
 	GEO_OPEN_NODE(),
-		GEO_ANIMATED_PART(LAYER_OPAQUE, 114, 0, 0, koopa_000_offset_002_mesh_layer_1_mat_override_f3dlite_material_005_0),
+		GEO_ANIMATED_PART(LAYER_OPAQUE, 114, 0, 0, koopa_000_offset_002_mesh_layer_1_opt_1),
 	GEO_CLOSE_NODE(),
 	GEO_RETURN(),
 };
-const GeoLayout koopa_with_shell_geo[] = {
+const GeoLayout koopa_geo[] = {
 	GEO_NODE_START(),
 	GEO_OPEN_NODE(),
 		GEO_SHADOW(1, 155, 100),
@@ -24,7 +24,7 @@ const GeoLayout koopa_with_shell_geo[] = {
 							GEO_OPEN_NODE(),
 								GEO_ANIMATED_PART(LAYER_OPAQUE, 114, 0, 0, koopa_000_offset_002_mesh_layer_1),
 							GEO_CLOSE_NODE(),
-							GEO_BRANCH(1, koopa_000_switch_opt1),
+							GEO_BRANCH(1, koopa_geo_opt_1),
 						GEO_CLOSE_NODE(),
 						GEO_ANIMATED_PART(LAYER_OPAQUE, -29, 39, 60, NULL),
 						GEO_OPEN_NODE(),
@@ -55,14 +55,13 @@ const GeoLayout koopa_with_shell_geo[] = {
 							GEO_ANIMATED_PART(LAYER_OPAQUE, 0, 0, 0, koopa_000_offset_009_mesh_layer_1),
 							GEO_OPEN_NODE(),
 								GEO_DISPLAY_LIST(LAYER_OPAQUE, koopa_000_offset_010_skinned_mesh_layer_1),
-								GEO_ANIMATED_PART(LAYER_OPAQUE, 54, 0, 0, koopa_000_offset_010_mesh_layer_1),
+								GEO_ANIMATED_PART(LAYER_OPAQUE, 54, 0, 0, koopa_000_offset_010_mesh_layer_1_with_revert),
 							GEO_CLOSE_NODE(),
 						GEO_CLOSE_NODE(),
 					GEO_CLOSE_NODE(),
 				GEO_CLOSE_NODE(),
 			GEO_CLOSE_NODE(),
 		GEO_CLOSE_NODE(),
-		GEO_DISPLAY_LIST(LAYER_OPAQUE, koopa_material_revert_render_settings),
 	GEO_CLOSE_NODE(),
 	GEO_END(),
 };

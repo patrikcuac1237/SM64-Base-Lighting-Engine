@@ -1,5 +1,4 @@
 // grand_star.inc.c
-
 s32 arc_to_goal_pos(Vec3f a0, Vec3f a1, f32 yVel, f32 gravity) {
     f32 dx = a0[0] - a1[0];
     f32 dz = a0[2] - a1[2];
@@ -79,7 +78,7 @@ void bhv_grand_star_loop(void) {
     if (o->oAngleVelYaw > 0x400) {
         o->oAngleVelYaw -= 0x100;
     }
-
+    AddStarLight();
     o->oFaceAngleYaw += o->oAngleVelYaw;
     cur_obj_scale(2.0f);
     o->oGraphYOffset = 110.0f;

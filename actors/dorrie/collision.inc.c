@@ -152,7 +152,7 @@ const Collision dorrie_seg6_collision_0600F644[] = {
     COL_TRI(56, 37, 76),
     COL_TRI(55, 44, 69),
 
-    COL_TRI_INIT(SURFACE_SWITCH, 85),
+    COL_TRI_INIT(NEWTERRAIN(3, 0, 0, 0), 85),
     COL_TRI(0, 1, 2),
     COL_TRI(2, 3, 0),
     COL_TRI(4, 0, 3),
@@ -320,7 +320,7 @@ const Collision dorrie_seg6_collision_0600FBB8[] = {
     COL_VERTEX(58, 167, 1027),
     COL_VERTEX(105, 247, 914),
 
-    COL_TRI_INIT(SURFACE_SWITCH, 142),
+    COL_TRI_INIT(NEWTERRAIN(3, 0, 0, 0), 142),
     COL_TRI(0, 1, 2),
     COL_TRI(1, 3, 4),
     COL_TRI(1, 5, 3),

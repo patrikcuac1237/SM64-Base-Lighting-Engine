@@ -88,6 +88,9 @@ UNUSED static const u64 binid_21 = 21;
 #include "tree/model.inc.c"
 UNUSED static const u64 binid_22 = 22;
 
+#include "bubbly_tree/model.inc.c"
+#include "spiky_tree/model.inc.c"
+#include "snow_tree/model.inc.c"
 #include "marios_metal_cap/model.inc.c"
 #include "marios_wing_cap/model.inc.c"
-#include "marios_winged_metal_cap/model.inc.c"
+#include "cartoon_star/model.inc.c"

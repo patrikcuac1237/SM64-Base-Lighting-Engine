@@ -114,54 +114,37 @@ struct Object *allocate_object(struct ObjectNode *objList) {
     s32 i;
     struct Object *obj = try_allocate_object(objList, &gFreeObjectList);
 
-    // The object list is full if the newly created pointer is NULL.
-    // If this happens, we first attempt to unload unimportant objects
-    // in order to finish allocating the object.
     if (obj == NULL) {
-        // Look for an unimportant object to kick out.
         struct Object *unimportantObj = find_unimportant_object();
-
-        // If no unimportant object exists, then the object pool is exhausted.
         if (unimportantObj == NULL) {
-            // We've met with a terrible fate.
-            while (TRUE) {
+            while (1) {
+                // Infinite loop in case of object pool exhaustion
             }
         } else {
-            // If an unimportant object does exist, unload it and take its slot.
             unload_object(unimportantObj);
             obj = try_allocate_object(objList, &gFreeObjectList);
-            if (gCurrentObject == obj) {
-                //! Uh oh, the unimportant object was in the middle of
-                //  updating! This could cause some interesting logic errors,
-                //  but I don't know of any unimportant objects that spawn
-                //  other objects.
-            }
         }
     }
 
     // Initialize object fields
-
     obj->activeFlags = ACTIVE_FLAG_ACTIVE | ACTIVE_FLAG_ALLOCATED;
     obj->parentObj = obj;
     obj->prevObj = NULL;
     obj->collidedObjInteractTypes = 0;
     obj->numCollidedObjs = 0;
 
+    for (i = 0; i < MAX_OBJECT_FIELDS; i++) {
+        obj->rawData.asS32[i] = 0;
 #if IS_64_BIT
-    for (i = 0; i < MAX_OBJECT_FIELDS; i++) {
-        obj->rawData.asS32[i] = 0;
         obj->ptrData.asVoidPtr[i] = NULL;
-    }
-#else
-    for (i = 0; i < MAX_OBJECT_FIELDS; i++) {
-        obj->rawData.asS32[i] = 0;
-    }
 #endif
+    }
 
     obj->unused1 = 0;
     obj->bhvStackIndex = 0;
     obj->bhvDelayTimer = 0;
 
+    // Initialize hitbox and hurtbox properties
     obj->hitboxRadius = 50.0f;
     obj->hitboxHeight = 100.0f;
     obj->hurtboxRadius = 0.0f;
@@ -169,23 +152,21 @@ struct Object *allocate_object(struct ObjectNode *objList) {
     obj->hitboxDownOffset = 0.0f;
     obj->unused2 = 0;
 
+    // Initialize other properties
     obj->platform = NULL;
     obj->collisionData = NULL;
     obj->oIntangibleTimer = -1;
     obj->oDamageOrCoinValue = 0;
     obj->oHealth = 2048;
-
     obj->oCollisionDistance = 1000.0f;
     obj->oDrawingDistance = 4000.0f;
-
     mtxf_identity(obj->transform);
-
     obj->respawnInfoType = RESPAWN_INFO_TYPE_NULL;
     obj->respawnInfo = NULL;
-
     obj->oDistanceToMario = 19000.0f;
     obj->oRoom = -1;
 
+    // Reset GFX properties
     obj->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
 #ifdef OBJECTS_REJ
     obj->header.gfx.ucode = GRAPH_NODE_UCODE_REJ;
@@ -203,27 +184,11 @@ struct Object *allocate_object(struct ObjectNode *objList) {
  * Spawn an object at the origin with the behavior script at virtual address bhvScript.
  */
 struct Object *create_object(const BehaviorScript *bhvScript) {
-    s32 objListIndex;
-    struct Object *obj;
-    struct ObjectNode *objList;
+    s32 objListIndex = ((bhvScript[0] >> 24) == 0) ? ((bhvScript[0] >> 16) & 0xFFFF) : OBJ_LIST_DEFAULT;
+    struct Object *obj = allocate_object(&gObjectLists[objListIndex]);
 
-    // If the first behavior script command is "begin <object list>", then
-    // extract the object list from it
-    if ((bhvScript[0] >> 24) == 0) {
-        objListIndex = (bhvScript[0] >> 16) & 0xFFFF;
-    } else {
-        objListIndex = OBJ_LIST_DEFAULT;
-    }
-
-    objList = &gObjectLists[objListIndex];
-    obj = allocate_object(objList);
-
-    obj->curBhvCommand = bhvScript;
-    obj->behavior = bhvScript;
-
-    if (objListIndex == OBJ_LIST_UNIMPORTANT) {
-        obj->activeFlags |= ACTIVE_FLAG_UNIMPORTANT;
-    }
+    obj->curBhvCommand = obj->behavior = bhvScript;
+    obj->activeFlags |= (objListIndex == OBJ_LIST_UNIMPORTANT) ? ACTIVE_FLAG_UNIMPORTANT : 0;
 
     return obj;
 }

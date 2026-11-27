@@ -15,3 +15,6 @@
 
 #include "levels/totwc/cloud/geo.inc.c"
 #include "levels/totwc/areas/1/geo.inc.c"
+
+#include "levels/totwc/totwc_levell/geo.inc.c"
+#include "totwc_cloud_floor_skybox/geo.inc.c"

@@ -567,6 +567,7 @@ u32 save_file_get_flags(void) {
             SAVE_FLAG_UNLOCKED_BITDW_DOOR    |
             SAVE_FLAG_UNLOCKED_BITFS_DOOR    |
             SAVE_FLAG_UNLOCKED_50_STAR_DOOR  |
+            SAVE_FLAG_UNLOCKED_4_COURSE_STAR |
             SAVE_FLAG_COLLECTED_TOAD_STAR_1  |
             SAVE_FLAG_COLLECTED_TOAD_STAR_2  |
             SAVE_FLAG_COLLECTED_TOAD_STAR_3  |
@@ -647,15 +648,18 @@ void save_file_set_cannon_unlocked(void) {
     gSaveFileModified = TRUE;
 }
 
-void save_file_set_cap_pos(s16 x, s16 y, s16 z) {
+void save_file_set_cap_pos(Vec3f capPos) {
     struct SaveFile *saveFile = &gSaveBuffer.files[gCurrSaveFileNum - 1][0];
 
     saveFile->capLevel = gCurrLevelNum;
     saveFile->capArea = gCurrAreaIndex;
+    saveFile->capPos[0] = capPos[0];
+    saveFile->capPos[1] = capPos[1];
+    saveFile->capPos[2] = capPos[2];
 #ifndef SAVE_NUM_LIVES
-    vec3s_set(saveFile->capPos, x, y, z);
+    //vec3s_set(saveFile->capPos, x, y, z);
 #else
-    (void) x; (void) y; (void) z; // Address compiler warnings for unused variables
+    //(void) x; (void) y; (void) z; // Address compiler warnings for unused variables
 #endif
     save_file_set_flags(SAVE_FLAG_CAP_ON_GROUND);
 }
@@ -711,6 +715,17 @@ void save_file_set_widescreen_mode(u8 mode) {
 }
 #endif
 
+u32 save_file_get__moves_change(void) {
+    return gSaveBuffer.menuData.MovesChange;
+}
+
+void save_file_set_moves_change(u8 mode) {
+    gSaveBuffer.menuData.MovesChange = mode;
+
+    gMainMenuDataModified = TRUE;
+    save_main_menu_data();
+}
+
 u32 save_file_get_sound_mode(void) {
     return gSaveBuffer.menuData.soundMode;
 }
@@ -728,7 +743,7 @@ void save_file_move_cap_to_default_location(void) {
                 save_file_set_flags(SAVE_FLAG_CAP_ON_UKIKI);
                 break;
         }
-        save_file_clear_flags(SAVE_FLAG_CAP_ON_GROUND);
+        save_file_set_flags(SAVE_FLAG_CAP_ON_GROUND);
     }
 }
 

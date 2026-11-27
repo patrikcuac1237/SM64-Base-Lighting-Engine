@@ -1,0 +1,13 @@
+extern const GeoLayout checkerboard_platform_geo[];
+extern u8 checkerboard_platform_checkerboard_platform_rgba16_rgba16[];
+extern u8 checkerboard_platform_checkerboard_platform_side_rgba16_ci8[];
+extern u8 checkerboard_platform_checkerboard_platform_side_rgba16_pal_rgba16[];
+extern Vtx checkerboard_platform_000_displaylist_mesh_layer_1_vtx_0[16];
+extern Gfx checkerboard_platform_000_displaylist_mesh_layer_1_tri_0[];
+extern Vtx checkerboard_platform_000_displaylist_mesh_layer_1_vtx_1[8];
+extern Gfx checkerboard_platform_000_displaylist_mesh_layer_1_tri_1[];
+extern Gfx mat_checkerboard_platform__0[];
+extern Gfx mat_revert_checkerboard_platform__0[];
+extern Gfx mat_checkerboard_platform__1[];
+extern Gfx mat_revert_checkerboard_platform__1[];
+extern Gfx checkerboard_platform_000_displaylist_mesh_layer_1_with_revert[];

@@ -93,7 +93,7 @@ void exclamation_box_act_active(void) {
         o->oVelY = 30.0f;
         o->oGravity = -8.0f;
         o->oFloorHeight = o->oPosY;
-        o->oAction = EXCLAMATION_BOX_ACT_SCALING;
+        o->oAction = gMarioState->action == ACT_JUMP_KICK ? EXCLAMATION_BOX_ACT_EXPLODE : EXCLAMATION_BOX_ACT_SCALING;
 #if ENABLE_RUMBLE
         queue_rumble_data(5, 80);
 #endif
@@ -141,7 +141,7 @@ void exclamation_box_spawn_contents(struct ExclamationBoxContents *contentsList,
 void exclamation_box_act_explode(void) {
     exclamation_box_spawn_contents(sExclamationBoxContents, o->oBehParams2ndByte);
     spawn_mist_particles_variable(0, 0, 46.0f);
-    spawn_triangle_break_particles(20, MODEL_CARTOON_STAR, 0.3f, o->oAnimState);
+    spawn_triangle_break_particles(10, MODEL_CARTOON_STAR, 0.3f, o->oAnimState);
     create_sound_spawner(SOUND_GENERAL_BREAK_BOX);
     if (o->oBehParams2ndByte < EXCLAMATION_BOX_BP_COINS_1) {
         o->oAction = EXCLAMATION_BOX_ACT_WAIT_FOR_RESPAWN;

@@ -1,0 +1,11 @@
+extern const GeoLayout hmc_geo_0005A0[];
+extern u8 arrow_platform__5_rgba16_rgba16[];
+extern u8 arrow_platform__3_rgba16_rgba16[];
+extern Vtx arrow_platform_000_displaylist_mesh_layer_1_vtx_0[16];
+extern Gfx arrow_platform_000_displaylist_mesh_layer_1_tri_0[];
+extern Vtx arrow_platform_000_displaylist_mesh_layer_1_vtx_1[8];
+extern Gfx arrow_platform_000_displaylist_mesh_layer_1_tri_1[];
+extern Gfx mat_arrow_platform__1[];
+extern Gfx mat_arrow_platform__0[];
+extern Gfx arrow_platform_000_displaylist_mesh_layer_1[];
+extern Gfx arrow_platform_material_revert_render_settings[];

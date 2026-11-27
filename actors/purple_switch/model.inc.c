@@ -332,39 +332,43 @@ u8 purple_switch_purple_switch_exclamation_point_rgba16_ci8_pal_rgba16[] = {
 	0x41, 0x8f, 
 };
 
-Vtx purple_switch_000_displaylist_mesh_layer_1_vtx_0[12] = {
-	{{{-101, 0, -101}, 0, {2032, 7}, {0xD1, 0x6C, 0xD1, 0xFF}}},
-	{{{-60, 36, -60}, 0, {7336, -1}, {0xDD, 0x75, 0xDD, 0xFF}}},
-	{{{61, 36, -60}, 0, {7336, -25}, {0x23, 0x75, 0xDD, 0xFF}}},
-	{{{102, 0, -101}, 0, {2032, -33}, {0x2F, 0x6C, 0xD1, 0xFF}}},
-	{{{61, 36, 61}, 0, {7336, -1}, {0x23, 0x75, 0x23, 0xFF}}},
-	{{{102, 0, 102}, 0, {2032, 7}, {0x2F, 0x6C, 0x2F, 0xFF}}},
-	{{{-101, 0, 102}, 0, {2032, 7}, {0xD1, 0x6C, 0x2F, 0xFF}}},
-	{{{-60, 36, -60}, 0, {7336, -25}, {0xDD, 0x75, 0xDD, 0xFF}}},
-	{{{-101, 0, -101}, 0, {2032, -33}, {0xD1, 0x6C, 0xD1, 0xFF}}},
-	{{{-60, 36, 61}, 0, {7336, -1}, {0xDD, 0x75, 0x23, 0xFF}}},
-	{{{102, 0, 102}, 0, {2032, -33}, {0x2F, 0x6C, 0x2F, 0xFF}}},
-	{{{61, 36, 61}, 0, {7336, -25}, {0x23, 0x75, 0x23, 0xFF}}},
+Vtx purple_switch_000_displaylist_mesh_layer_1_vtx_0[16] = {
+	{{{102, 0, -101}, 0, {2032, -33}, {0x54, 0x60, 0x0, 0xFF}}},
+	{{{61, 36, -60}, 0, {7336, -25}, {0x54, 0x60, 0x0, 0xFF}}},
+	{{{61, 36, 61}, 0, {7336, -1}, {0x54, 0x60, 0x0, 0xFF}}},
+	{{{102, 0, 102}, 0, {2032, 7}, {0x54, 0x60, 0x0, 0xFF}}},
+	{{{-101, 0, -101}, 0, {2032, 7}, {0x0, 0x60, 0xAC, 0xFF}}},
+	{{{61, 36, -60}, 0, {7336, -25}, {0x0, 0x60, 0xAC, 0xFF}}},
+	{{{102, 0, -101}, 0, {2032, -33}, {0x0, 0x60, 0xAC, 0xFF}}},
+	{{{-60, 36, -60}, 0, {7336, -1}, {0x0, 0x60, 0xAC, 0xFF}}},
+	{{{-101, 0, 102}, 0, {2032, 7}, {0xAC, 0x60, 0x0, 0xFF}}},
+	{{{-60, 36, -60}, 0, {7336, -25}, {0xAC, 0x60, 0x0, 0xFF}}},
+	{{{-101, 0, -101}, 0, {2032, -33}, {0xAC, 0x60, 0x0, 0xFF}}},
+	{{{-60, 36, 61}, 0, {7336, -1}, {0xAC, 0x60, 0x0, 0xFF}}},
+	{{{102, 0, 102}, 0, {2032, -33}, {0x0, 0x60, 0x54, 0xFF}}},
+	{{{61, 36, 61}, 0, {7336, -25}, {0x0, 0x60, 0x54, 0xFF}}},
+	{{{-60, 36, 61}, 0, {7336, -1}, {0x0, 0x60, 0x54, 0xFF}}},
+	{{{-101, 0, 102}, 0, {2032, 7}, {0x0, 0x60, 0x54, 0xFF}}},
 };
 
 Gfx purple_switch_000_displaylist_mesh_layer_1_tri_0[] = {
-	gsSPVertex(purple_switch_000_displaylist_mesh_layer_1_vtx_0 + 0, 12, 0),
+	gsSPVertex(purple_switch_000_displaylist_mesh_layer_1_vtx_0 + 0, 16, 0),
 	gsSP1Triangle(0, 1, 2, 0),
 	gsSP1Triangle(0, 2, 3, 0),
-	gsSP1Triangle(3, 2, 4, 0),
-	gsSP1Triangle(3, 4, 5, 0),
-	gsSP1Triangle(6, 7, 8, 0),
-	gsSP1Triangle(6, 9, 7, 0),
-	gsSP1Triangle(10, 9, 6, 0),
-	gsSP1Triangle(10, 11, 9, 0),
+	gsSP1Triangle(4, 5, 6, 0),
+	gsSP1Triangle(4, 7, 5, 0),
+	gsSP1Triangle(8, 9, 10, 0),
+	gsSP1Triangle(8, 11, 9, 0),
+	gsSP1Triangle(12, 13, 14, 0),
+	gsSP1Triangle(12, 14, 15, 0),
 	gsSPEndDisplayList(),
 };
 
 Vtx purple_switch_000_displaylist_mesh_layer_1_vtx_1[4] = {
-	{{{61, 36, -60}, 0, {2457, -284}, {0x23, 0x75, 0xDD, 0xFF}}},
-	{{{-60, 36, 61}, 0, {-607, 2164}, {0xDD, 0x75, 0x23, 0xFF}}},
-	{{{61, 36, 61}, 0, {2457, 2164}, {0x23, 0x75, 0x23, 0xFF}}},
-	{{{-60, 36, -60}, 0, {-607, -284}, {0xDD, 0x75, 0xDD, 0xFF}}},
+	{{{61, 36, -60}, 0, {2457, -284}, {0x0, 0x7F, 0x0, 0xFF}}},
+	{{{-60, 36, 61}, 0, {-607, 2164}, {0x0, 0x7F, 0x0, 0xFF}}},
+	{{{61, 36, 61}, 0, {2457, 2164}, {0x0, 0x7F, 0x0, 0xFF}}},
+	{{{-60, 36, -60}, 0, {-607, -284}, {0x0, 0x7F, 0x0, 0xFF}}},
 };
 
 Gfx purple_switch_000_displaylist_mesh_layer_1_tri_1[] = {
@@ -375,7 +379,7 @@ Gfx purple_switch_000_displaylist_mesh_layer_1_tri_1[] = {
 };
 
 
-Gfx mat_purple_switch_f3dlite_material_001[] = {
+Gfx mat_purple_switch_base[] = {
 	gsDPPipeSync(),
 	gsDPSetCombineLERP(TEXEL0, 0, SHADE, 0, 0, 0, 0, ENVIRONMENT, TEXEL0, 0, SHADE, 0, 0, 0, 0, ENVIRONMENT),
 	gsSPTexture(65535, 65535, 0, 0, 1),
@@ -397,13 +401,13 @@ Gfx mat_purple_switch_f3dlite_material_001[] = {
 	gsSPEndDisplayList(),
 };
 
-Gfx mat_revert_purple_switch_f3dlite_material_001[] = {
+Gfx mat_revert_purple_switch_base[] = {
 	gsDPPipeSync(),
 	gsDPSetTextureLUT(G_TT_NONE),
 	gsSPEndDisplayList(),
 };
 
-Gfx mat_purple_switch_f3dlite_material[] = {
+Gfx mat_purple_switch_exclamation[] = {
 	gsDPPipeSync(),
 	gsDPSetCombineLERP(TEXEL0, 0, SHADE, 0, 0, 0, 0, ENVIRONMENT, TEXEL0, 0, SHADE, 0, 0, 0, 0, ENVIRONMENT),
 	gsSPTexture(65535, 65535, 0, 0, 1),
@@ -425,19 +429,19 @@ Gfx mat_purple_switch_f3dlite_material[] = {
 	gsSPEndDisplayList(),
 };
 
-Gfx mat_revert_purple_switch_f3dlite_material[] = {
+Gfx mat_revert_purple_switch_exclamation[] = {
 	gsDPPipeSync(),
 	gsDPSetTextureLUT(G_TT_NONE),
 	gsSPEndDisplayList(),
 };
 
 Gfx purple_switch_000_displaylist_mesh_layer_1[] = {
-	gsSPDisplayList(mat_purple_switch_f3dlite_material_001),
+	gsSPDisplayList(mat_purple_switch_base),
 	gsSPDisplayList(purple_switch_000_displaylist_mesh_layer_1_tri_0),
-	gsSPDisplayList(mat_revert_purple_switch_f3dlite_material_001),
-	gsSPDisplayList(mat_purple_switch_f3dlite_material),
+	gsSPDisplayList(mat_revert_purple_switch_base),
+	gsSPDisplayList(mat_purple_switch_exclamation),
 	gsSPDisplayList(purple_switch_000_displaylist_mesh_layer_1_tri_1),
-	gsSPDisplayList(mat_revert_purple_switch_f3dlite_material),
+	gsSPDisplayList(mat_revert_purple_switch_exclamation),
 	gsSPEndDisplayList(),
 };
 

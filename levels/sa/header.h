@@ -15,4 +15,5 @@ extern const MacroObject sa_seg7_macro_objs[];
 // script
 extern const LevelScript level_sa_entry[];
 
+#include "secret_aquarium/geo_header.h"
 #endif

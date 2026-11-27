@@ -67,7 +67,7 @@
 // not in behavior file
 static struct SpawnParticlesInfo sMistParticles = {
     /* behParam:        */ 2,
-    /* count:           */ 20,
+    /* count:           */ 10,
     /* model:           */ MODEL_MIST,
     /* offsetY:         */ 0,
     /* forwardVelBase:  */ 40,
@@ -83,12 +83,12 @@ static struct SpawnParticlesInfo sMistParticles = {
 // generate_wind_puffs/dust (something like that)
 void spawn_mist_particles_variable(s32 count, s32 offsetY, f32 size) {
     sMistParticles.sizeBase = size;
-    sMistParticles.sizeRange = size / 20.0f;
+    sMistParticles.sizeRange = size / 10.0f;
     sMistParticles.offsetY = offsetY;
 
     if (count == 0) {
-        sMistParticles.count = 20;
-    } else if (count > 20) {
+        sMistParticles.count = 10;
+    } else if (count > 10) {
         sMistParticles.count = count;
     } else {
         sMistParticles.count = 4;
@@ -232,3 +232,8 @@ void set_obj_anim_with_accel_and_sound(s16 frame1, s16 frame2, s32 sound) {
 #include "behaviors/strong_wind_particle.inc.c"
 #include "behaviors/sl_snowman_wind.inc.c"
 #include "behaviors/sl_walking_penguin.inc.c"
+#include "behaviors/metal_door.inc.c"
+#include "behaviors/locked_bricks_door.inc.c"
+#include "behaviors/blackya.inc.c"
+#include "behaviors/locked_jungle_door.inc.c"
+#include "behaviors/!skybox.inc.c"

@@ -18,6 +18,7 @@ enum ObjActiveFlags {
     ACTIVE_FLAG_ALLOCATED                      = (1 <<  8), // 0x0100
     ACTIVE_FLAG_DESTRUCTIVE_OBJ_DONT_DESTROY   = (1 <<  9), // 0x0200
     ACTIVE_FLAG_IGNORE_ENV_BOXES               = (1 << 10), // 0x0400
+    ACTIVE_FLAG_HAS_LIGHT                      = (1 << 11),
 };
 
 /* respawnInfoType */
@@ -54,6 +55,9 @@ enum ObjFlags {
     OBJ_FLAG_SILHOUETTE                        = (1 << 19), // 0x00080000
     OBJ_FLAG_OCCLUDE_SILHOUETTE                = (1 << 20), // 0x00100000
     OBJ_FLAG_OPACITY_FROM_CAMERA_DIST          = (1 << 21), // 0x00200000
+    OBJ_FLAG_HAS_ACTIVE_LIGHT                  = (1 << 22),
+    OBJ_FLAG_DYNAMIC_SHADOW                    = (1 << 23),
+    OBJ_FLAG_FAR_AWAY                          = (1 << 24),
     OBJ_FLAG_HITBOX_WAS_SET                    = (1 << 30), // 0x40000000
 };
 

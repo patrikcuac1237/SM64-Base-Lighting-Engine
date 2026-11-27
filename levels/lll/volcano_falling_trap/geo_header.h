@@ -1,0 +1,14 @@
+extern const GeoLayout lll_geo_000EA8[];
+extern u8 volcano_falling_trap__29_rgba16_ci8[];
+extern u8 volcano_falling_trap__29_rgba16_pal_rgba16[];
+extern u8 volcano_falling_trap_lll_textures_0A000_rgba16_ci8[];
+extern u8 volcano_falling_trap_lll_textures_0A000_rgba16_pal_rgba16[];
+extern Vtx volcano_falling_trap_lll_seg7_dl_07025EC0_mesh_mesh_layer_1_vtx_0[16];
+extern Gfx volcano_falling_trap_lll_seg7_dl_07025EC0_mesh_mesh_layer_1_tri_0[];
+extern Vtx volcano_falling_trap_lll_seg7_dl_07025EC0_mesh_mesh_layer_1_vtx_1[10];
+extern Gfx volcano_falling_trap_lll_seg7_dl_07025EC0_mesh_mesh_layer_1_tri_1[];
+extern Gfx mat_volcano_falling_trap__0[];
+extern Gfx mat_revert_volcano_falling_trap__0[];
+extern Gfx mat_volcano_falling_trap__1[];
+extern Gfx mat_revert_volcano_falling_trap__1[];
+extern Gfx volcano_falling_trap_lll_seg7_dl_07025EC0_mesh_mesh_layer_1_with_revert[];

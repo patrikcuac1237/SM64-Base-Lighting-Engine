@@ -638,16 +638,13 @@ void obj_check_floor_death(s16 collisionFlags, struct Surface *floor) {
     }
 
     if ((collisionFlags & OBJ_COL_FLAG_GROUNDED) == OBJ_COL_FLAG_GROUNDED) {
-        switch (floor->type) {
-            case SURFACE_BURNING:
-                o->oAction = OBJ_ACT_LAVA_DEATH;
-                break;
-            case SURFACE_VERTICAL_WIND:
-            case SURFACE_DEATH_PLANE:
-                o->oAction = OBJ_ACT_DEATH_PLANE_DEATH;
-                break;
-            default:
-                break;
+        if (IS_SURFACE_BURNING(floor) == SPECFLAG_BURNING)
+        {
+            o->oAction = OBJ_ACT_LAVA_DEATH;
+
+        } else if (GET_SURFACE_PROP(floor) == SPECFLAG_DEATH_PLANE)
+        {
+            o->oAction = OBJ_ACT_DEATH_PLANE_DEATH;    
         }
     }
 }

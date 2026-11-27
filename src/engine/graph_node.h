@@ -56,7 +56,6 @@ enum GraphNodeTypes {
     GRAPH_NODE_TYPE_ORTHO_PROJECTION,
     GRAPH_NODE_TYPE_PERSPECTIVE,
     GRAPH_NODE_TYPE_MASTER_LIST,
-    GRAPH_NODE_TYPE_LEVEL_OF_DETAIL,
     GRAPH_NODE_TYPE_SWITCH_CASE,
     GRAPH_NODE_TYPE_CAMERA,
     GRAPH_NODE_TYPE_TRANSLATION_ROTATION,
@@ -75,6 +74,8 @@ enum GraphNodeTypes {
     GRAPH_NODE_TYPE_HELD_OBJ,
     GRAPH_NODE_TYPE_CULLING_RADIUS,
     GRAPH_NODE_TYPE_SCENE_LIGHT,
+    GRAPH_NODE_TYPE_LIGHT_POS,
+    GRAPH_NODE_TYPE_SCENE_POINT_LIGHT,
     GRAPH_NODE_TYPE_ROOT,
     GRAPH_NODE_TYPE_START,
 };
@@ -109,9 +110,12 @@ enum GraphNodeTypes {
     GRAPH_NODE_TYPE_CULLING_RADIUS       =  0x2F,
 
     GRAPH_NODE_TYPE_SCENE_LIGHT          =  0x030,
+    GRAPH_NODE_TYPE_SCENE_POINT_LIGHT    =  0x031,
+    GRAPH_NODE_TYPE_LIGHT_POS            =  0x032,
     GRAPH_NODE_TYPES_MASK                =  0xFF,
 };
 #endif
+#define GFX_NUM_MASTER_LISTS 8
 
 // Passed as first argument to a GraphNodeFunc to give information about in
 // which context it was called and what it is expected to do.
@@ -409,6 +413,13 @@ struct GraphNodeSceneLight
     /*0x19*/ u8 b; // Dir y (directional light) or Inverse linear falloff (point light)
     /*0x1A*/ u8 c; // Dir z (directional light) or unused (point light)
     /*0x1B*/ struct SceneLight* light; // Pointer to this light's scene light struct
+    /*0x1C*/ Vec3f WorldPos;
+};
+
+struct GraphNodeLightPos
+{
+    struct GraphNode node;
+    Vec3s worldPos;
 };
 
 extern struct GraphNodeMasterList  *gCurGraphNodeMasterList;
@@ -430,7 +441,6 @@ struct GraphNodeOrthoProjection     *init_graph_node_ortho_projection    (struct
 struct GraphNodePerspective         *init_graph_node_perspective         (struct AllocOnlyPool *pool, struct GraphNodePerspective         *graphNode, f32 fov, u16 near, u16 far, GraphNodeFunc nodeFunc, s32 unused);
 struct GraphNodeStart               *init_graph_node_start               (struct AllocOnlyPool *pool, struct GraphNodeStart               *graphNode);
 struct GraphNodeMasterList          *init_graph_node_master_list         (struct AllocOnlyPool *pool, struct GraphNodeMasterList          *graphNode, s16 on);
-struct GraphNodeLevelOfDetail       *init_graph_node_render_range        (struct AllocOnlyPool *pool, struct GraphNodeLevelOfDetail       *graphNode, s16 minDistance, s16 maxDistance);
 struct GraphNodeSwitchCase          *init_graph_node_switch_case         (struct AllocOnlyPool *pool, struct GraphNodeSwitchCase          *graphNode, s16 numCases, s16 selectedCase, GraphNodeFunc nodeFunc, s32 unused);
 struct GraphNodeCamera              *init_graph_node_camera              (struct AllocOnlyPool *pool, struct GraphNodeCamera              *graphNode, f32 *pos, f32 *focus, GraphNodeFunc func, s32 mode);
 struct GraphNodeTranslationRotation *init_graph_node_translation_rotation(struct AllocOnlyPool *pool, struct GraphNodeTranslationRotation *graphNode, s32 drawingLayer, void *displayList, Vec3s translation, Vec3s rotation);
@@ -450,6 +460,7 @@ struct GraphNodeBackground          *init_graph_node_background          (struct
 struct GraphNodeHeldObject          *init_graph_node_held_object         (struct AllocOnlyPool *pool, struct GraphNodeHeldObject          *graphNode, struct Object *objNode, Vec3s translation, GraphNodeFunc nodeFunc, s32 playerIndex);
 // Advanced lighting engine
 struct GraphNodeSceneLight          *init_graph_node_scene_light         (struct AllocOnlyPool *pool, struct GraphNodeSceneLight          *graphNode, u8 lightType, u8 color[], u8 quadraticFalloff, u8 linearFalloff, u8 unused);
+struct GraphNodeLightPos            *init_graph_node_light_pos           (struct AllocOnlyPool *pool, struct GraphNodeLightPos            *graphNode, Vec3s worldPos);
 
 struct GraphNode *geo_add_child       (struct GraphNode *parent, struct GraphNode *childNode);
 struct GraphNode *geo_remove_child    (struct GraphNode *graphNode);

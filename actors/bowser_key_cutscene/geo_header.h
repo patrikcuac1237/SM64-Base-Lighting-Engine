@@ -1,0 +1,7 @@
+extern const GeoLayout bowser_key_cutscene_geo[];
+extern Vtx bowser_key_cutscene_000_displaylist_mesh_layer_1_vtx_0[210];
+extern Gfx bowser_key_cutscene_000_displaylist_mesh_layer_1_tri_0[];
+extern Gfx mat_bowser_key_cutscene_f3dlite_material[];
+extern Gfx mat_revert_bowser_key_cutscene_f3dlite_material[];
+extern Gfx bowser_key_cutscene_000_displaylist_mesh_layer_1[];
+extern Gfx bowser_key_cutscene_material_revert_render_settings[];

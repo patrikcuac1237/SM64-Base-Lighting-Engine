@@ -79,6 +79,7 @@ static const Gfx wdw_seg7_dl_07012658[] = {
     gsSP2Triangles( 0,  6,  1, 0x0,  7,  8,  9, 0x0),
     gsSP2Triangles( 7, 10,  8, 0x0,  7, 11, 10, 0x0),
     gsSP2Triangles( 7,  9, 12, 0x0,  7, 12, 13, 0x0),
+    gsSPSetGeometryMode(G_LIGHTING),
     gsSPVertex(wdw_seg7_vertex_070123A8, 16, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 3,  6,  4, 0x0,  3,  7,  8, 0x0),

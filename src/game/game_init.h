@@ -60,7 +60,6 @@ extern s8 gEepromProbe;
 #ifdef SRAM
 extern s8 gSramProbe;
 #endif
-
 extern void (*gGoddardVblankCallback)(void);
 extern struct Controller *gPlayer1Controller;
 extern struct Controller *gPlayer2Controller;
@@ -73,6 +72,7 @@ extern struct DemoInput gRecordedDemoInput;
 // of a single word next to the input list. this word is the current ID count.
 extern struct DmaHandlerList gMarioAnimsBuf;
 extern struct DmaHandlerList gDemoInputsBuf;
+extern s32 gUpdateLogic;
 
 extern u8 gMarioAnims[];
 extern u8 gDemoInputs[];

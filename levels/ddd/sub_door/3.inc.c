@@ -19,6 +19,7 @@ static const Gfx ddd_seg7_dl_070091D0[] = {
 // 0x07009208 - 0x07009288
 const Gfx ddd_seg7_dl_07009208[] = {
     gsDPPipeSync(),
+    gsSPSetGeometryMode(G_LIGHTING),
     gsDPSetEnvColor(255, 255, 255, 128),
     gsDPSetCombineMode(G_CC_MODULATERGBFADEA, G_CC_MODULATERGBFADEA),
     gsSPClearGeometryMode(G_LIGHTING),

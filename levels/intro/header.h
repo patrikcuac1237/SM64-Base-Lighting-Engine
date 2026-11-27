@@ -25,5 +25,7 @@ extern const LevelScript script_intro_level_select[];
 extern const LevelScript script_intro_main_level_entry_stop_music[];
 extern const LevelScript script_intro_main_level_entry[];
 extern const LevelScript script_intro_splash_screen[];
+extern Gfx intro_sm64_logo_intro_seg7_dl_logo_mesh_mesh_layer_1_with_revert[];
 
+#include "intro_sm64_logo/geo_header.h"
 #endif

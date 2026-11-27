@@ -1,5 +1,4 @@
 // flame.inc.c
-
 void bhv_moving_flame_loop(void) {
     if (GET_BPARAM2(o->oBehParams) == MOVING_FLAME_BP_1FRAME) {
         if (o->oTimer > 0) {
@@ -39,7 +38,7 @@ void bhv_moving_flame_loop(void) {
             obj_die_if_health_non_positive();
         }
     }
-
+    addCurrentPointLight(0xFF320000, 850, 10, TRUE);
     o->oGraphYOffset = 15.0f * o->header.gfx.scale[1];
 }
 
@@ -49,6 +48,5 @@ void bhv_moving_flame_particle_loop(void) {
     if (approach_f32_ptr(&o->header.gfx.scale[0], 0.0f, 0.6f)) {
         obj_mark_for_deletion(o);
     }
-
     cur_obj_scale(o->header.gfx.scale[0]);
 }

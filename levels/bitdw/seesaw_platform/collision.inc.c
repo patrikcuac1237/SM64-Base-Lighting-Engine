@@ -10,7 +10,7 @@ const Collision bitdw_seg7_collision_0700F70C[] = {
     COL_VERTEX(-306, 102, 819),
     COL_VERTEX(-306, 0, 768),
     COL_VERTEX(307, 0, 768),
-    COL_TRI_INIT(SURFACE_WOOD, 12),
+    COL_TRI_INIT(NEWTERRAIN(8, 0, 0, 0), 12),
     COL_TRI(0, 1, 2),
     COL_TRI(3, 1, 0),
     COL_TRI(3, 4, 1),

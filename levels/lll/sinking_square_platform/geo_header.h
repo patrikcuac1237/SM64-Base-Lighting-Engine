@@ -1,0 +1,8 @@
+extern const GeoLayout sinking_square_platform_geo[];
+extern u8 sinking_square_platform_lll_textures_04000_rgba16_ci4[];
+extern u8 sinking_square_platform_lll_textures_04000_rgba16_pal_rgba16[];
+extern Vtx sinking_square_platform_000_displaylist_mesh_layer_1_vtx_0[14];
+extern Gfx sinking_square_platform_000_displaylist_mesh_layer_1_tri_0[];
+extern Gfx mat_sinking_square_platform__0_layer1[];
+extern Gfx mat_revert_sinking_square_platform__0_layer1[];
+extern Gfx sinking_square_platform_000_displaylist_mesh_layer_1_with_revert[];

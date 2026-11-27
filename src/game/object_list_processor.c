@@ -166,7 +166,7 @@ struct ObjectNode gObjectListArray[16];
 /**
  * The order that object lists are processed in a frame.
  */
-s8 sObjectListUpdateOrder[] = { OBJ_LIST_SPAWNER,
+const s8 sObjectListUpdateOrder[] = { OBJ_LIST_SPAWNER,
                                 OBJ_LIST_SURFACE,
                                 OBJ_LIST_POLELIKE,
                                 OBJ_LIST_PLAYER,
@@ -192,7 +192,7 @@ struct ParticleProperties {
 /**
  * A table mapping particle flags to various properties use when spawning a particle.
  */
-struct ParticleProperties sParticleTypes[] = {
+const struct ParticleProperties sParticleTypes[] = {
     { PARTICLE_DUST,                 ACTIVE_PARTICLE_DUST,                 MODEL_MIST,                 bhvMistParticleSpawner },
     { PARTICLE_VERTICAL_STAR,        ACTIVE_PARTICLE_V_STAR,               MODEL_NONE,                 bhvVertStarParticleSpawner },
     { PARTICLE_HORIZONTAL_STAR,      ACTIVE_PARTICLE_H_STAR,               MODEL_NONE,                 bhvHorStarParticleSpawner },
@@ -273,7 +273,6 @@ void bhv_mario_update(void) {
     s32 i;
 
     particleFlags = execute_mario_action(gCurrentObject);
-
     gCurrentObject->oMarioParticleFlags = particleFlags;
 
     // Mario code updates MarioState's versions of position etc, so we need
@@ -320,15 +319,32 @@ s32 update_objects_starting_at(struct ObjectNode *objList, struct ObjectNode *fi
  * Return the total number of objects in the list (including those that weren't
  * updated)
  */
+
+ void emit_object_light(struct Object *obj) {
+    u32 objFlags = obj->oFlags;
+
+    if (objFlags & OBJ_FLAG_EMIT_LIGHT) {
+        s32 color = obj->oLightColor;
+        u8 RGBMultAdd[3];
+        RGBMultAdd[0] = (color >> 24) & 0xFF;
+        RGBMultAdd[1] = (color >> 16) & 0xFF;
+        RGBMultAdd[2] = (color >> 8) & 0xFF;
+        
+        if ((obj->header.gfx.node.flags & GRAPH_RENDER_ACTIVE) || (gMarioState->heldObj == obj)) {
+            addPointLight((obj->header.gfx.node.flags & GRAPH_RENDER_ACTIVE) ? obj : gMarioState->heldObj, 
+                          RGBMultAdd, obj->oLightMaxDist, obj->oLightBrightness, TRUE);
+        }
+    }
+}
+
 s32 update_objects_during_time_stop(struct ObjectNode *objList, struct ObjectNode *firstObj) {
     s32 count = 0;
     s32 unfrozen;
 
     while (objList != firstObj) {
         gCurrentObject = (struct Object *) firstObj;
-
         unfrozen = FALSE;
-
+        
         // Selectively unfreeze certain objects
         if (!(gTimeStopState & TIME_STOP_ALL_OBJECTS)) {
             if (gCurrentObject == gMarioObject && !(gTimeStopState & TIME_STOP_MARIO_AND_DOORS)) {
@@ -346,12 +362,17 @@ s32 update_objects_during_time_stop(struct ObjectNode *objList, struct ObjectNod
             }
         }
 
-        // Only update if unfrozen
+        // CONTROL DE ACTUALIZACIÓN
         if (unfrozen) {
             gCurrentObject->header.gfx.node.flags |= GRAPH_RENDER_HAS_ANIMATION;
-            cur_obj_update();
+            cur_obj_update(); // Corre el objeto completo (incluye su luz adentro)
         } else {
             gCurrentObject->header.gfx.node.flags &= ~GRAPH_RENDER_HAS_ANIMATION;
+            
+            // --- AQUÍ ESTÁ EL TRUCO ---
+            // El objeto está congelado, pero si tiene el flag de emitir luz,
+            // forzamos al motor a registrar la luz en este frame para que no desaparezca.
+            emit_object_light(gCurrentObject);
         }
 
         firstObj = firstObj->next;
@@ -615,14 +636,11 @@ UNUSED static u16 unused_get_elapsed_time(u64 *cycleCounts, s32 index) {
  * and object surface management.
  */
 void update_objects(UNUSED s32 unused) {
-    //s64 cycleCounts[30];
 #if PUPPYPRINT_DEBUG
     OSTime first = osGetTime();
     OSTime colTime = collisionTime[perfIteration];
 #endif
     fast_profiler_update(PROFILER_TIME_LEVEL_SCRIPT);
-
-    // cycleCounts[0] = get_current_clock();
 
     gTimeStopState &= ~TIME_STOP_MARIO_OPENED_DOOR;
 
@@ -635,45 +653,36 @@ void update_objects(UNUSED s32 unused) {
 
     gObjectLists = gObjectListArray;
 
-    // If time stop is not active, unload object surfaces
-    // cycleCounts[1] = get_clock_difference(cycleCounts[0]);
+    // Limpiamos superficies dinámicas en cada frame para mantener la fluidez a 60 FPS
     clear_dynamic_surfaces();
 
-    // Update spawners and objects with surfaces
-    // cycleCounts[2] = get_clock_difference(cycleCounts[0]);
+    // Actualizamos spawners y objetos con superficies
+    // Nota: Estas funciones ahora deben usar gDeltaTime internamente
     update_terrain_objects();
     
     fast_profiler_update(PROFILER_TIME_OBJECTS1);
 
-    // If Mario was touching a moving platform at the end of last frame, apply
-    // displacement now
-    //! If the platform object unloaded and a different object took its place,
-    //  displacement could be applied incorrectly
+    // Aplicamos desplazamiento de plataformas
+    // IMPORTANTE: Asegúrate de que esta función también multiplique por gDeltaTime
     apply_mario_platform_displacement();
 
-    // Detect which objects are intersecting
-    // cycleCounts[3] = get_clock_difference(cycleCounts[0]);
+    // Detección de colisiones
     detect_object_collisions();
 
-    // Update all other objects that haven't been updated yet
-    // cycleCounts[4] = get_clock_difference(cycleCounts[0]);
+    // Actualización de todos los objetos
+    // Como quitamos el "if", esto corre a 60 FPS (o a los FPS que dé la PC)
+    // La velocidad se regula mediante gDeltaTime dentro de los comportamientos (behaviors)
     update_non_terrain_objects();
 
-    // Unload any objects that have been deactivated
-    // cycleCounts[5] = get_clock_difference(cycleCounts[0]);
+    // Descarga objetos desactivados
     unload_deactivated_objects();
 
-    // Check if Mario is on a platform object and save this object
-    // cycleCounts[6] = get_clock_difference(cycleCounts[0]);
+    // Guarda la plataforma actual de Mario
     update_mario_platform();
 
-    // cycleCounts[7] = get_clock_difference(cycleCounts[0]);
-
-    // cycleCounts[0] = 0;
     try_print_debug_mario_object_info();
 
-    // If time stop was enabled this frame, activate it now so that it will
-    // take effect next frame
+    // Lógica de detención de tiempo
     if (gTimeStopState & TIME_STOP_ENABLED) {
         gTimeStopState |= TIME_STOP_ACTIVE;
     } else {
@@ -681,10 +690,72 @@ void update_objects(UNUSED s32 unused) {
     }
 
     gPrevFrameObjectCount = gObjectCounter;
+
 #if PUPPYPRINT_DEBUG
     profiler_update(behaviourTime, first);
     behaviourTime[perfIteration] -= collisionTime[perfIteration] - colTime;
 #endif
     
     fast_profiler_update(PROFILER_TIME_OBJECTS2);
+}
+
+extern u8 curMarioLightCount;
+extern Lights1 marioLights[5];
+
+ALWAYS_INLINE void addMarioLight(const u8 rgb[3], s8 dir[3]) {
+    s32 i;
+    if (curMarioLightCount >=5) {
+        return;
+    }
+    for (i = 0; i < 3; i++) {
+        marioLights[curMarioLightCount].l[0].l.col[i] = rgb[i];
+        marioLights[curMarioLightCount].l[0].l.colc[i] = rgb[i];
+        marioLights[curMarioLightCount].l[0].l.dir[i] = dir[i];
+    }
+    curMarioLightCount++;
+}
+
+
+#define BRIGHTNESS 1.f
+void addLightSource(f32 maxDist, const u8 RGBMultAdd[3]) {
+    s8 direction[3];
+    f32 dir[3];
+    s32 i;
+    u8 RGBUsed[3];
+    if (o->oDistanceToMario < maxDist) {
+        f32 multiplier = (BRIGHTNESS * (1.0f - (o->oDistanceToMario / maxDist)));
+        for (i = 0; i < 3; i++) {
+            RGBUsed[i] = RGBMultAdd[i] * sqr(multiplier);
+            dir[i] = o->OBJECT_FIELD_F32(O_POS_INDEX + i)
+                    - gMarioState->marioObj->OBJECT_FIELD_F32(O_POS_INDEX + i);
+        }
+        vec3f_normalize(dir);
+        for (i = 0; i < 3; i++) {
+            direction[i] = dir[i] * 126.f;
+        }
+        addMarioLight(RGBUsed, direction);
+    }
+}
+#undef BRIGHTNESS
+void addObjectPointLight(u8 rgb[3], f32 maxDist, s32 brightness) {
+    addPointLight(o, rgb, maxDist, brightness, TRUE);
+}
+
+void addCurrentPointLight(s32 rgb, s16 maxDist, s16 brightness, s16 canOcclude)
+{
+    o->oFlags |= OBJ_FLAG_EMIT_LIGHT;
+    o->oLightColor = rgb;
+    o->oLightMaxDist = maxDist;
+    o->oLightBrightness = brightness;
+    o->oLightCanOcclude = canOcclude;
+}
+
+void AddStarLight(void)
+{
+    if (o->header.gfx.sharedChild == gLoadedGraphNodes[MODEL_STAR]) {addCurrentPointLight(0xFFF03C00, 1500.f, 10, TRUE);}
+}
+
+void Add1UpLight(void)
+{
+    addCurrentPointLight(0x7FF0C800, 250, 7, TRUE);
 }

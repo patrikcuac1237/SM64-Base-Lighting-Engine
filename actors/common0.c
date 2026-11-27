@@ -81,7 +81,9 @@ UNUSED static const u64 binid_17 = 17;
 UNUSED static const u64 binid_18 = 18;
 
 #include "black_bobomb/model.inc.c"
-#include "bobomb_buddy/model.inc.c"
 #include "breakable_box_no_shadow/model.inc.c"
 #include "floating_platform/model.inc.c"
 #include "floating_platform/collision.inc.c"
+#include "blacha/model.inc.c"
+#include "bobomb_throw/model.inc.c"
+#include "floomba/model.inc.c"

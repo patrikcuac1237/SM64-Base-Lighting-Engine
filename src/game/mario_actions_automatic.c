@@ -99,7 +99,7 @@ s32 act_holding_pole(struct MarioState *m) {
 
     if ((m->input & INPUT_Z_PRESSED) || m->health < 0x100) {
         add_tree_leaf_particles(m);
-        m->forwardVel = -2.0f;
+        m->forwardVel = -m->forwardVel;
         return set_mario_action(m, ACT_SOFT_BONK, 0);
     }
 
@@ -271,7 +271,8 @@ s32 perform_hanging_step(struct MarioState *m, Vec3f nextPos) {
     if (ceilHeight - floorHeight <= HANG_DISTANCE) {
         return HANG_HIT_CEIL_OR_OOB;
     }
-    if (ceil->type != SURFACE_HANGABLE) {
+    // ANTES: if (ceil->type != SURFACE_HANGABLE)
+    if (!IS_SURFACE_HANGABLE(ceil)) {
         return HANG_LEFT_CEIL;
     }
 
@@ -392,7 +393,7 @@ s32 act_start_hanging(struct MarioState *m) {
     }
 
     // HackerSM64 fix: check if ceil is NULL to prevent crashing
-    if (m->ceil == NULL || m->ceil->type != SURFACE_HANGABLE) {
+    if (m->ceil == NULL || !IS_SURFACE_HANGABLE(m->ceil)) {
         return set_mario_action(m, ACT_FREEFALL, 0);
     }
 
@@ -427,8 +428,8 @@ s32 act_hanging(struct MarioState *m) {
         return set_mario_action(m, ACT_GROUND_POUND, 0);
     }
 
-    // HackerSM64 fix: check if ceil is NULL to prevent crashing
-    if (m->ceil == NULL || m->ceil->type != SURFACE_HANGABLE) {
+    // ANTES: if (m->ceil == NULL || m->ceil->type != SURFACE_HANGABLE)
+    if (!IS_SURFACE_HANGABLE(m->ceil)) {
         return set_mario_action(m, ACT_FREEFALL, 0);
     }
 
@@ -459,8 +460,8 @@ s32 act_hang_moving(struct MarioState *m) {
         return set_mario_action(m, ACT_GROUND_POUND, 0);
     }
 
-    // HackerSM64 fix: check if ceil is NULL to prevent crashing
-    if (m->ceil == NULL || m->ceil->type != SURFACE_HANGABLE) {
+    // ANTES: if (m->ceil == NULL || m->ceil->type != SURFACE_HANGABLE)
+    if (!IS_SURFACE_HANGABLE(m->ceil)) {
         return set_mario_action(m, ACT_FREEFALL, 0);
     }
 
@@ -678,9 +679,8 @@ s32 act_grabbed(struct MarioState *m) {
 #if ENABLE_RUMBLE
         queue_rumble_data(5, 60);
 #endif
-
-        return set_mario_action(m, (m->forwardVel >= 0.0f) ? ACT_THROWN_FORWARD : ACT_THROWN_BACKWARD,
-                                thrown);
+        m->bIsForward = m->forwardVel > 0.0f ? TRUE : FALSE;
+        return set_mario_action(m, ACT_THROWN_BACKWARD, m->actionArg);
     }
 
     set_mario_animation(m, MARIO_ANIM_BEING_GRABBED);

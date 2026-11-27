@@ -1,0 +1,8 @@
+extern const GeoLayout geo_bitdw_0004F8[];
+extern u8 track_for_pyramid_platforms_rr_textures_03800_rgba16_rgba16[];
+extern Vtx track_for_pyramid_platforms_000_displaylist_mesh_layer_4_vtx_0[32];
+extern Gfx track_for_pyramid_platforms_000_displaylist_mesh_layer_4_tri_0[];
+extern Gfx mat_track_for_pyramid_platforms__0[];
+extern Gfx mat_revert_track_for_pyramid_platforms__0[];
+extern Gfx track_for_pyramid_platforms_000_displaylist_mesh_layer_4[];
+extern Gfx track_for_pyramid_platforms_material_revert_render_settings[];

@@ -298,10 +298,12 @@ u8 sBackgroundMusicDefaultVolume[] = {
     0,   // SEQ_EVENT_CUTSCENE_LAKITU (not in JP)
     75,  // SEQ_DW
     75,  // SEQ_KB
+    75,  // SEQ_SMB3O
+    75,  // SEQ_GERUDO
+    75   // SEQ_UNDERWATER
 };
 
-STATIC_ASSERT(ARRAY_COUNT(sBackgroundMusicDefaultVolume) == SEQ_COUNT,
-              "change this array if you are adding sequences");
+STATIC_ASSERT(ARRAY_COUNT(sBackgroundMusicDefaultVolume) == SEQ_COUNT, "change this array if you are adding sequences");
 
 u8 sCurrentBackgroundMusicSeqId = SEQUENCE_NONE;
 u8 sMusicDynamicDelay = 0;

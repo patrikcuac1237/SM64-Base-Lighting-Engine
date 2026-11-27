@@ -102,7 +102,7 @@ enum MarioAnimID {
     /* 0x5F */ MARIO_ANIM_PULL_DOOR_WALK_IN,
     /* 0x60 */ MARIO_ANIM_PUSH_DOOR_WALK_IN,
     /* 0x61 */ MARIO_ANIM_UNLOCK_DOOR,
-    /* 0x62 */ MARIO_ANIM_START_REACH_POCKET, // unused, reaching keys maybe?
+    /* 0x62 */ MARIO_ANIM_TWIRL_JUMP, // unused, reaching keys maybe?
     /* 0x63 */ MARIO_ANIM_REACH_POCKET, // unused
     /* 0x64 */ MARIO_ANIM_STOP_REACH_POCKET, // unused
     /* 0x65 */ MARIO_ANIM_GROUND_THROW,

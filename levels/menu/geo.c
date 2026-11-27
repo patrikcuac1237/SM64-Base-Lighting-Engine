@@ -176,7 +176,7 @@ const GeoLayout geo_menu_act_selector_strings[] = {
       GEO_OPEN_NODE(),
          GEO_NODE_ORTHO(100),
          GEO_OPEN_NODE(),
-            GEO_BACKGROUND_COLOR(0xFFFF),
+            GEO_DISPLAY_LIST(LAYER_OPAQUE, light_skybox_Cube_mesh_layer_0_with_revert),
          GEO_CLOSE_NODE(),
       GEO_CLOSE_NODE(),
       GEO_ZBUFFER(1),
@@ -186,6 +186,11 @@ const GeoLayout geo_menu_act_selector_strings[] = {
             GEO_CAMERA(CAMERA_MODE_NONE, 0, 0, 1000, 0, 0, 0, 0x00000000),
             GEO_OPEN_NODE(),
                GEO_RENDER_OBJ(),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_DIRECTIONAL, 0xFF, 0xFF, 0xFF, 0x28, 0x28, 0x28),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 0x7F, 0x7F, 0x7F, 0x28, 0x28, 0x28),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_CAMERA, 0x7F, 0x7F, 0x7F, 0x28, 0x28, 0x28),
+               //GEO_OPEN_NODE(),
+               //GEO_CLOSE_NODE(),
             GEO_CLOSE_NODE(),
          GEO_CLOSE_NODE(),
       GEO_CLOSE_NODE(),
@@ -196,3 +201,4 @@ const GeoLayout geo_menu_act_selector_strings[] = {
    GEO_CLOSE_NODE(),
    GEO_END(),
 };
+#include "light_skybox/geo.inc.c"

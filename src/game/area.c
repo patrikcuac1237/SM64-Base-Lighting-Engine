@@ -159,21 +159,19 @@ struct ObjectWarpNode *area_get_warp_node_from_params(struct Object *obj) {
     return area_get_warp_node(GET_BPARAM2(obj->oBehParams));
 }
 
-void load_obj_warp_nodes(void) {
-    struct ObjectWarpNode *warpNode;
-    struct Object *children = (struct Object *) gObjParentGraphNode.children;
-
-    do {
-        struct Object *obj = children;
-
-        if (obj->activeFlags != ACTIVE_FLAG_DEACTIVATED && get_mario_spawn_type(obj) != 0) {
-            warpNode = area_get_warp_node_from_params(obj);
-            if (warpNode != NULL) {
-                warpNode->object = obj;
+ALWAYS_INLINE void load_obj_warp_nodes(void) {
+    for (s32 i = 0; i < OBJECT_POOL_CAPACITY; i++)
+    {
+        struct Object *ObjItr = &gObjectPool[i];
+        if (ObjItr->activeFlags != ACTIVE_FLAG_DEACTIVATED && get_mario_spawn_type(ObjItr) != 0)
+        {
+            struct ObjectWarpNode *WarpNode = area_get_warp_node((ObjItr->oBehParams & 0x00FF0000) >> 16);
+            if (WarpNode)
+            {
+                WarpNode->object = ObjItr;
             }
         }
-    } while ((children = (struct Object *) children->header.gfx.node.next)
-             != (struct Object *) gObjParentGraphNode.children);
+    } 
 }
 
 void clear_areas(void) {

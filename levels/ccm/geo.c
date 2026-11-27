@@ -23,3 +23,10 @@
 #include "levels/ccm/areas/1/10/geo.inc.c"
 #include "levels/ccm/areas/1/geo.inc.c"
 #include "levels/ccm/areas/2/geo.inc.c"
+
+#include "levels/ccm/CCMountain/geo.inc.c"
+#include "levels/ccm/snowman_body/geo.inc.c"
+#include "levels/ccm/CCMArea2/geo.inc.c"
+#include "levels/ccm/ccm_water_level/geo.inc.c"
+#include "ccm_skybox/geo.inc.c"
+#include "ccm_black_background/geo.inc.c"

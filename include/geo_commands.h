@@ -38,7 +38,6 @@ enum GeoLayoutCommands {
     /*0x0A*/ GEO_CMD_NODE_PERSPECTIVE,
     /*0x0B*/ GEO_CMD_NODE_START,
     /*0x0C*/ GEO_CMD_NODE_MASTER_LIST,
-    /*0x0D*/ GEO_CMD_NODE_LEVEL_OF_DETAIL,
     /*0x0E*/ GEO_CMD_NODE_SWITCH_CASE,
     /*0x0F*/ GEO_CMD_NODE_CAMERA,
     /*0x10*/ GEO_CMD_NODE_TRANSLATION_ROTATION,
@@ -61,6 +60,7 @@ enum GeoLayoutCommands {
     /*0x21*/ GEO_CMD_BONE,
     // Advanced lighting engine
     /*0x22*/ GEO_CMD_SCENE_LIGHT,
+    /*0x23*/ GEO_CMD_SCENE_LIGHT_POS,
 };
 
 // geo layout macros
@@ -185,9 +185,6 @@ enum GeoLayoutCommands {
  *   0x04: s16 minDistance
  *   0x06: s16 maxDistance
  */
-#define GEO_RENDER_RANGE(minDistance, maxDistance) \
-    CMD_BBH(GEO_CMD_NODE_LEVEL_OF_DETAIL, 0x00, 0x0000), \
-    CMD_HH(minDistance, maxDistance)
 
 /**
  * 0x0E: Create switch-case scene graph node
@@ -502,5 +499,13 @@ enum GeoLayoutCommands {
 #define GEO_SCENE_LIGHT(lightType, red, green, blue, a, b, c) \
     CMD_BBBB(GEO_CMD_SCENE_LIGHT, lightType, red, green), \
     CMD_BBBB(blue, a, b, c)
+
+#define GEO_SCENE_LIGHT_POSITION(worldPos1, worldPos2, worldPos3) \
+    CMD_BBBB(GEO_CMD_SCENE_LIGHT_POS, worldPos1, worldPos2, worldPos2)
+
+#define GEO_SCENE_LIGHT_NEW(lightType, red, green, blue, a, b, c, pos1, pos2, pos3) \
+    CMD_BBBB(GEO_CMD_SCENE_LIGHT, lightType, red, green), \
+    CMD_BBBB(blue, a, b, c), \
+    CMD_BBH(pos1, pos2, pos3)
 
 #endif // GEO_COMMANDS_H

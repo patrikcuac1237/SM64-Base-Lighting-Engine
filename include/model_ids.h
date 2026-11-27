@@ -252,7 +252,7 @@
 #define MODEL_LLL_SINKING_ROCK_BLOCK              0x37        // lll_geo_000DD0
 #define MODEL_LLL_ROLLING_LOG                     0x39        // lll_geo_000DE8
 #define MODEL_LLL_WOOD_BRIDGE                     0x35        // lll_geo_000B50
-#define MODEL_LLL_LARGE_WOOD_BRIDGE               0x3B        // lll_geo_000B68
+#define MODEL_LLL_LARGE_WOOD_BRIDGE               0x3B        // UNUSED!
 #define MODEL_LLL_FALLING_PLATFORM                0x3C        // lll_geo_000B80
 #define MODEL_LLL_LARGE_FALLING_PLATFORM          0x3D        // lll_geo_000B98
 #define MODEL_LLL_VOLCANO_FALLING_TRAP            0x53        // lll_geo_000EA8
@@ -517,7 +517,7 @@
 // find me
 // find me
 // find me
-#define MODEL_SSL_TOX_BOX                 0xC7        // ssl_geo_000630
+#define MODEL_SSL_TOX_BOX                 0xC7        // tox_box_geo
 #define MODEL_BOWSER_KEY_CUTSCENE         0xC8        // bowser_key_cutscene_geo
 #define MODEL_DL_CANNON_LID               0xC9        // cannon_closed_seg8_dl_080048E0
 #define MODEL_CHECKERBOARD_PLATFORM       0xCA        // checkerboard_platform_geo
@@ -549,11 +549,8 @@
 #define MODEL_SILVER_COIN                 0xE2        // silver_coin_geo
 #define MODEL_SILVER_COIN_NO_SHADOW       0xE3        // silver_coin_no_shadow_geo
 #endif
-
-#define MODEL_LANTERN 0xF0
-#define MODEL_CASTLE_GROUNDS_FLOATING_PLATFORM 0xF1   // floating_platform_geo
-
-// Menu Models (overwrites Level Geometry IDs)
+#define MODEL_SKY                         0xE4
+//  Menu Models (overwrites Level Geometry IDs)
 #define MODEL_MAIN_MENU_MARIO_SAVE_BUTTON         MODEL_LEVEL_GEOMETRY_03   // main_menu_geo_0001D0
 #define MODEL_MAIN_MENU_RED_ERASE_BUTTON          MODEL_LEVEL_GEOMETRY_04   // main_menu_geo_000290
 #define MODEL_MAIN_MENU_BLUE_COPY_BUTTON          MODEL_LEVEL_GEOMETRY_05   // main_menu_geo_0002B8
@@ -574,5 +571,6 @@
 #define MODEL_THI_WARP_PIPE                       MODEL_LEVEL_GEOMETRY_16   // warp_pipe_geo
 #define MODEL_VCUTM_WARP_PIPE                     MODEL_LEVEL_GEOMETRY_16   // warp_pipe_geo
 #define MODEL_CASTLE_GROUNDS_WARP_PIPE            MODEL_LEVEL_GEOMETRY_16   // warp_pipe_geo
+#define MODEL_FLOOMBA                      0xE5
 
 #endif // MODEL_IDS_H

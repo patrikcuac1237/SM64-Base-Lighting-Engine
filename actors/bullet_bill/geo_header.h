@@ -1,0 +1,12 @@
+extern const GeoLayout bullet_bill_geo[];
+extern u8 bullet_bill_bullet_bill_eye_rgba16_ia8[];
+extern u8 bullet_bill_bullet_bill_mouth_rgba16_rgba16[];
+extern Vtx bullet_bill_000_displaylist_mesh_layer_1_vtx_0[70];
+extern Gfx bullet_bill_000_displaylist_mesh_layer_1_tri_0[];
+extern Vtx bullet_bill_000_displaylist_mesh_layer_1_vtx_1[10];
+extern Gfx bullet_bill_000_displaylist_mesh_layer_1_tri_1[];
+extern Gfx mat_bullet_bill__0[];
+extern Gfx mat_revert_bullet_bill__0[];
+extern Gfx mat_bullet_bill__1[];
+extern Gfx mat_revert_bullet_bill__1[];
+extern Gfx bullet_bill_000_displaylist_mesh_layer_1_with_revert[];

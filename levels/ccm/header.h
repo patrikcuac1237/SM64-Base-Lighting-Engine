@@ -57,4 +57,24 @@ extern const Trajectory ccm_seg7_trajectory_penguin_race[];
 // script
 extern const LevelScript level_ccm_entry[];
 
+#include "levels/ccm/CCMountain/geo_header.h"
+
+#include "levels/ccm/CCMCol/collision_header.h"
+
+#include "levels/ccm/snowman_base/geo_header.h"
+
+#include "levels/ccm/snowman_base/collision_header.h"
+
+#include "levels/ccm/snowman_body/geo_header.h"
+
+#include "levels/ccm/snowman_head/geo_header.h"
+
+#include "levels/ccm/CCMArea2/geo_header.h"
+
+#include "levels/ccm/ropeway_lift/geo_header.h"
+
+#include "levels/ccm/ccm_water_level/geo_header.h"
+
+#include "ccm_skybox/geo_header.h"
+#include "ccm_black_background/geo_header.h"
 #endif

@@ -77,6 +77,7 @@
 /**
  * Global Text
  */
+#define TEXT_TIME _("TIME") // Timer Text
 // File Select
 #define TEXT_NEW _("NEW") // New File Text
 #define TEXT_4DASHES _("----") // Used in Score File Menu
@@ -90,7 +91,9 @@
 #define TEXT_HUD_CURRENT_RATIO_43 _("ASPECT RATIO: 4:3")
 #define TEXT_HUD_CURRENT_RATIO_169 _("ASPECT RATIO: 16:9")
 #define TEXT_HUD_PRESS_L _("PRESS L TO SWITCH")
-#define TEXT_HUD_PRESS_B _("R TO ACTIVATE CHEATS")
+#define TEXT_HUD_CURRENT_MOVES_OFF _("EXTRA MOVES: OFF")
+#define TEXT_HUD_CURRENT_MOVES_ON _("EXTRA MOVES: ON")
+#define TEXT_HUD_PRESS_R _("PRESS R TO SWITCH")
 #endif
 
 #if defined(VERSION_JP) || defined(VERSION_SH)

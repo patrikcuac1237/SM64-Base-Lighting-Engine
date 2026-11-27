@@ -63,7 +63,23 @@ extern const struct MovtexQuadCollection jrb_movtex_sunken_ship_water[];
 // script
 extern const LevelScript level_jrb_entry[];
 
+#include "levels/jrb/jrbArea1/geo_header.h"
 
-#include "levels/jrb/header.inc.h"
+#include "levels/jrb/rock/geo_header.h"
 
+#include "levels/jrb/falling_pillar/geo_header.h"
+
+#include "levels/jrb/floating_platform/geo_header.h"
+
+#include "levels/jrb/wooden_ship/geo_header.h"
+
+#include "levels/jrb/falling_pillar_base/geo_header.h"
+
+#include "levels/jrb/sliding_box/geo_header.h"
+
+#include "levels/jrb/jrbarea2/geo_header.h"
+
+#include "jrb_skybox/geo_header.h"
+
+#include "jrbArea1_bright/geo_header.h"
 #endif

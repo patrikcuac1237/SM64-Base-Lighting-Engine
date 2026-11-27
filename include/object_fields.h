@@ -240,7 +240,7 @@
 #define /*0x0F8*/ oBirdTargetAngleVec       OBJECT_FIELD_S32(O_BIRD_TARGET_ANGLE_INDEX)
 #define /*0x0F8*/ oBirdTargetPitch          OBJECT_FIELD_S32(O_BIRD_TARGET_PITCH_INDEX)
 #define /*0x0FC*/ oBirdTargetYaw            OBJECT_FIELD_S32(O_BIRD_TARGET_YAW_INDEX)
-#define /*0x100*/ oBirdTargetRoll           OBJECT_FIELD_S32(O_BIRD_TARGET_ROLL_INDEX) // unused
+#define /*0x100*/ oTimerF           OBJECT_FIELD_S32(O_BIRD_TARGET_ROLL_INDEX) // unused
 
 /* Bird Chirp Chirp */
 #define /*0x0F4*/ oCheepCheepSpawnerSpawnAmount OBJECT_FIELD_S32(0x1B)
@@ -1346,8 +1346,9 @@ os16112*/
 // These use previously unused object fields outside of the normal range
 // for specific behaviors, so they shouldn't interfere with any custom ones
 #define /*0x148*/ oLightColor                 OBJECT_FIELD_S32(0x30) // 0xRRGGBB00
-#define /*0x1A4*/ oLightQuadraticFalloff      OBJECT_FIELD_S16(0x47, 0)
-#define /*0x1A6*/ oLightLinearFalloff         OBJECT_FIELD_S16(0x47, 1)
-#define /*0x098*/ oLightConstantFalloff       OBJECT_FIELD_S16(0x04, 0)
+#define /*0x1A4*/ oLightBrightness            OBJECT_FIELD_S16(0x47, 0)
+#define /*0x1A6*/ oLightMaxDist               OBJECT_FIELD_S16(0x47, 1)
+#define /*0x098*/ oLightCanOcclude            OBJECT_FIELD_S16(0x04, 0)
+#define /*     */ oLightType                  OBJECT_FIELD_S32(0x34)
 
 #endif // OBJECT_FIELDS_H

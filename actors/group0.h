@@ -335,4 +335,11 @@ extern const Gfx white_particle_small_unused_dl[];
 
 #include "lantern/geo_header.h"
 
+#include "bubble/geo_header.h"
+
+#include "water_splash/geo_header.h"
+
+#include "walk_smoke/geo_header.h"
+
+#include "white_particle_small/geo_header.h"
 #endif

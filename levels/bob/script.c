@@ -73,11 +73,14 @@ const LevelScript level_bob_entry[] = {
     LOAD_MODEL_FROM_GEO(MODEL_BOB_CHAIN_CHOMP_GATE, bob_geo_000440),
     LOAD_MODEL_FROM_GEO(MODEL_BOB_SEESAW_PLATFORM,  bob_geo_000458),
     LOAD_MODEL_FROM_GEO(MODEL_BOB_BARS_GRILLS,      bob_geo_000470),
+    LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_03,    star_zone_geo),
+    LOAD_MODEL_FROM_GEO(MODEL_SKY,                  bob_water_skybox_geo),
 
     AREA(/*index*/ 1, bob_geo_000488),
         JUMP_LINK(script_func_local_1),
         JUMP_LINK(script_func_local_2),
         JUMP_LINK(script_func_local_3),
+        OBJECT          (/*model*/ MODEL_LEVEL_GEOMETRY_03,     /*pos*/     0,    0,     0, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvBOBStarZone),
         OBJECT(/*model*/ MODEL_NONE, /*pos*/ -6558,  1000,  6464, /*angle*/ 0, 135, 0,  /*behParam*/ 0x000A0000, /*beh*/ bhvSpinAirborneWarp),
         OBJECT(/*model*/ MODEL_NONE, /*pos*/   583,  2683, -5387, /*angle*/ 0, -154, 0, /*behParam*/ 0x000B0000, /*beh*/ bhvFadingWarp),
         OBJECT(/*model*/ MODEL_NONE, /*pos*/  1680,  3835, -5523, /*angle*/ 0, -153, 0, /*behParam*/ 0x000C0000, /*beh*/ bhvFadingWarp),
@@ -98,7 +101,7 @@ const LevelScript level_bob_entry[] = {
     END_AREA(),
 
     FREE_LEVEL_POOL(),
-    MARIO_POS(/*area*/ 1, /*yaw*/ 135, /*pos*/ -6558, 0, 6464),
+    MARIO_POS(/*area*/ 1, /*yaw*/ 135, /*pos*/ -6558, 1000, 6464),
     CALL(/*arg*/ 0, /*func*/ lvl_init_or_update),
     CALL_LOOP(/*arg*/ 1, /*func*/ lvl_init_or_update),
     CLEAR_LEVEL(),

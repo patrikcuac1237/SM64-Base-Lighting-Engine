@@ -257,64 +257,44 @@ void set_mario_initial_cap_powerup(struct MarioState *m) {
     }
 }
 
+struct MarioSpawnAction {
+    u32 action;
+    u32 arg;
+};
+
+static const struct MarioSpawnAction sMarioSpawnActionTable[] = {
+    [MARIO_SPAWN_DOOR_WARP]           = { ACT_WARP_DOOR_SPAWN,           0 }, // El arg se sobreescribe abajo
+    [MARIO_SPAWN_IDLE]                = { ACT_IDLE,                      0 },
+    [MARIO_SPAWN_PIPE]                = { ACT_EMERGE_FROM_PIPE,          0 },
+    [MARIO_SPAWN_TELEPORT]             = { ACT_TELEPORT_FADE_IN,          0 },
+    [MARIO_SPAWN_INSTANT_ACTIVE]      = { ACT_IDLE,                      0 },
+    [MARIO_SPAWN_AIRBORNE]            = { ACT_SPAWN_NO_SPIN_AIRBORNE,    0 },
+    [MARIO_SPAWN_HARD_AIR_KNOCKBACK]  = { ACT_HARD_BACKWARD_AIR_KB,      0 },
+    [MARIO_SPAWN_SPIN_AIRBORNE_CIRCLE]= { ACT_SPAWN_SPIN_AIRBORNE,       0 },
+    [MARIO_SPAWN_DEATH]               = { ACT_FALLING_DEATH_EXIT,        0 },
+    [MARIO_SPAWN_SPIN_AIRBORNE]       = { ACT_SPAWN_SPIN_AIRBORNE,       0 },
+    [MARIO_SPAWN_FLYING]              = { ACT_FLYING,                    2 },
+    [MARIO_SPAWN_SWIMMING]            = { ACT_WATER_IDLE,                1 },
+    [MARIO_SPAWN_PAINTING_STAR_COLLECT] = { ACT_EXIT_AIRBORNE,           0 },
+    [MARIO_SPAWN_PAINTING_DEATH]      = { ACT_DEATH_EXIT,                0 },
+    [MARIO_SPAWN_AIRBORNE_STAR_COLLECT] = { ACT_FALLING_EXIT_AIRBORNE,  0 },
+    [MARIO_SPAWN_AIRBORNE_DEATH]      = { ACT_UNUSED_DEATH_EXIT,         0 },
+    [MARIO_SPAWN_LAUNCH_STAR_COLLECT] = { ACT_SPECIAL_EXIT_AIRBORNE,    0 },
+    [MARIO_SPAWN_LAUNCH_DEATH]        = { ACT_SPECIAL_DEATH_EXIT,        0 },
+};
+
 void set_mario_initial_action(struct MarioState *m, u32 spawnType, u32 actionArg) {
-    switch (spawnType) {
-        case MARIO_SPAWN_DOOR_WARP:
-            set_mario_action(m, ACT_WARP_DOOR_SPAWN, actionArg);
-            break;
-        case MARIO_SPAWN_IDLE:
-            set_mario_action(m, ACT_IDLE, 0);
-            break;
-        case MARIO_SPAWN_PIPE:
-            set_mario_action(m, ACT_EMERGE_FROM_PIPE, 0);
-            break;
-        case MARIO_SPAWN_TELEPORT:
-            set_mario_action(m, ACT_TELEPORT_FADE_IN, 0);
-            break;
-        case MARIO_SPAWN_INSTANT_ACTIVE:
-            set_mario_action(m, ACT_IDLE, 0);
-            break;
-        case MARIO_SPAWN_AIRBORNE:
-            set_mario_action(m, ACT_SPAWN_NO_SPIN_AIRBORNE, 0);
-            break;
-        case MARIO_SPAWN_HARD_AIR_KNOCKBACK:
-            set_mario_action(m, ACT_HARD_BACKWARD_AIR_KB, 0);
-            break;
-        case MARIO_SPAWN_SPIN_AIRBORNE_CIRCLE:
-            set_mario_action(m, ACT_SPAWN_SPIN_AIRBORNE, 0);
-            break;
-        case MARIO_SPAWN_DEATH:
-            set_mario_action(m, ACT_FALLING_DEATH_EXIT, 0);
-            break;
-        case MARIO_SPAWN_SPIN_AIRBORNE:
-            set_mario_action(m, ACT_SPAWN_SPIN_AIRBORNE, 0);
-            break;
-        case MARIO_SPAWN_FLYING:
-            set_mario_action(m, ACT_FLYING, 2);
-            break;
-        case MARIO_SPAWN_SWIMMING:
-            set_mario_action(m, ACT_WATER_IDLE, 1);
-            break;
-        case MARIO_SPAWN_PAINTING_STAR_COLLECT:
-            set_mario_action(m, ACT_EXIT_AIRBORNE, 0);
-            break;
-        case MARIO_SPAWN_PAINTING_DEATH:
-            set_mario_action(m, ACT_DEATH_EXIT, 0);
-            break;
-        case MARIO_SPAWN_AIRBORNE_STAR_COLLECT:
-            set_mario_action(m, ACT_FALLING_EXIT_AIRBORNE, 0);
-            break;
-        case MARIO_SPAWN_AIRBORNE_DEATH:
-            set_mario_action(m, ACT_UNUSED_DEATH_EXIT, 0);
-            break;
-        case MARIO_SPAWN_LAUNCH_STAR_COLLECT:
-            set_mario_action(m, ACT_SPECIAL_EXIT_AIRBORNE, 0);
-            break;
-        case MARIO_SPAWN_LAUNCH_DEATH:
-            set_mario_action(m, ACT_SPECIAL_DEATH_EXIT, 0);
-            break;
+    // 1. Aplicamos la acción desde la tabla
+    if (spawnType < (sizeof(sMarioSpawnActionTable) / sizeof(sMarioSpawnActionTable[0]))) {
+        const struct MarioSpawnAction *spawn = &sMarioSpawnActionTable[spawnType];
+        
+        // Manejo especial: Door Warp usa el actionArg que viene por parámetro
+        u32 finalArg = (spawnType == MARIO_SPAWN_DOOR_WARP) ? actionArg : spawn->arg;
+        
+        set_mario_action(m, spawn->action, finalArg);
     }
 
+    // 2. Parche para prevenir bucles de muerte (tu código original)
 #ifdef PREVENT_DEATH_LOOP
     if (m->isDead) {
         m->health = 0x880;
@@ -621,7 +601,10 @@ void initiate_warp(s16 destLevel, s16 destArea, s16 destWarpNode, s32 warpFlags)
  */
 struct WarpNode *get_painting_warp_node(void) {
     struct WarpNode *warpNode = NULL;
-    s32 paintingIndex = gMarioState->floor->type - SURFACE_PAINTING_WARP_D3;
+    
+    // Extraemos el ID del suelo actual y le restamos el ID base (0xD3)
+    // Usamos (cmd & 0xFF) para ignorar los bits de NEWTERRAIN
+    s32 paintingIndex = (gMarioState->floor->type & 0xFF) - 0xD3; 
 
     if (paintingIndex >= PAINTING_WARP_INDEX_START && paintingIndex < PAINTING_WARP_INDEX_END) {
         if (paintingIndex < PAINTING_WARP_INDEX_FA
@@ -1008,6 +991,7 @@ s32 play_mode_normal(void) {
             set_play_mode(PLAY_MODE_PAUSED);
         }
     }
+    clear_time_stop_flags(TIME_STOP_PAUSE);
 
     return FALSE;
 }
@@ -1032,7 +1016,8 @@ s32 play_mode_paused(void) {
         gCameraMovementFlags &= ~CAM_MOVE_PAUSE_SCREEN;
 #endif
     }
-
+    set_time_stop_flags(TIME_STOP_PAUSE);
+    area_update_objects();
     return FALSE;
 }
 
@@ -1074,6 +1059,8 @@ s32 play_mode_change_area(void) {
     if (sTransitionUpdate != NULL) {
         sTransitionUpdate(&sTransitionTimer);
     }
+    set_time_stop_flags(TIME_STOP_PAUSE);
+    area_update_objects();
 
     if (--sTransitionTimer == -1) {
         update_camera(gCurrentArea->camera);
@@ -1092,6 +1079,8 @@ s32 play_mode_change_level(void) {
     if (sTransitionUpdate != NULL) {
         sTransitionUpdate(&sTransitionTimer);
     }
+    set_time_stop_flags(TIME_STOP_PAUSE);
+    area_update_objects();
 
     if (--sTransitionTimer == -1) {
         gHudDisplay.flags = HUD_DISPLAY_NONE;

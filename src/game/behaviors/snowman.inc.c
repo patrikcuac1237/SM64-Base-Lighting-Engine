@@ -91,7 +91,7 @@ void snowmans_bottom_act_final_stretch(void) { // act 2
         cur_obj_play_sound_2(SOUND_OBJ_SNOWMAN_BOUNCE);
     }
 
-    if (o->oTimer == 200) {
+    if (o->oTimer == 150) {
         create_respawner(MODEL_CCM_SNOWMAN_BASE, bhvSnowmansBottom, 3000);
         o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
     }
@@ -162,11 +162,13 @@ void bhv_snowmans_head_init(void) {
     o->oGravity = 5.0f;
     o->oFriction = 0.999f;
     o->oBuoyancy = 2.0f;
+    o->oGraphYOffset = 110;
 
     if ((starFlags & (1 << behParams)) && gCurrActNum != behParams + 1) {
         spawn_object_abs_with_rot(o, 0, MODEL_CCM_SNOWMAN_BASE, bhvBigSnowmanWhole, sSnowmanHeadPos[0], sSnowmanHeadPos[1], sSnowmanHeadPos[2], 0, 0, 0);
         vec3f_copy(&o->oPosVec, sSnowmanHeadPos);
         o->oAction = SNOWMANS_HEAD_ACT_NONE;
+        o->oGraphYOffset = 454;
     }
 }
 

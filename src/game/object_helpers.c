@@ -76,9 +76,9 @@ Gfx *geo_update_layer_transparency(s32 callContext, struct GraphNode *node, UNUS
             } else {
                 SET_GRAPH_NODE_LAYER(currentGraphNode->fnNode.node.flags, LAYER_TRANSPARENT);
             }
-
+            
             objectGraphNode->oAnimState = TRANSPARENCY_ANIM_STATE_TRANSPARENT;
-
+            
             if (objectOpacity == 0x00 && segmented_to_virtual(bhvBowser) == objectGraphNode->behavior) {
                 objectGraphNode->oAnimState = BOWSER_ANIM_STATE_INVISIBLE;
             }
@@ -93,6 +93,40 @@ Gfx *geo_update_layer_transparency(s32 callContext, struct GraphNode *node, UNUS
     }
 
     return dlStart;
+}
+
+static Gfx *geo_object_set_render_mode_2cycle(struct GraphNodeGenerated *node, u32 type) {
+    Gfx *gfx;
+    Gfx *gfxHead = NULL;
+    gfxHead = alloc_display_list(2 * sizeof(*gfxHead));
+    gfx = gfxHead;
+    if (type == 0)
+    {
+        SET_GRAPH_NODE_LAYER(node->fnNode.node.flags, LAYER_OPAQUE);
+        gDPSetRenderMode(gfx++, G_RM_NOOP, G_RM_AA_ZB_OPA_SURF2);
+    } else if (type == 2)
+    {
+        gDPSetRenderMode(gfx++, G_RM_NOOP, G_RM_AA_ZB_TEX_EDGE2);
+    } else if (type == 3)
+    {
+        gDPSetRenderMode(gfx++, G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF2);
+    } else if (type == 4)
+    {
+        gDPSetRenderMode(gfx++, G_RM_AA_ZB_TEX_EDGE, G_RM_AA_ZB_TEX_EDGE2);
+    }
+    
+    gSPEndDisplayList(gfx);
+    return gfxHead;
+}
+
+Gfx *geo_object_fix_2cycle_issue(s32 callContext, struct GraphNode *node, UNUSED Mat4 *mtx) {
+    Gfx *gfx = NULL;
+    struct GraphNodeGenerated *asGenerated = (struct GraphNodeGenerated *) node;
+
+    if (callContext == GEO_CONTEXT_RENDER) {
+        gfx = geo_object_set_render_mode_2cycle(asGenerated, asGenerated->parameter);
+    }
+    return gfx;
 }
 
 Gfx *geo_switch_anim_state(s32 callContext, struct GraphNode *node, UNUSED void *context) {
@@ -168,32 +202,21 @@ void obj_update_pos_from_parent_transformation(Mat4 a0, struct Object *a1) {
 
 
 void create_transformation_from_matrices(Mat4 a0, Mat4 a1, Mat4 a2) {
-    f32 spC, sp8, sp4;
-
-    spC = a2[3][0] * a2[0][0] + a2[3][1] * a2[0][1] + a2[3][2] * a2[0][2];
-    sp8 = a2[3][0] * a2[1][0] + a2[3][1] * a2[1][1] + a2[3][2] * a2[1][2];
-    sp4 = a2[3][0] * a2[2][0] + a2[3][1] * a2[2][1] + a2[3][2] * a2[2][2];
-
-    a0[0][0] = a1[0][0] * a2[0][0] + a1[0][1] * a2[0][1] + a1[0][2] * a2[0][2];
-    a0[0][1] = a1[0][0] * a2[1][0] + a1[0][1] * a2[1][1] + a1[0][2] * a2[1][2];
-    a0[0][2] = a1[0][0] * a2[2][0] + a1[0][1] * a2[2][1] + a1[0][2] * a2[2][2];
-
-    a0[1][0] = a1[1][0] * a2[0][0] + a1[1][1] * a2[0][1] + a1[1][2] * a2[0][2];
-    a0[1][1] = a1[1][0] * a2[1][0] + a1[1][1] * a2[1][1] + a1[1][2] * a2[1][2];
-    a0[1][2] = a1[1][0] * a2[2][0] + a1[1][1] * a2[2][1] + a1[1][2] * a2[2][2];
-
-    a0[2][0] = a1[2][0] * a2[0][0] + a1[2][1] * a2[0][1] + a1[2][2] * a2[0][2];
-    a0[2][1] = a1[2][0] * a2[1][0] + a1[2][1] * a2[1][1] + a1[2][2] * a2[1][2];
-    a0[2][2] = a1[2][0] * a2[2][0] + a1[2][1] * a2[2][1] + a1[2][2] * a2[2][2];
-
-    a0[3][0] = a1[3][0] * a2[0][0] + a1[3][1] * a2[0][1] + a1[3][2] * a2[0][2] - spC;
-    a0[3][1] = a1[3][0] * a2[1][0] + a1[3][1] * a2[1][1] + a1[3][2] * a2[1][2] - sp8;
-    a0[3][2] = a1[3][0] * a2[2][0] + a1[3][1] * a2[2][1] + a1[3][2] * a2[2][2] - sp4;
-
-    a0[0][3] = 0;
-    a0[1][3] = 0;
-    a0[2][3] = 0;
-    a0[3][3] = 1.0f;
+    Vec3f medium;
+    s32 j, i;
+    for(j = 0; j < 3; j++) {
+        medium[j] = a2[3][0] * a2[j][0] + a2[3][1] * a2[j][1] + a2[3][2] * a2[j][2];
+        a0[j][3] = 0;
+    }
+    for (j = 0; j < 4; j++) {
+        for (i = 0; i < 3; i++) {
+            a0[j][i] = a1[j][0] * a2[i][0] + a1[j][1] * a2[i][1] + a1[j][2] * a2[j][2];
+        }
+    }
+    a0[3][0] -= medium[0];
+    a0[3][1] -= medium[1];
+    a0[3][2] -= medium[2];
+    *((u32 *) &a0[3][3]) = 0x3F800000;
 }
 
 void obj_set_held_state(struct Object *obj, const BehaviorScript *heldBehavior) {
@@ -780,6 +803,7 @@ s32 mario_is_in_air_action(void) {
 }
 
 s32 mario_is_dive_sliding(void) {
+    //return set_mario_action(gMarioState, ACT_DIVE_SLIDE, 0);
     return gMarioStates[0].action == ACT_DIVE_SLIDE;
 }
 
@@ -1386,9 +1410,9 @@ static void cur_obj_update_floor(void) {
 
     if (floor != NULL) {
         SurfaceType floorType = floor->type;
-        if (floorType == SURFACE_BURNING) {
+        if (IS_SURFACE_BURNING(floor)) {
             o->oMoveFlags |= OBJ_MOVE_ABOVE_LAVA;
-        } else if ((floorType == SURFACE_DEATH_PLANE) || (floorType == SURFACE_VERTICAL_WIND)) {
+        } else if (GET_SURFACE_PROP(floor) == SPECFLAG_DEATH_PLANE || (floorType == SURFACE_VERTICAL_WIND)) {
             //! This maybe misses SURFACE_WARP
             o->oMoveFlags |= OBJ_MOVE_ABOVE_DEATH_BARRIER;
         }
@@ -1396,7 +1420,7 @@ static void cur_obj_update_floor(void) {
         o->oFloorType = floorType;
         o->oFloorRoom = floor->room;
     } else {
-        o->oFloorType = SURFACE_DEFAULT;
+        o->oFloorType = 0x0000;
         o->oFloorRoom = 0;
     }
 }
@@ -1692,7 +1716,7 @@ void cur_obj_spawn_particles(struct SpawnParticlesInfo *info) {
         particle->oBehParams2ndByte = info->behParam;
         particle->oMoveAngleYaw = random_u16();
         particle->oGravity = info->gravity;
-        particle->oDragStrength = info->dragStrength;
+        //particle->oDragStrength = info->dragStrength;
 
         particle->oPosY += info->offsetY;
         particle->oForwardVel = random_float() * info->forwardVelRange + info->forwardVelBase;
@@ -1874,7 +1898,7 @@ s32 is_item_in_array(s8 item, s8 *array) {
 
         array++;
     }
-
+ 
     return FALSE;
 }
 
@@ -1985,11 +2009,11 @@ s32 obj_is_hidden(struct Object *obj) {
 }
 
 void enable_time_stop(void) {
-    gTimeStopState |= TIME_STOP_ENABLED;
+    gTimeStopState |= TIME_STOP_PAUSE;
 }
 
 void disable_time_stop(void) {
-    gTimeStopState &= ~TIME_STOP_ENABLED;
+    gTimeStopState &= ~TIME_STOP_PAUSE;
 }
 
 void set_time_stop_flags(s32 flags) {
@@ -2135,7 +2159,7 @@ s32 cur_obj_update_dialog_with_cutscene(s32 actionArg, s32 dialogFlags, s32 cuts
             //  allows us to move during time stop as long as Mario never enters
             //  an action that can be interrupted with text.
             if (gMarioState->health >= 0x0100) {
-                gTimeStopState |= TIME_STOP_ENABLED;
+                gTimeStopState &= ~TIME_STOP_ENABLED;
                 o->activeFlags |= ACTIVE_FLAG_INITIATED_TIME_STOP;
                 o->oDialogState++;
                 o->oDialogResponse = DIALOG_RESPONSE_NONE;
@@ -2318,7 +2342,7 @@ void cur_obj_unused_play_footstep_sound(s32 animFrame1, s32 animFrame2, s32 soun
 }
 
 void enable_time_stop_including_mario(void) {
-    gTimeStopState |= TIME_STOP_ENABLED | TIME_STOP_MARIO_AND_DOORS;
+    gTimeStopState |= TIME_STOP_ENABLED;
     o->activeFlags |= ACTIVE_FLAG_INITIATED_TIME_STOP;
 }
 
@@ -2348,4 +2372,82 @@ void cur_obj_spawn_star_at_y_offset(f32 targetX, f32 targetY, f32 targetZ, f32 o
     o->oPosY += offsetY + gDebugInfo[DEBUG_PAGE_ENEMYINFO][0];
     spawn_default_star(targetX, targetY, targetZ);
     o->oPosY = objectPosY;
+}
+
+Gfx *geo_apply_primitive_color(s32 callContext, struct GraphNode *node, UNUSED void *context) {
+    Gfx *displayListHead = NULL;
+    Gfx *displayList = NULL;
+    if (callContext == GEO_CONTEXT_RENDER) {
+        struct Object *objectGraphNode = (struct Object *) gCurGraphNodeObject;
+        displayList = alloc_display_list(2 * sizeof(*displayList));
+        if (displayList == NULL) {
+            return NULL;
+        } else {
+            displayListHead = displayList;
+        }
+        struct GraphNodeGenerated *generatedNode = (struct GraphNodeGenerated *) node;
+        SET_GRAPH_NODE_LAYER(generatedNode->fnNode.node.flags, generatedNode->parameter == 0 ? LAYER_TRANSPARENT : LAYER_OPAQUE);
+        if (objectGraphNode->oAnimState == 0)
+        {
+            gDPSetPrimColor(displayListHead++, 0, 0, 255, 0, 0, generatedNode->parameter == 1 ? 255 : 127);
+        } else if (objectGraphNode->oAnimState == 1)
+        {
+            gDPSetPrimColor(displayListHead++, 0, 0, 0, 214, 49, generatedNode->parameter == 1 ? 255 : 127);
+        } else if (objectGraphNode->oAnimState == 2)
+        {
+            gDPSetPrimColor(displayListHead++, 0, 0, 0, 0, 255, generatedNode->parameter == 1 ? 255 : 127);
+        } else if (objectGraphNode->oAnimState == 3)
+        {
+            gDPSetPrimColor(displayListHead++, 0, 0, 255, 148, 8, generatedNode->parameter == 1 ? 255 : 127);
+        }
+        gSPEndDisplayList(displayListHead);
+    }
+
+    return displayList;
+}
+
+Gfx *geo_apply_star_primitive_color(s32 callContext, struct GraphNode *node, UNUSED void *context) {
+    Gfx *displayListHead = NULL;
+    Gfx *displayList = NULL;
+    
+    if (callContext == GEO_CONTEXT_RENDER) {
+        struct Object *objectGraphNode = (struct Object *) gCurGraphNodeObject;
+        
+        // Asignamos memoria para la Display List
+        displayList = alloc_display_list(2 * sizeof(*displayList));
+        if (displayList == NULL) {
+            return NULL;
+        } else {
+            displayListHead = displayList;
+        }
+        
+        struct GraphNodeGenerated *generatedNode = (struct GraphNodeGenerated *) node;
+        SET_GRAPH_NODE_LAYER(generatedNode->fnNode.node.flags, LAYER_OPAQUE);
+
+        // Variables para el color (por defecto, el Naranja/Dorado de la estrella)
+        u8 r = 0xFF, g = 0xEB, b = 0, a = 255;
+
+        // Cambiamos el color según el AnimState
+        switch (objectGraphNode->oAnimState) {
+            case 0:
+                r = 255; g = 0;   b = 0;   // Rojo
+                break;
+            case 1:
+                r = 0;   g = 255; b = 0;  // Verde
+                break;
+            case 2:
+                r = 0;   g = 0x3C; b = 0xFF; // Cian (¡Alfa corregido a 255!)
+                break;
+            case 3:
+            default:
+                // Naranja/Dorado (Valores por defecto)
+                break;
+        }
+
+        // Mandamos el color a la GPU
+        gDPSetEnvColor(displayListHead++, r, g, b, a);
+        gSPEndDisplayList(displayListHead);
+    }
+
+    return displayList;
 }

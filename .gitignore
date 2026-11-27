@@ -1196,6 +1196,7 @@ sound/samples/sfx_terrain/04_step_snow.aiff
 sound/samples/sfx_terrain/05_step_ice.aiff
 sound/samples/sfx_terrain/06_step_metal.aiff
 sound/samples/sfx_terrain/07_step_sand.aiff
+sound/samples/sfx_terrain/08_wood_step.aiff
 sound/samples/sfx_water/00_plunge.aiff
 sound/samples/sfx_water/01_splash.aiff
 sound/samples/sfx_water/02_swim.aiff
@@ -2146,3 +2147,6 @@ lib/libs2d_engine.a
 
 # :Zone_Identifier files
 *Zone.Identifier
+clear/
+.vs/
+status.txt

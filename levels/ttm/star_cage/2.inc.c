@@ -28,6 +28,7 @@ static const Gfx ttm_seg7_dl_070135A0[] = {
     gsSP2Triangles( 3,  5,  6, 0x0,  7,  8,  9, 0x0),
     gsSP2Triangles( 7,  9, 10, 0x0, 11, 12, 13, 0x0),
     gsSP2Triangles(11, 14, 12, 0x0,  0, 15,  1, 0x0),
+    gsSPSetGeometryMode(G_LIGHTING),
     gsSPEndDisplayList(),
 };
 

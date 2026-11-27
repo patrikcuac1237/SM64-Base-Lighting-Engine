@@ -1,10 +1,11 @@
-// 0x16000A84
+#include "src/game/envfx_snow.h"
+
 const GeoLayout bowser_key_geo[] = {
    GEO_SHADOW(SHADOW_CIRCLE_4_VERTS, 0x9B, 300),
    GEO_OPEN_NODE(),
       GEO_SCALE(0x00, 65536),
       GEO_OPEN_NODE(),
-         GEO_DISPLAY_LIST(LAYER_OCCLUDE_SILHOUETTE_OPAQUE, bowser_key_dl),
+         GEO_DISPLAY_LIST(LAYER_OCCLUDE_SILHOUETTE_OPAQUE, bowser_key_000_displaylist_mesh_layer_1_with_revert),
       GEO_CLOSE_NODE(),
    GEO_CLOSE_NODE(),
    GEO_END(),
@@ -21,7 +22,7 @@ const GeoLayout bowser_key_cutscene_geo[] = {
             GEO_ASM(0, geo_scale_bowser_key),
             GEO_SCALE(0x00, 65536),
             GEO_OPEN_NODE(),
-               GEO_DISPLAY_LIST(LAYER_OCCLUDE_SILHOUETTE_OPAQUE, bowser_key_dl),
+               GEO_DISPLAY_LIST(LAYER_OCCLUDE_SILHOUETTE_OPAQUE, bowser_key_000_displaylist_mesh_layer_1_with_revert),
             GEO_CLOSE_NODE(),
          GEO_CLOSE_NODE(),
       GEO_CLOSE_NODE(),

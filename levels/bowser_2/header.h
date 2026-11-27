@@ -16,5 +16,4 @@ extern const Collision bowser_2_seg7_collision_tilting_platform[];
 
 // script
 extern const LevelScript level_bowser_2_entry[];
-
 #endif

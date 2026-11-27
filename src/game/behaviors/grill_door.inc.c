@@ -1,4 +1,4 @@
-// grill_door.inc.c
+ // grill_door.inc.c
 
 struct OpenableGrill {
     s16 halfWidth;

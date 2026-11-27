@@ -26,7 +26,7 @@ const GeoLayout sl_geo_0003A8[] = {
                GEO_ASM(SL_MOVTEX_WATER,   geo_movtex_draw_water_regions),
                GEO_RENDER_OBJ(),
                GEO_ASM(ENVFX_SNOW_NORMAL, geo_envfx_main),
-               GEO_SCENE_LIGHT(LIGHT_TYPE_DIRECTIONAL, 225, 225, 255, 0, 1, 0),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_DIRECTIONAL, 225, 225, 255, 0, 90, 0),
                GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 50, 75, 100, 1, 0, 8),
             GEO_CLOSE_NODE(),
          GEO_CLOSE_NODE(),

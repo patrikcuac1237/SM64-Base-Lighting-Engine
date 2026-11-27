@@ -9,14 +9,6 @@
 #include "dialog_ids.h"
 
 #include "make_const_nonconst.h"
-#include "levels/jrb/texture.inc.c"
-#include "levels/jrb/areas/1/1/model.inc.c"
-#include "levels/jrb/areas/1/2/model.inc.c"
-#include "levels/jrb/areas/1/3/model.inc.c"
-#include "levels/jrb/areas/1/4/model.inc.c"
-#include "levels/jrb/areas/1/5/model.inc.c"
-#include "levels/jrb/areas/1/6/model.inc.c"
-#include "levels/jrb/areas/1/7/model.inc.c"
 #include "levels/jrb/rock/model.inc.c"
 #include "levels/jrb/floating_platform/model.inc.c"
 #include "levels/jrb/sliding_box/model.inc.c"
@@ -40,4 +32,7 @@
 #include "levels/jrb/areas/2/macro.inc.c"
 #include "levels/jrb/areas/2/movtext.inc.c"
 
-#include "levels/jrb/leveldata.inc.c"
+#include "levels/jrb/jrbArea1/model.inc.c"
+#include "levels/jrb/jrbarea2/model.inc.c"
+#include "jrb_skybox/model.inc.c"
+#include "jrbArea1_bright/model.inc.c"

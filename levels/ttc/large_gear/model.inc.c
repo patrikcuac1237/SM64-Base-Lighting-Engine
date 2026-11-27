@@ -20,6 +20,7 @@ static const Gfx ttc_seg7_dl_07012240[] = {
 const Gfx ttc_seg7_dl_07012278[] = {
     gsDPPipeSync(),
     gsDPSetCycleType(G_CYC_2CYCLE),
+    gsSPSetGeometryMode(G_LIGHTING),
     gsDPSetRenderMode(G_RM_FOG_SHADE_A, G_RM_AA_ZB_TEX_EDGE2),
     gsDPSetDepthSource(G_ZS_PIXEL),
     gsDPSetFogColor(200, 255, 255, 255),

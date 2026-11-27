@@ -605,7 +605,7 @@ const Collision ddd_seg7_area_2_collision[] = {
     COL_TRI_INIT(SURFACE_WARP, 2),
     COL_TRI(6, 7, 8),
     COL_TRI(6, 9, 7),
-    COL_TRI_INIT(SURFACE_WOOD, 42),
+    COL_TRI_INIT(NEWTERRAIN(4, 0, 0, 0), 42),
     COL_TRI(26, 32, 27),
     COL_TRI(18, 19, 20),
     COL_TRI(20, 19, 21),

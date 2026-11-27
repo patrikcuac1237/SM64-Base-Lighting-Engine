@@ -1,4 +1,4 @@
-// drawbridge.inc.c
+ // drawbridge.inc.c
 
 void bhv_lll_drawbridge_spawner_loop(void) {
     struct Object *drawbridge1, *drawbridge2;

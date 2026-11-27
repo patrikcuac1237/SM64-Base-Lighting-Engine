@@ -5,6 +5,7 @@
 
 // geo
 extern const GeoLayout cotmc_geo_0001A0[];
+#include "levels/cotmc/areas/1/cotmc_level/geo_header.h"
 
 // leveldata
 extern const Gfx cotmc_seg7_dl_07007D48[];
@@ -19,5 +20,7 @@ extern const Gfx cotmc_dl_water[];
 
 // script
 extern const LevelScript level_cotmc_entry[];
+
+#include "levels/cotmc/cotmc_water/geo_header.h"
 
 #endif

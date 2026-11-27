@@ -22,10 +22,16 @@ extern void make_vertex(
 );
 #endif
 extern Gfx *geo_exec_inside_castle_light(s32 callContext, struct GraphNode *node, UNUSED Mat4 mtx);
+extern Gfx *geo_exec_castle_grounds_shadows(s32 callContext, struct GraphNode *node, UNUSED Mat4 mtx);
+extern Gfx *geo_exec_castle_grounds_water_shadows(s32 callContext, struct GraphNode *node, UNUSED Mat4 mtx);
 extern Gfx *geo_exec_flying_carpet_timer_update(s32 callContext, struct GraphNode *node, UNUSED Mat4 mtx);
 extern Gfx *geo_exec_flying_carpet_create(s32 callContext, struct GraphNode *node, UNUSED Mat4 mtx);
 extern Gfx *geo_exec_cake_end_screen(s32 callContext, struct GraphNode *node, UNUSED Mat4 mtx);
-
+extern Gfx *geo_apply_jrb_skybox_environment_color(s32 callContext, struct GraphNode *node, UNUSED void *context);
+extern Gfx *geo_jrb_switch_area(s32 callContext, struct GraphNode *node, UNUSED void *context);
+extern Gfx *geo_exec_jrb_dark_area_opaques(s32 callContext, struct GraphNode *node, UNUSED Mat4 mtx);
+extern Gfx *geo_exec_jrb_dark_area_transparents(s32 callContext, struct GraphNode *node, UNUSED Mat4 mtx);
+extern Gfx *geo_exec_jrb_dark_area_alphas(s32 callContext, struct GraphNode *node, UNUSED Mat4 mtx);
 #define gLoadBlockTexture(dl, width, height, format, image)                                                  \
 {                                                                                                            \
     gDPSetTextureImage((dl), (format), G_IM_SIZ_16b, 1, (image));                                            \

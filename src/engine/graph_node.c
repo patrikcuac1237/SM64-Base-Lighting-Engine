@@ -8,6 +8,7 @@
 #include "game/rendering_graph_node.h"
 #include "game/area.h"
 #include "geo_layout.h"
+#include "game/game_init.h"
 
 /**
  * Initialize a geo node with a given type. Sets all links such that there
@@ -124,25 +125,6 @@ struct GraphNodeMasterList *init_graph_node_master_list(struct AllocOnlyPool *po
         if (on) {
             graphNode->node.flags |= GRAPH_RENDER_Z_BUFFER;
         }
-    }
-
-    return graphNode;
-}
-
-/**
- * Allocates and returns a newly created render range node
- */
-struct GraphNodeLevelOfDetail *init_graph_node_render_range(struct AllocOnlyPool *pool,
-                                                            struct GraphNodeLevelOfDetail *graphNode,
-                                                            s16 minDistance, s16 maxDistance) {
-    if (pool != NULL) {
-        graphNode = alloc_only_pool_alloc(pool, sizeof(struct GraphNodeLevelOfDetail));
-    }
-
-    if (graphNode != NULL) {
-        init_scene_graph_node_links(&graphNode->node, GRAPH_NODE_TYPE_LEVEL_OF_DETAIL);
-        graphNode->minDistance = minDistance;
-        graphNode->maxDistance = maxDistance;
     }
 
     return graphNode;
@@ -559,9 +541,9 @@ struct GraphNodeSceneLight *init_graph_node_scene_light(struct AllocOnlyPool *po
     if (graphNode != NULL) {
         init_scene_graph_node_links(&graphNode->node, GRAPH_NODE_TYPE_SCENE_LIGHT);
         graphNode->lightType = lightType;
-        graphNode->color[0] = color[0];
-        graphNode->color[1] = color[1];
-        graphNode->color[2] = color[2];
+        for (s32 i = 0; i < 3; i++) {
+            graphNode->color[i] = color[i];
+        }
         graphNode->a = a;
         graphNode->b = b;
         graphNode->c = c;
@@ -571,13 +553,54 @@ struct GraphNodeSceneLight *init_graph_node_scene_light(struct AllocOnlyPool *po
             graphNode->light = &gPointLights[gAreaPointLightCount];
             if (lightType == LIGHT_TYPE_POINT_OCCLUDE)
             {
-                gPointLights[gAreaPointLightCount].flags |= LIGHT_FLAG_OCCLUDE;
+                //gPointLights[gAreaPointLightCount].flags |= LIGHT_FLAG_OCCLUDE;
             }
             gAreaPointLightCount++;
         }
     }
 
     return graphNode;
+}
+
+struct GraphNodeSceneLight *init_graph_node_scene_light_new(struct AllocOnlyPool *pool,
+                                                        struct GraphNodeSceneLight *graphNode,
+                                                        u8 lightType, u8 color[],
+                                                        u8 a, u8 b, u8 c, Vec3f worldPos)
+{
+    if (pool != NULL) {
+        graphNode = alloc_only_pool_alloc(pool, sizeof(struct GraphNodeSceneLight));
+    }
+
+    if (graphNode != NULL) {
+        init_scene_graph_node_links(&graphNode->node, GRAPH_NODE_TYPE_SCENE_LIGHT);
+        graphNode->lightType = lightType;
+        for (s32 i = 0; i < 3; i++) {
+            graphNode->color[i] = color[i];
+            graphNode->WorldPos[i] = worldPos[i];
+        }
+        graphNode->a = a;
+        graphNode->b = b;
+        graphNode->c = c;
+        if (lightType == LIGHT_TYPE_POINT || lightType == LIGHT_TYPE_POINT_OCCLUDE)
+        {
+            // Set this node's light pointer (used during rendering to set the position of the light)
+            graphNode->light = &gPointLights[gAreaPointLightCount];
+            if (lightType == LIGHT_TYPE_POINT_OCCLUDE)
+            {
+                //gPointLights[gAreaPointLightCount].flags |= LIGHT_FLAG_OCCLUDE;
+            }
+            gAreaPointLightCount++;
+        }
+    }
+
+    return graphNode;
+}
+
+struct GraphNodeLightPos *init_graph_node_light_pos(struct AllocOnlyPool *pool, struct GraphNodeLightPos *graphNode, Vec3s worldPos)
+{
+    for (s32 i = 0; i < 3; i++) {
+        graphNode->worldPos[i] = worldPos[i];
+    }
 }
 
 /**
@@ -849,13 +872,14 @@ s32 geo_update_animation_frame(struct AnimInfo *obj, s32 *accelAssist) {
         if (accelAssist != NULL) {
             accelAssist[0] = obj->animFrameAccelAssist;
         }
-
         return obj->animFrame;
     }
 
+    s32 scaledAccel = (s32)((f32)obj->animAccel);
+
     if (anim->flags & ANIM_FLAG_FORWARD) {
         if (obj->animAccel != 0) {
-            result = obj->animFrameAccelAssist - obj->animAccel;
+            result = obj->animFrameAccelAssist - scaledAccel;
         } else {
             result = (obj->animFrame - 1) << 16;
         }
@@ -869,7 +893,7 @@ s32 geo_update_animation_frame(struct AnimInfo *obj, s32 *accelAssist) {
         }
     } else {
         if (obj->animAccel != 0) {
-            result = obj->animFrameAccelAssist + obj->animAccel;
+            result = obj->animFrameAccelAssist + scaledAccel;
         } else {
             result = (obj->animFrame + 1) << 16;
         }

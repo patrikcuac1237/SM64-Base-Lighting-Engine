@@ -1,0 +1,14 @@
+extern const GeoLayout sliding_platform_geo[];
+extern u8 sliding_platform_wf_textures_01000_rgba16_ci8[];
+extern u8 sliding_platform_wf_textures_01000_rgba16_pal_rgba16[];
+extern u8 sliding_platform_wf_textures_00800_rgba16_ci8[];
+extern u8 sliding_platform_wf_textures_00800_rgba16_pal_rgba16[];
+extern Vtx sliding_platform_000_displaylist_mesh_layer_1_vtx_0[4];
+extern Gfx sliding_platform_000_displaylist_mesh_layer_1_tri_0[];
+extern Vtx sliding_platform_000_displaylist_mesh_layer_1_vtx_1[4];
+extern Gfx sliding_platform_000_displaylist_mesh_layer_1_tri_1[];
+extern Gfx mat_sliding_platform__0[];
+extern Gfx mat_revert_sliding_platform__0[];
+extern Gfx mat_sliding_platform__1[];
+extern Gfx mat_revert_sliding_platform__1[];
+extern Gfx sliding_platform_000_displaylist_mesh_layer_1_with_revert[];

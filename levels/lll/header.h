@@ -5,12 +5,6 @@
 #include "game/moving_texture.h"
 
 // geo
-extern const GeoLayout lll_geo_0009E0[];
-extern const GeoLayout lll_geo_0009F8[];
-extern const GeoLayout lll_geo_000A10[];
-extern const GeoLayout lll_geo_000A28[];
-extern const GeoLayout lll_geo_000A40[];
-extern const GeoLayout lll_geo_000A60[];
 extern const GeoLayout lll_geo_000A78[];
 extern const GeoLayout lll_geo_000A90[];
 extern const GeoLayout lll_geo_000AA8[];
@@ -128,4 +122,20 @@ extern const Gfx lll_dl_lavafall_volcano[];
 // script
 extern const LevelScript level_lll_entry[];
 
+#include "levels/lll/LLLArea1/geo_header.h"
+
+#include "lll_skybox/geo_header.h"
+#include "rotating_hexagonal_ring/geo_header.h"
+#include "levels/lll/areas/1/10/geo_header.h"
+#include "rolling_log/geo_header.h"
+#include "tilting_square_platform/geo_header.h"
+#include "sinking_rectangular_platform/geo_header.h"
+#include "drawbridge_part/geo_header.h"
+#include "sinking_square_platform/geo_header.h"
+#include "rotating_block_fire_bars/geo_header.h"
+#include "wooden_float_small/geo_header.h"
+#include "LLLArea2/geo_header.h"
+#include "volcano_falling_trap/geo_header.h"
+#include "dark_skybox/geo_header.h"
+#include "areas/1/10/geo_header.h"
 #endif

@@ -89,6 +89,7 @@ static void clear_spatial_partition(SpatialPartitionCell *cells) {
         (*cells)[SPATIAL_PARTITION_CEILS].next = NULL;
         (*cells)[SPATIAL_PARTITION_WALLS].next = NULL;
         (*cells)[SPATIAL_PARTITION_WATER].next = NULL;
+        (*cells)[SPATIAL_PARTITION_SHADOWS].next = NULL;
 
         cells++;
     }
@@ -111,23 +112,28 @@ static void clear_static_surfaces(void) {
 static void add_surface_to_cell(s32 dynamic, s32 cellX, s32 cellZ, struct Surface *surface) {
     struct SurfaceNode *list;
     s32 priority;
-    s32 sortDir = 1; // highest to lowest, then insertion order (water and floors)
+    s32 sortDir = 1; 
     s32 listIndex;
 
+    // Clasificación por tipo de superficie
     if (SURFACE_IS_NEW_WATER(surface->type)) {
         listIndex = SPATIAL_PARTITION_WATER;
-    } else if (surface->normal.y > NORMAL_FLOOR_THRESHOLD) {
+    } 
+    else if (SURFACE_IS_SHADOW_VOLUME(surface->type)) { // <--- Lógica para sombras
+        listIndex = SPATIAL_PARTITION_SHADOWS;
+    }
+    else if (surface->normal.y > NORMAL_FLOOR_THRESHOLD) {
         listIndex = SPATIAL_PARTITION_FLOORS;
     } else if (surface->normal.y < NORMAL_CEIL_THRESHOLD) {
         listIndex = SPATIAL_PARTITION_CEILS;
-        sortDir = -1; // lowest to highest, then insertion order
+        sortDir = -1;
     } else {
         listIndex = SPATIAL_PARTITION_WALLS;
-        sortDir = 0; // insertion order
+        sortDir = 0;
     }
 
+    // ... (El resto de la función para alojar el nodo se mantiene igual)
     s32 surfacePriority = surface->upperY * sortDir;
-
     struct SurfaceNode *newNode = alloc_surface_node();
     newNode->surface = surface;
 
@@ -241,11 +247,18 @@ static struct Surface *read_surface_data(TerrainData *vertexData, TerrainData **
     Vec3t offset;
     s16 min, max;
 
+    // --- CORRECCIÓN AQUÍ ---
+    // Como vertexData ahora es un puntero a s32 (Collision), al sumar un índice
+    // saltaría 4 bytes. Necesitamos que salte 2 bytes (s16) para leer la ROM.
+    s16 *data16 = (s16 *)vertexData;
+    // -----------------------
+
     vec3_prod_val(offset, (*vertexIndices), 3);
 
-    vec3s_copy(v[0], (vertexData + offset[0]));
-    vec3s_copy(v[1], (vertexData + offset[1]));
-    vec3s_copy(v[2], (vertexData + offset[2]));
+    // Usamos data16 para realizar la suma de punteros correctamente
+    vec3s_copy(v[0], (data16 + offset[0]));
+    vec3s_copy(v[1], (data16 + offset[1]));
+    vec3s_copy(v[2], (data16 + offset[2]));
 
     find_vector_perpendicular_to_plane(n, v[0], v[1], v[2]);
 
@@ -279,7 +292,6 @@ static s32 surface_has_force(s32 surfaceType) {
     s32 hasForce = FALSE;
 
     switch (surfaceType) {
-        case SURFACE_0004: // Unused
         case SURFACE_FLOWING_WATER:
         case SURFACE_DEEP_MOVING_QUICKSAND:
         case SURFACE_SHALLOW_MOVING_QUICKSAND:
@@ -307,7 +319,6 @@ static s32 surf_has_no_cam_collision(s32 surfaceType) {
         case SURFACE_NO_CAM_COLLISION:
         case SURFACE_NO_CAM_COLLISION_77: // Unused
         case SURFACE_NO_CAM_COL_VERY_SLIPPERY:
-        case SURFACE_SWITCH:
             flags = SURFACE_FLAG_NO_CAM_COLLISION;
             break;
 
@@ -331,24 +342,35 @@ static void load_static_surfaces(TerrainData **data, TerrainData *vertexData, s3
 #endif
     s32 flags = surf_has_no_cam_collision(surfaceType);
 
-    s32 numSurfaces = *(*data)++;
+    // --- CORRECCIÓN DE LECTURA INICIAL ---
+    // Obtenemos una vista de 16 bits para leer la cantidad de superficies
+    s16 *data16 = (s16 *)*data;
+    s32 numSurfaces = *data16++; 
+    // Actualizamos el puntero original al terminar
+    *data = (TerrainData *)data16; 
 
     for (i = 0; i < numSurfaces; i++) {
         if (*surfaceRooms != NULL) {
             room = *(*surfaceRooms)++;
         }
 
+        // read_surface_data ya está corregida con el cast a s16
         surface = read_surface_data(vertexData, data);
+        
         if (surface != NULL) {
             surface->room = room;
             surface->type = surfaceType;
             surface->flags = flags;
 
+            // --- CORRECCIÓN DE ACCESO A DATOS ---
+            // Usamos data16 para leer los índices o valores de fuerza de la ROM
+            data16 = (s16 *)*data;
+            
 #ifdef ALL_SURFACES_HAVE_FORCE
-            surface->force = *(*data + 3);
+            surface->force = data16[3]; // Equivalent a *(*data + 3) pero en s16
 #else
             if (hasForce) {
-                surface->force = *(*data + 3);
+                surface->force = data16[3];
             } else {
                 surface->force = 0;
             }
@@ -357,14 +379,17 @@ static void load_static_surfaces(TerrainData **data, TerrainData *vertexData, s3
             add_surface(surface, FALSE);
         }
 
+        // --- CORRECCIÓN DE AVANCE DE PUNTERO ---
 #ifdef ALL_SURFACES_HAVE_FORCE
-        *data += 4;
+        data16 += 4;
 #else
-        *data += 3;
+        data16 += 3;
         if (hasForce) {
-            (*data)++;
+            data16++;
         }
 #endif
+        // Guardamos la posición final del puntero tras los saltos
+        *data = (TerrainData *)data16;
     }
 }
 
@@ -372,29 +397,49 @@ static void load_static_surfaces(TerrainData **data, TerrainData *vertexData, s3
  * Read the data for vertices for reference by triangles.
  */
 static TerrainData *read_vertex_data(TerrainData **data) {
-    s32 numVertices = *(*data)++;
+    // Convertimos a s16* para leer correctamente la estructura de la ROM
+    s16 *data16 = (s16 *)*data;
 
-    TerrainData *vertexData = *data;
-    *data += 3 * numVertices;
+    // Leemos el número de vértices (esto avanza 2 bytes)
+    s32 numVertices = *data16++;
+
+    // Guardamos la dirección actual como el inicio de los datos de vértices
+    TerrainData *vertexData = (TerrainData *)data16;
+
+    // Avanzamos el puntero: 3 coordenadas por vértice (x, y, z), 2 bytes por coordenada.
+    // Esto es igual a (3 * numVertices) elementos de tipo s16.
+    data16 += 3 * numVertices;
+
+    // Actualizamos el puntero original (el que recibe el resto del motor) 
+    // convertido de nuevo a TerrainData* (s32*)
+    *data = (TerrainData *)data16;
 
     return vertexData;
 }
-
 /**
  * Loads in special environmental regions, such as water, poison gas, and JRB fog.
  */
 static void load_environmental_regions(TerrainData **data) {
     s32 i;
-
+    
+    // --- CORRECCIÓN AQUÍ ---
+    // Mantenemos una vista de 16 bits para navegar el binario de la ROM
+    s16 *data16 = (s16 *)*data;
+    
     gEnvironmentRegions = *data;
-    s32 numRegions = *(*data)++;
+    s32 numRegions = *data16++; // Leemos el contador como s16
 
     for (i = 0; i < numRegions; i++) {
-        *data += 5;
-        gEnvironmentLevels[i] = *(*data)++;
+        // Saltamos 5 elementos de 2 bytes cada uno (10 bytes en total)
+        data16 += 5; 
+        
+        // Leemos el nivel ambiental como s16
+        gEnvironmentLevels[i] = *data16++;
     }
-}
 
+    // Sincronizamos el puntero original al terminar
+    *data = (TerrainData *)data16;
+}
 /**
  * Allocate some of the main pool for surfaces (2300 surf) and for surface nodes (7000 nodes).
  */
@@ -470,22 +515,30 @@ u32 get_area_terrain_size(TerrainData *data) {
 void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16 *macroObjects) {
     s32 terrainLoadType;
     TerrainData *vertexData = NULL;
+    
+    // --- CORRECCIÓN AQUÍ ---
+    // Usamos un puntero s16 para navegar por el flujo de datos binarios (ROM).
+    // Esto garantiza que los saltos de memoria sean de 2 bytes, no de 4.
+    s16 *stream = (s16 *)data;
+    // -----------------------
+
 #if PUPPYPRINT_DEBUG
     OSTime first = osGetTime();
 #endif
 
-    // Initialize the data for this.
     gEnvironmentRegions = NULL;
     gSurfaceNodesAllocated = 0;
     gSurfacesAllocated = 0;
 
     clear_static_surfaces();
 
-    // A while loop iterating through each section of the level data. Sections of data
-    // are prefixed by a terrain "type." This type is reused for surfaces as the surface
-    // type.
     while (TRUE) {
-        terrainLoadType = *data++;
+        // Leemos el tipo de comando (2 bytes) correctamente
+        terrainLoadType = *stream++;
+
+        // Actualizamos el puntero 'data' para que las funciones subyacentes
+        // (que ya tienen el cast a s16 interno) reciban la dirección correcta.
+        data = (TerrainData *)stream;
 
         if (TERRAIN_LOAD_IS_SURFACE_TYPE_LOW(terrainLoadType)) {
             load_static_surfaces(&data, vertexData, terrainLoadType, &surfaceRooms);
@@ -496,23 +549,25 @@ void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16
         } else if (terrainLoadType == TERRAIN_LOAD_ENVIRONMENT) {
             load_environmental_regions(&data);
         } else if (terrainLoadType == TERRAIN_LOAD_CONTINUE) {
+            // Actualizamos stream tras saltar (si es necesario)
+            stream = (s16 *)data;
             continue;
         } else if (terrainLoadType == TERRAIN_LOAD_END) {
             break;
         } else if (TERRAIN_LOAD_IS_SURFACE_TYPE_HIGH(terrainLoadType)) {
             load_static_surfaces(&data, vertexData, terrainLoadType, &surfaceRooms);
+            stream = (s16 *)data; // Sincronizamos stream tras el retorno
             continue;
         }
+
+        // Tras cada llamada, sincronizamos el stream con la posición donde quedó 'data'
+        stream = (s16 *)data;
     }
 
     if (macroObjects != NULL && *macroObjects != -1) {
-        // If the first macro object presetID is within the range [0, 29].
-        // Generally an early spawning method, every object is in BBH (the first level).
         if (0 <= *macroObjects && *macroObjects < 30) {
             spawn_macro_objects_hardcoded(index, macroObjects);
-        }
-        // A more general version that can spawn more objects.
-        else {
+        } else {
             spawn_macro_objects(index, macroObjects);
         }
     }
@@ -542,9 +597,12 @@ void clear_dynamic_surfaces(void) {
 void transform_object_vertices(TerrainData **data, TerrainData *vertexData) {
     Mat4 *objectTransform = &o->transform;
 
-    register s32 numVertices = *(*data)++;
-
-    register TerrainData *vertices = *data;
+    // --- CORRECCIÓN AQUÍ ---
+    // Usamos un puntero auxiliar para leer la ROM como s16
+    s16 *stream = (s16 *)*data;
+    
+    register s32 numVertices = *stream++;
+    // -----------------------
 
     if (o->header.gfx.throwMatrix == NULL) {
         o->header.gfx.throwMatrix = objectTransform;
@@ -554,19 +612,22 @@ void transform_object_vertices(TerrainData **data, TerrainData *vertexData) {
     Mat4 transform;
     mtxf_scale_vec3f(transform, *objectTransform, o->header.gfx.scale);
 
-    // Go through all vertices, rotating and translating them to transform the object.
     Vec3f pos;
     while (numVertices--) {
-        vec3s_to_vec3f(pos, vertices);
-        vertices += 3;
+        // Leemos del stream s16 (ROM)
+        vec3s_to_vec3f(pos, stream);
+        stream += 3; // Salto correcto de 6 bytes (3 * 2)
 
         //! No bounds check on vertex data
         linear_mtxf_mul_vec3_and_translate(transform, vertexData, pos);
 
-        vertexData += 3;
+        // vertexData sigue siendo TerrainData* (s32*), así que 
+        // al sumar 3 saltamos 12 bytes. Esto es correcto para escribir en el struct.
+        vertexData += 3; 
     }
 
-    *data = vertices;
+    // Sincronizamos el puntero original al terminar
+    *data = (TerrainData *)stream;
 }
 
 /**
@@ -574,67 +635,83 @@ void transform_object_vertices(TerrainData **data, TerrainData *vertexData) {
  */
 void load_object_surfaces(TerrainData **data, TerrainData *vertexData) {
     s32 i;
+    // Creamos el stream de 16 bits para navegar el binario
+    s16 *stream = (s16 *)*data;
 
-    s32 surfaceType = *(*data)++;
-    s32 numSurfaces = *(*data)++;
+    s32 surfaceType = *stream++;
+    s32 numSurfaces = *stream++;
 
 #ifndef ALL_SURFACES_HAVE_FORCE
     TerrainData hasForce = surface_has_force(surfaceType);
 #endif
 
     s32 flags = surf_has_no_cam_collision(surfaceType) | SURFACE_FLAG_DYNAMIC;
-
-    // The DDD warp is initially loaded at the origin and moved to the proper
-    // position in paintings.c and doesn't update its room, so set it here.
     RoomData room = (o->behavior == segmented_to_virtual(bhvDddWarp)) ? 5 : 0;
 
     for (i = 0; i < numSurfaces; i++) {
+        // Sincronizamos data para que read_surface_data (que ya está corregida) 
+        // reciba el puntero correcto
+        *data = (TerrainData *)stream;
         struct Surface *surface = read_surface_data(vertexData, data);
+        
+        // Recuperamos el stream donde haya quedado la lectura de read_surface_data
+        stream = (s16 *)*data;
 
         if (surface != NULL) {
             surface->object = o;
             surface->type = surfaceType;
 
 #ifdef ALL_SURFACES_HAVE_FORCE
-            surface->force = *(*data + 3);
+            surface->force = stream[3]; // Leemos el force desde el stream de 16 bits
 #else
             if (hasForce) {
-                surface->force = *(*data + 3);
+                surface->force = stream[3];
             } else {
                 surface->force = 0;
             }
 #endif
-
             surface->flags |= flags;
             surface->room = room;
             add_surface(surface, TRUE);
         }
 
+        // Avance del stream (s16 stride)
 #ifdef ALL_SURFACES_HAVE_FORCE
-        *data += 4;
+        stream += 4;
 #else
         if (hasForce) {
-            *data += 4;
+            stream += 4;
         } else {
-            *data += 3;
+            stream += 3;
         }
 #endif
     }
+    // Sincronizamos el puntero final
+    *data = (TerrainData *)stream;
 }
 
 #ifdef AUTO_COLLISION_DISTANCE
 static void get_optimal_coll_dist(struct Object *obj) {
     register f32 thisVertDist, maxDist = 0.0f;
     Vec3f v;
-    TerrainData *collisionData = o->collisionData;
+    
+    // --- CORRECCIÓN AQUÍ ---
+    // Cast a s16 para recorrer la estructura original de datos
+    s16 *stream = (s16 *)o->collisionData;
+    
     obj->oFlags |= OBJ_FLAG_DONT_CALC_COLL_DIST;
-    collisionData++;
-    register u32 vertsLeft = *(collisionData)++;
+    
+    stream++; // Saltar tipo (primer elemento)
+    u32 vertsLeft = *stream++; // Saltar cantidad de vértices
+    
     while (vertsLeft) {
-        vec3_prod(v, collisionData, obj->header.gfx.scale);
+        // vec3_prod espera datos, pasamos el stream s16
+        vec3_prod(v, stream, obj->header.gfx.scale);
+        
         thisVertDist = vec3_sumsq(v);
         if (thisVertDist > maxDist) maxDist = thisVertDist;
-        collisionData += 3;
+        
+        stream += 3; // Salto correcto de 6 bytes (3 * 2)
         vertsLeft--;
     }
     obj->oCollisionDistance = (sqrtf(maxDist) + 100.0f);

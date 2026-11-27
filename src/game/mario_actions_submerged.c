@@ -876,12 +876,13 @@ static void common_water_knockback_step(struct MarioState *m, s32 animation, u32
 }
 
 static s32 act_backward_water_kb(struct MarioState *m) {
-    common_water_knockback_step(m, MARIO_ANIM_BACKWARDS_WATER_KB, ACT_WATER_IDLE, m->actionArg);
-    return FALSE;
-}
-
-static s32 act_forward_water_kb(struct MarioState *m) {
-    common_water_knockback_step(m, MARIO_ANIM_WATER_FORWARD_KB, ACT_WATER_IDLE, m->actionArg);
+    s32 animation;
+    if (m->forwardVel > 0.0f) {
+        animation = MARIO_ANIM_WATER_FORWARD_KB;    
+    } else {
+        animation = MARIO_ANIM_BACKWARDS_WATER_KB;
+    }
+    common_water_knockback_step(m, animation, ACT_WATER_IDLE, m->actionArg);
     return FALSE;
 }
 
@@ -1543,7 +1544,6 @@ s32 mario_execute_submerged_action(struct MarioState *m) {
         case ACT_HOLD_WATER_ACTION_END:      cancel = act_hold_water_action_end(m);      break;
         case ACT_DROWNING:                   cancel = act_drowning(m);                   break;
         case ACT_BACKWARD_WATER_KB:          cancel = act_backward_water_kb(m);          break;
-        case ACT_FORWARD_WATER_KB:           cancel = act_forward_water_kb(m);           break;
         case ACT_WATER_DEATH:                cancel = act_water_death(m);                break;
         case ACT_WATER_SHOCKED:              cancel = act_water_shocked(m);              break;
         case ACT_BREASTSTROKE:               cancel = act_breaststroke(m);               break;

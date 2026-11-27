@@ -154,4 +154,44 @@ extern const struct MovtexQuadCollection inside_castle_movtex_moat_water[];
 // script
 extern const LevelScript level_castle_inside_entry[];
 
+#include "levels/castle_inside/LevelRTXGeo/geo_header.h"
+
+#include "levels/castle_inside/LevelRTXGeo1/geo_header.h"
+
+#include "levels/castle_inside/LevelRTXGeo2/geo_header.h"
+
+#include "levels/castle_inside/LevelRTXGeo3/geo_header.h"
+
+#include "levels/castle_inside/LevelRTXGeo4/geo_header.h"
+
+#include "levels/castle_inside/LevelRTXGeo5/geo_header.h"
+
+#include "levels/castle_inside/LevelRTXGeo6/geo_header.h"
+
+#include "levels/castle_inside/LevelRTXGeo7/geo_header.h"
+
+#include "levels/castle_inside/LevelRTXGeo8/geo_header.h"
+
+#include "levels/castle_inside/LevelRTXGeo9/geo_header.h"
+
+#include "levels/castle_inside/areas/3/RTX/geo_header.h"
+#include "levels/castle_inside/areas/3/RTX1/geo_header.h"
+#include "levels/castle_inside/areas/3/RTX2/geo_header.h"
+#include "levels/castle_inside/areas/3/RTX3/geo_header.h"
+#include "levels/castle_inside/areas/3/RTX4/geo_header.h"
+
+#include "levels/castle_inside/trap_door/geo_header.h"
+
+#include "levels/castle_inside/star_door/geo_header.h"
+
+#include "levels/castle_inside/water_level_pillar/geo_header.h"
+
+#include "levels/castle_inside/water_level_water/geo_header.h"
+
+#include "levels/castle_inside/bob_painting/geo_header.h"
+
+#include "levels/castle_inside/jrb_painting/geo_header.h"
+
+#include "black_background/geo_header.h"
+#include "aquarium_lights/collision_header.h"
 #endif

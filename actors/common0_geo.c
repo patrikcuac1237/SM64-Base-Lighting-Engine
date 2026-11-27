@@ -29,6 +29,8 @@
 #include "koopa_shell/geo.inc.c"
 
 #include "black_bobomb/geo.inc.c"
-#include "bobomb_buddy/geo.inc.c"
 #include "breakable_box_no_shadow/geo.inc.c"
 #include "floating_platform/geo.inc.c"
+#include "blacha/geo.inc.c"
+#include "bobomb_throw/geo.inc.c"
+#include "floomba/geo.inc.c"

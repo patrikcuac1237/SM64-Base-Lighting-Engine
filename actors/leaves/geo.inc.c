@@ -1,8 +1,12 @@
-// 0x16000C8C
+#include "src/game/envfx_snow.h"
+
 const GeoLayout leaves_geo[] = {
-   GEO_NODE_START(),
-   GEO_OPEN_NODE(),
-      GEO_DISPLAY_LIST(LAYER_OCCLUDE_SILHOUETTE_ALPHA, leaves_seg3_dl_0301CDE0),
-   GEO_CLOSE_NODE(),
-   GEO_END(),
+	GEO_NODE_START(),
+	GEO_OPEN_NODE(),
+		GEO_NODE_START(),
+		GEO_OPEN_NODE(),
+			GEO_DISPLAY_LIST(LAYER_ALPHA, leaves_000_displaylist_mesh_layer_4_with_revert),
+		GEO_CLOSE_NODE(),
+	GEO_CLOSE_NODE(),
+	GEO_END(),
 };

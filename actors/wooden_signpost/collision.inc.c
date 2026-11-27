@@ -13,7 +13,7 @@ const Collision wooden_signpost_seg3_collision_0302DD80[] = {
     COL_VERTEX(-44, -9, 20),
     COL_VERTEX(45, -9, 20),
 
-    COL_TRI_INIT(SURFACE_WOOD, 12),
+    COL_TRI_INIT(NEWTERRAIN(8, 0, 0, 0), 12),
     COL_TRI(0, 1, 2),
     COL_TRI(2, 1, 3),
     COL_TRI(2, 3, 4),

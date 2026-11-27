@@ -22,5 +22,6 @@ enum BhvProc {
 #define obj_and_int(object, offset, value) object->OBJECT_FIELD_S32(offset) &= (s32)(value)
 
 void cur_obj_update(void);
+void cur_obj_update2(void);
 
 #endif // BEHAVIOR_SCRIPT_H

@@ -19,6 +19,7 @@ static const Gfx ttc_seg7_dl_07012110[] = {
 // 0x07012148 - 0x07012200
 const Gfx ttc_seg7_dl_07012148[] = {
     gsDPPipeSync(),
+    gsSPSetGeometryMode(G_LIGHTING),
     gsDPSetCycleType(G_CYC_2CYCLE),
     gsDPSetRenderMode(G_RM_FOG_SHADE_A, G_RM_AA_ZB_TEX_EDGE2),
     gsDPSetDepthSource(G_ZS_PIXEL),

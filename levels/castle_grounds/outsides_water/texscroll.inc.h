@@ -1,0 +1,2 @@
+extern void scroll_outsides_water_outsides_water_mesh_layer_5_vtx_0();
+extern void scroll_castle_grounds_level_geo_outsides_water();

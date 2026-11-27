@@ -131,6 +131,7 @@ static const Gfx pss_seg7_dl_0700E0E0[] = {
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSP2Triangles( 4,  5,  6, 0x0,  4,  6,  7, 0x0),
     gsSP2Triangles( 8,  9, 10, 0x0,  8, 10, 11, 0x0),
+    gsSPSetGeometryMode(G_LIGHTING),
     gsSPEndDisplayList(),
 };
 

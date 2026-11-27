@@ -1,0 +1,15 @@
+extern const GeoLayout geo_bbh_000640[];
+extern u8 merry_go_round_bbh_textures_05000_rgba16_ci8[];
+extern u8 merry_go_round_bbh_textures_05000_rgba16_ci8_pal_rgba16[];
+extern u8 merry_go_round__0_rgba16_ci8[];
+extern u8 merry_go_round__0_rgba16_ci8_pal_rgba16[];
+extern Vtx merry_go_round_000_displaylist_mesh_layer_1_vtx_0[12];
+extern Gfx merry_go_round_000_displaylist_mesh_layer_1_tri_0[];
+extern Vtx merry_go_round_000_displaylist_mesh_layer_1_vtx_1[16];
+extern Gfx merry_go_round_000_displaylist_mesh_layer_1_tri_1[];
+extern Gfx mat_merry_go_round__1[];
+extern Gfx mat_revert_merry_go_round__1[];
+extern Gfx mat_merry_go_round__0[];
+extern Gfx mat_revert_merry_go_round__0[];
+extern Gfx merry_go_round_000_displaylist_mesh_layer_1[];
+extern Gfx merry_go_round_material_revert_render_settings[];

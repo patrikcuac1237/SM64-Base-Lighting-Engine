@@ -18,7 +18,7 @@ const Collision lll_seg7_collision_octagonal_moving_platform[] = {
     COL_VERTEX(256, 0, 128),
     COL_VERTEX(256, 0, -127),
     COL_VERTEX(128, 0, -255),
-    COL_TRI_INIT(SURFACE_DEFAULT, 22),
+    COL_TRI_INIT(NEWTERRAIN(3, 0, 0, 0), 22),
     COL_TRI(12, 6, 11),
     COL_TRI(0, 1, 2),
     COL_TRI(1, 3, 4),

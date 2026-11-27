@@ -36,11 +36,6 @@ void cap_check_quicksand(void) {
     }
 
     switch (sObjFloor->type) {
-        case SURFACE_DEATH_PLANE:
-            o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
-            save_file_clear_flags(ACTIVE_FLAG_DEACTIVATED);
-            break;
-
         case SURFACE_SHALLOW_QUICKSAND:
         case SURFACE_DEEP_QUICKSAND:
         case SURFACE_QUICKSAND:
@@ -66,6 +61,15 @@ void cap_check_quicksand(void) {
             o->oMoveAngleYaw = (sObjFloor->force & 0xFF) << 8;
             o->oForwardVel = 8 + 2 * (0 - ((sObjFloor->force & 0xFF00) >> 8));
             break;
+        case SURFACE_DEATH_PLANE:
+            save_file_clear_flags(SAVE_FLAG_CAP_ON_GROUND);
+            if (o->oForwardVel <= 4.0f)
+            {
+                o->oFlags |= GRAPH_RENDER_INVISIBLE;
+                obj_mark_for_deletion(o);
+            }
+            break;            
+
     }
 }
 
@@ -198,13 +202,16 @@ void bhv_normal_cap_init(void) {
     o->oFriction = 0.89f;
     o->oBuoyancy = 0.9f;
     o->oOpacity = 255;
-
-    save_file_set_cap_pos(o->oPosX, o->oPosY, o->oPosZ);
+    Vec3f SavePos;
+    SavePos[0] = o->oPosX;
+    SavePos[1] = o->oPosY;
+    SavePos[2] = o->oPosZ;
+    save_file_set_cap_pos(SavePos);
 }
 
 void normal_cap_set_save_flags(void) {
 
-    save_file_set_flags(SAVE_FLAG_CAP_ON_GROUND);
+    //save_file_set_flags(SAVE_FLAG_CAP_ON_GROUND);
     switch (gCurrCourseNum) {
         case COURSE_SSL:
             save_file_set_flags(SAVE_FLAG_CAP_ON_KLEPTO);
@@ -244,6 +251,7 @@ void normal_cap_act_0(void) {
 }
 
 void bhv_normal_cap_loop(void) {
+    //o->oFlags |= OBJ_FLAG_DYNAMIC_SHADOW;
     switch (o->oAction) {
         case CAP_ACT_MOVE:
             normal_cap_act_0();
@@ -256,7 +264,7 @@ void bhv_normal_cap_loop(void) {
     }
 
     if ((s32) o->oForwardVel != 0) {
-        save_file_set_cap_pos(o->oPosX, o->oPosY, o->oPosZ);
+        save_file_set_cap_pos(o->header.gfx.pos);
     }
 
     if (o->activeFlags == ACTIVE_FLAG_DEACTIVATED) {
@@ -272,5 +280,5 @@ void bhv_vanish_cap_init(void) {
     o->oGravity = 1.2f;
     o->oFriction = 0.999f;
     o->oBuoyancy = 0.9f;
-    o->oOpacity = 50;
+    o->oOpacity = 150;
 }

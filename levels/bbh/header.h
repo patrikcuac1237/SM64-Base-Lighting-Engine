@@ -111,4 +111,44 @@ extern const struct MovtexQuadCollection bbh_movtex_merry_go_round_water_side[];
 // script
 extern const LevelScript level_bbh_entry[];
 
+#include "levels/bbh/Mansion/geo_header.h"
+
+#include "levels/bbh/room1/geo_header.h"
+
+#include "levels/bbh/room2/geo_header.h"
+
+#include "levels/bbh/room3/geo_header.h"
+
+#include "levels/bbh/room4/geo_header.h"
+
+#include "levels/bbh/room5/geo_header.h"
+
+#include "levels/bbh/room6/geo_header.h"
+
+#include "levels/bbh/room7/geo_header.h"
+
+#include "levels/bbh/room8/geo_header.h"
+
+#include "levels/bbh/room9/geo_header.h"
+
+#include "levels/bbh/room10/geo_header.h"
+
+#include "levels/bbh/room11/geo_header.h"
+
+#include "levels/bbh/room0/geo_header.h"
+
+#include "levels/bbh/staircase_step/geo_header.h"
+
+#include "levels/bbh/tilting_trap_platform/geo_header.h"
+
+#include "levels/bbh/tumbling_platform_far/geo_header.h"
+
+#include "levels/bbh/tumbling_platform_near/geo_header.h"
+
+#include "levels/bbh/water_mat/geo_header.h"
+
+#include "levels/bbh/mesh_elevator/geo_header.h"
+
+#include "levels/bbh/merry_go_round/geo_header.h"
+
 #endif

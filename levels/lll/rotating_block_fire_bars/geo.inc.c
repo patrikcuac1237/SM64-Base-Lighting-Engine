@@ -1,8 +1,11 @@
-// 0x0E000B38
+#include "src/game/envfx_snow.h"
+
 const GeoLayout lll_geo_000B38[] = {
    GEO_CULLING_RADIUS(500),
-   GEO_OPEN_NODE(),
-      GEO_DISPLAY_LIST(LAYER_OPAQUE, lll_seg7_dl_07018A30),
-   GEO_CLOSE_NODE(),
-   GEO_END(),
+	GEO_OPEN_NODE(),
+		GEO_OPEN_NODE(),
+			GEO_DISPLAY_LIST(LAYER_OPAQUE, rotating_block_fire_bars_000_displaylist_mesh_layer_1_with_revert),
+		GEO_CLOSE_NODE(),
+	GEO_CLOSE_NODE(),
+	GEO_END(),
 };

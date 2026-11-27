@@ -1841,8 +1841,8 @@ Gfx mat_bobomb_buddy_f3dlite_material_010[] = {
 	gsDPPipeSync(),
 	gsDPSetTile(G_IM_FMT_IA, G_IM_SIZ_8b, 4, 0, 0, 0, G_TX_CLAMP | G_TX_NOMIRROR, 6, 0, G_TX_CLAMP | G_TX_MIRROR, 5, 0),
 	gsDPSetTileSize(0, 0, 0, 252, 252),
-    gsSPLightColor(LIGHT_1, 0xffffffff),
-    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
+    //1, 0xffffffff),
+    //2, 0x7f7f7fff),
 	gsSPEndDisplayList(),
 };
 

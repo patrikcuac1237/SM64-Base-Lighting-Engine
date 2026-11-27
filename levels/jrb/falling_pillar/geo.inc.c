@@ -1,8 +1,12 @@
-// 0x0E000900
+#include "src/game/envfx_snow.h"
+
 const GeoLayout jrb_geo_000900[] = {
-   GEO_CULLING_RADIUS(1600),
-   GEO_OPEN_NODE(),
-      GEO_DISPLAY_LIST(LAYER_OPAQUE, jrb_seg7_dl_0700AE48),
-   GEO_CLOSE_NODE(),
-   GEO_END(),
+	GEO_CULLING_RADIUS(1600),
+	GEO_OPEN_NODE(),
+		GEO_OPEN_NODE(),
+			GEO_DISPLAY_LIST(LAYER_OPAQUE, falling_pillar_000_displaylist_mesh_layer_1),
+		GEO_CLOSE_NODE(),
+		GEO_DISPLAY_LIST(LAYER_OPAQUE, falling_pillar_material_revert_render_settings),
+	GEO_CLOSE_NODE(),
+	GEO_END(),
 };

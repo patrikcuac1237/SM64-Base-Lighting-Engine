@@ -15,6 +15,7 @@
 #include "graph_node.h"
 #include "surface_collision.h"
 #include "game/puppylights.h"
+#include "game/interaction.h"
 
 // Macros for retrieving arguments from behavior scripts.
 #define BHV_CMD_GET_1ST_U8(index)  (u8)((gCurBhvCommand[index] >> 24) & 0xFF) // unused
@@ -769,15 +770,13 @@ static s32 bhv_cmd_set_light_color(void) {
 // Command 0x39: Sets an object's light falloff
 // Usage: SET_LIGHT_FALLOFF(constant, linear, quadratic)
 static s32 bhv_cmd_set_light_falloff(void) {
-    s32 constantFalloff = BHV_CMD_GET_2ND_S16(0);
-    s32 linearFalloff = BHV_CMD_GET_1ST_S16(1);
-    s32 quadraticFalloff = BHV_CMD_GET_2ND_S16(1);
+    s32 brightness = BHV_CMD_GET_2ND_U8(0);
+    s32 maxDist = BHV_CMD_GET_2ND_S16(0);
 
-    gCurrentObject->oLightQuadraticFalloff = quadraticFalloff;
-    gCurrentObject->oLightLinearFalloff = linearFalloff;
-    gCurrentObject->oLightConstantFalloff = constantFalloff;
+    gCurrentObject->oLightBrightness = brightness;
+    gCurrentObject->oLightMaxDist = maxDist;
 
-    gCurBhvCommand += 2;
+    gCurBhvCommand++;
     return BHV_PROC_CONTINUE;
 }
 
@@ -848,16 +847,29 @@ static BhvCommandProc BehaviorCmdTable[] = {
 
 #include <point_lights.h>
 #include <stdio.h>
-
+Bool32 game_is_paused()
+{
+    if (o->oFlags & OBJ_FLAG_HAS_ACTIVE_LIGHT)
+    {
+        return FALSE;
+    }
+    if (!(gTimeStopState & TIME_STOP_PAUSE))
+    {
+        return FALSE;
+    } else {
+        return TRUE;
+    }
+    return FALSE;
+}
 extern struct MarioState *gMarioState;
-
 // Execute the behavior script of the current object, process the object flags, and other miscellaneous code for updating objects.
 void cur_obj_update(void) {
     u32 objFlags = o->oFlags;
     f32 distanceFromMario;
     BhvCommandProc bhvCmdProc;
     s32 bhvProcResult;
-
+    
+    
     // Calculate the distance from the object to Mario.
     if (objFlags & OBJ_FLAG_COMPUTE_DIST_TO_MARIO) {
         o->oDistanceToMario = dist_between_objects(o, gMarioObject);
@@ -865,42 +877,36 @@ void cur_obj_update(void) {
     } else {
         distanceFromMario = 0.0f;
     }
-
+    o->header.gfx.node.flags &= ~GRAPH_RENDER_HAS_ANIMATION;
     // Calculate the angle from the object to Mario.
     if (objFlags & OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO) {
         o->oAngleToMario = obj_angle_to_object(o, gMarioObject);
     }
 
     // If the object's action has changed, reset the action timer.
-    if (o->oAction != o->oPrevAction) {
+    if (!game_is_paused())
+    {if (o->oAction != o->oPrevAction) {
         o->oTimer = 0;
         o->oSubAction = 0;
         o->oPrevAction = o->oAction;
-    }
+    }}
 
     // Execute the behavior script.
+    if (!game_is_paused()) {
+    o->header.gfx.node.flags |= GRAPH_RENDER_HAS_ANIMATION;
     gCurBhvCommand = o->curBhvCommand;
-
     do {
         bhvCmdProc = BehaviorCmdTable[*gCurBhvCommand >> 24];
         bhvProcResult = bhvCmdProc();
     } while (bhvProcResult == BHV_PROC_CONTINUE);
-
     o->curBhvCommand = gCurBhvCommand;
-
+    }
     // Increment the object's timer.
-    if (o->oTimer < 0x3FFFFFFF) {
+    if (!game_is_paused())
+    {if (o->oTimer < 0x3FFFFFFF) {
         o->oTimer++;
-    }
+    }}
 
-    // If the object's action has changed, reset the action timer.
-    if (o->oAction != o->oPrevAction) {
-        o->oTimer = 0;
-        o->oSubAction = 0;
-        o->oPrevAction = o->oAction;
-    }
-
-    // Execute various code based on object flags.
     objFlags = o->oFlags;
 
     if (objFlags & OBJ_FLAG_SET_FACE_ANGLE_TO_MOVE_ANGLE) {
@@ -926,87 +932,33 @@ void cur_obj_update(void) {
     if (objFlags & OBJ_FLAG_SET_THROW_MATRIX_FROM_TRANSFORM) {
         obj_set_throw_matrix_from_transform(o);
     }
-
-    if (objFlags & OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE) {
-        obj_update_gfx_pos_and_angle(o);
+    if (!game_is_paused())
+        {if (objFlags & OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE) {
+            obj_update_gfx_pos_and_angle(o);
+        }
     }
-
-#if SILHOUETTE
-    COND_BIT((  objFlags & OBJ_FLAG_SILHOUETTE         ), o->header.gfx.node.flags, GRAPH_RENDER_SILHOUETTE        );
-    COND_BIT((  objFlags & OBJ_FLAG_OCCLUDE_SILHOUETTE ), o->header.gfx.node.flags, GRAPH_RENDER_OCCLUDE_SILHOUETTE);
-#endif
-#ifdef OBJECTS_REJ
-    s32 objListIndex = OBJ_LIST_PLAYER;
-
-    BehaviorScript *bhvScript = segmented_to_virtual(o->behavior);
-    if ((bhvScript[0] >> 24) == 0) {
-        objListIndex = ((bhvScript[0] >> 16) & 0xFFFF);
-    }
-
-    if (objFlags & OBJ_FLAG_UCODE_SMALL) {
-        o->header.gfx.ucode = GRAPH_NODE_UCODE_REJ;
-    }
-    else {
-        o->header.gfx.ucode = GRAPH_NODE_UCODE_DEFAULT;
-    }
-
-#endif
-#ifdef OBJ_OPACITY_BY_CAM_DIST
-    if (objFlags & OBJ_FLAG_OPACITY_FROM_CAMERA_DIST) {
-        obj_set_opacity_from_cam_dist(o);
-    }
-#endif
-
-#ifdef PUPPYLIGHTS
-    puppylights_object_emit(o);
-#endif
-
     // Handle visibility of object
     if (o->oRoom != -1) {
-        // If the object is in a room, only show it when Mario is in the room.
         cur_obj_enable_rendering_if_mario_in_room();
-    } else if (
-        o->collisionData == NULL
-        &&  (objFlags & OBJ_FLAG_COMPUTE_DIST_TO_MARIO)
-        && !(objFlags & OBJ_FLAG_ACTIVE_FROM_AFAR)
-    ) {
-        // If the object has a render distance, check if it should be shown.
+    } else if (o->collisionData == NULL && (objFlags & OBJ_FLAG_COMPUTE_DIST_TO_MARIO) && !(objFlags & OBJ_FLAG_ACTIVE_FROM_AFAR)) {
         if (distanceFromMario > o->oDrawingDistance) {
-            // Out of render distance, hide the object.
             o->header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE;
             o->activeFlags |= ACTIVE_FLAG_FAR_AWAY;
         } else if (o->oHeldState == HELD_FREE) {
-            // In render distance (and not being held), show the object.
             o->header.gfx.node.flags |= GRAPH_RENDER_ACTIVE;
             o->activeFlags &= ~ACTIVE_FLAG_FAR_AWAY;
         }
     }
 
     // Advanced lighting engine
-    // If this object emits light, is active, is visible, and there are still scene point light slots available,
-    // create a point light at this object
-    if ((objFlags & OBJ_FLAG_EMIT_LIGHT))
-    {
+    if ((objFlags & OBJ_FLAG_EMIT_LIGHT)) {
         s32 color = gCurrentObject->oLightColor;
-        s32 red   = (color >> 24) & 0xFF;
-        s32 green = (color >> 16) & 0xFF;
-        s32 blue  = (color >>  8) & 0xFF;
-
-        if (gCurrentObject->header.gfx.node.flags & GRAPH_RENDER_ACTIVE)
-        {
-            emit_light(gCurrentObject->header.gfx.pos,
-                    red, green, blue,
-                    gCurrentObject->oLightQuadraticFalloff,
-                    gCurrentObject->oLightLinearFalloff,
-                    gCurrentObject->oLightConstantFalloff);
-        }
-        else if (gMarioState->heldObj == gCurrentObject)
-        {
-            emit_light(gMarioState->marioBodyState->heldObjLastPosition,
-                    red, green, blue,
-                    gCurrentObject->oLightQuadraticFalloff,
-                    gCurrentObject->oLightLinearFalloff,
-                    gCurrentObject->oLightConstantFalloff);
+        u8 RGBMultAdd[3];
+        RGBMultAdd[0] = (color >> 24) & 0xFF;
+        RGBMultAdd[1] = (color >> 16) & 0xFF;
+        RGBMultAdd[2] = (color >> 8) & 0xFF;
+        if ((gCurrentObject->header.gfx.node.flags) & GRAPH_RENDER_ACTIVE || (gMarioState->heldObj == gCurrentObject)) {;
+            addPointLight((gCurrentObject->header.gfx.node.flags & GRAPH_RENDER_ACTIVE) ? gCurrentObject : gMarioState->heldObj, RGBMultAdd, gCurrentObject->oLightMaxDist, gCurrentObject->oLightBrightness, TRUE);
         }
     }
 }

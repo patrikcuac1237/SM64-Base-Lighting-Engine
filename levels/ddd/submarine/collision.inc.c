@@ -156,7 +156,7 @@ const Collision ddd_seg7_collision_submarine[] = {
     COL_VERTEX(3405, -145, -1996),
     COL_VERTEX(4019, -606, -1996),
     COL_VERTEX(4429, 161, -1996),
-    COL_TRI_INIT(SURFACE_WOOD, 28),
+    COL_TRI_INIT(NEWTERRAIN(4, 0, 0, 0), 28),
     COL_TRI(131, 85, 145),
     COL_TRI(131, 80, 104),
     COL_TRI(131, 145, 80),

@@ -75,8 +75,8 @@ static const Gfx dl_tex_block_menu_save_button_base[] = {
 
 // 0x070031A0 - 0x07003218
 static const Gfx dl_vertex_menu_save_button_borders[] = {
-    gsSPLightColor(LIGHT_1, 0xffffffff),
-    gsSPLightColor(LIGHT_2, 0x3f3f3fff),
+    ////1, 0xffffffff),
+    ////2, 0x3f3f3fff),
     gsSPVertex(vertex_menu_save_button_borders, 16, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  1,  3,  2, 0x0),
     gsSP2Triangles( 4,  5,  6, 0x0,  5,  7,  6, 0x0),
@@ -122,8 +122,8 @@ static const Gfx dl_tex_block_menu_save_button_back[] = {
 
 // 0x070032E0 - 0x07003330
 static const Gfx dl_vertex_menu_save_button_back[] = {
-    gsSPLightColor(LIGHT_1, 0xffffffff),
-    gsSPLightColor(LIGHT_2, 0x3f3f3fff),
+    ////1, 0xffffffff),
+    ////2, 0x3f3f3fff),
     gsSPVertex(vertex_menu_save_button_back, 4, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  1,  3,  2, 0x0),
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF),
@@ -175,8 +175,8 @@ const Gfx dl_menu_save_button_back[] = {
 const Gfx dl_menu_save_button_fade_back[] = {
     gsDPPipeSync(),
     gsSPClearGeometryMode(G_SHADING_SMOOTH),
-    gsSPLightColor(LIGHT_1, 0xffffffff),
-    gsSPLightColor(LIGHT_2, 0x3f3f3fff),
+    ////1, 0xffffffff),
+    ////2, 0x3f3f3fff),
     gsSPVertex(vertex_menu_save_button_back, 4, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  1,  3,  2, 0x0),
     gsDPPipeSync(),
@@ -290,8 +290,8 @@ static const Vtx vertex_menu_main_button_group4[] = {
 
 // 0x07006038 - 0x07006150
 static const Gfx dl_vertex_menu_main_button[] = {
-    gsSPLightColor(LIGHT_1, 0xffffffff),
-    gsSPLightColor(LIGHT_2, 0x3f3f3fff),
+    ////1, 0xffffffff),
+    ////2, 0x3f3f3fff),
     gsSPVertex(vertex_menu_main_button_group1, 16, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 6,  7,  8, 0x0,  6,  9,  7, 0x0),
@@ -1846,3 +1846,4 @@ const Collision main_menu_seg7_collision[] = {
 #undef COURSE_TABLE
 
 #endif
+#include "light_skybox/model.inc.c"

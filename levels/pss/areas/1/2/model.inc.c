@@ -140,6 +140,7 @@ static const Gfx pss_seg7_dl_0700AE00[] = {
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  1, 0x0),
     gsSP2Triangles( 4,  5,  6, 0x0,  7,  8,  9, 0x0),
     gsSP2Triangles( 7,  9, 10, 0x0, 11, 12, 13, 0x0),
+    gsSPSetGeometryMode(G_LIGHTING),
     gsSP1Triangle(11, 13, 14, 0x0),
     gsSPEndDisplayList(),
 };
@@ -152,6 +153,7 @@ static const Gfx pss_seg7_dl_0700AF60[] = {
     gsSPVertex(pss_seg7_vertex_0700AD48, 6, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  1,  3,  2, 0x0),
     gsSP2Triangles( 0,  2,  4, 0x0,  5,  0,  4, 0x0),
+    gsSPSetGeometryMode(G_LIGHTING),
     gsSPEndDisplayList(),
 };
 

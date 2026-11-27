@@ -1,0 +1,10 @@
+extern const GeoLayout hmc_geo_000530[];
+extern Lights1 grill_door__0_lights;
+extern u8 grill_door_hmc_textures_01000_rgba16_ci8[];
+extern u8 grill_door_hmc_textures_01000_rgba16_ci8_pal_rgba16[];
+extern Vtx grill_door_000_displaylist_mesh_layer_4_vtx_0[24];
+extern Gfx grill_door_000_displaylist_mesh_layer_4_tri_0[];
+extern Gfx mat_grill_door__0[];
+extern Gfx mat_revert_grill_door__0[];
+extern Gfx grill_door_000_displaylist_mesh_layer_4[];
+extern Gfx grill_door_material_revert_render_settings[];

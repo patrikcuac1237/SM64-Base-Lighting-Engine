@@ -12,7 +12,6 @@
 #include "game/debug.h"
 #include "menu/file_select.h"
 #include "engine/surface_load.h"
-
 #include "actors/common0.h"
 #include "actors/common1.h"
 #include "actors/group0.h"
@@ -43,6 +42,7 @@
 #include "levels/jrb/header.h"
 #include "levels/thi/header.h"
 #include "levels/ttc/header.h"
+#include "levels/ccm/header.h"
 #include "levels/rr/header.h"
 #include "levels/castle_grounds/header.h"
 #include "levels/bitdw/header.h"
@@ -396,9 +396,8 @@ enum BehaviorCommands {
     
 // Advanced lighting Engine
 // Sets an object's light falloff
-#define SET_LIGHT_FALLOFF(constant, linear, quadratic) \
-    BC_B0H(0x39, constant), \
-    BC_HH(linear, quadratic)
+#define SET_LIGHT_FALLOFF(brightness, maxDist) \
+    BC_BBH(0x39, brightness, maxDist)
 
 const BehaviorScript bhvStarDoor[] = {
     BEGIN(OBJ_LIST_SURFACE),
@@ -537,7 +536,7 @@ const BehaviorScript bhvKingBobomb[] = {
     SET_HOME(),
     SPAWN_OBJ(/*Model*/ MODEL_NONE, /*Behavior*/ bhvBobombAnchorMario),
     SET_INT(oHealth, 3),
-    SET_INT(oDamageOrCoinValue, 1),
+    SET_INT(oDamageOrCoinValue, 4),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_king_bobomb_loop),
     END_LOOP(),
@@ -771,7 +770,7 @@ const BehaviorScript bhvRotatingPlatform[] = {
 const BehaviorScript bhvTower[] = {
     BEGIN(OBJ_LIST_SURFACE),
     OR_INT(oFlags, (OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
-    LOAD_COLLISION_DATA(wf_seg7_collision_tower),
+    LOAD_COLLISION_DATA(whomps_tower_collision),
     SET_FLOAT(oCollisionDistance, 3000),
     SET_FLOAT(oDrawingDistance, 20000),
     BEGIN_LOOP(),
@@ -782,7 +781,7 @@ const BehaviorScript bhvTower[] = {
 const BehaviorScript bhvBulletBillCannon[] = {
     BEGIN(OBJ_LIST_SURFACE),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
-    LOAD_COLLISION_DATA(wf_seg7_collision_bullet_bill_cannon),
+    LOAD_COLLISION_DATA(bullet_bill_cannon_collision),
     SET_FLOAT(oCollisionDistance, 300),
     BEGIN_LOOP(),
         CALL_NATIVE(load_object_collision_model),
@@ -920,17 +919,13 @@ const BehaviorScript bhvWhitePuffExplosion[] = {
 const BehaviorScript bhvSpawnedStar[] = {
     BEGIN(OBJ_LIST_LEVEL),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
-    SET_INT(oBehParams2ndByte,  OBJ_FLAG_EMIT_LIGHT),
-    SET_LIGHT_COLOR(255, 225, 0),
-    SET_LIGHT_FALLOFF(0, 0, 5),
+    SET_INT(oBehParams2ndByte, SPAWN_STAR_POS_CUTSCENE_BP_SPAWN_AT_HOME),
     GOTO(bhvSpawnedStarNoLevelExit + 1 + 1),
 };
 
 const BehaviorScript bhvSpawnedStarNoLevelExit[] = {
     BEGIN(OBJ_LIST_LEVEL),
-    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT),
-    SET_LIGHT_COLOR(255, 200, 0),
-    SET_LIGHT_FALLOFF(0, 0, 5),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     // Spawned star - common:
     SET_HOME(),
     CALL_NATIVE(bhv_spawned_star_init),
@@ -1051,9 +1046,7 @@ const BehaviorScript bhvSingleCoinGetsSpawned[] = {
 
 const BehaviorScript bhvCoinSparkles[] = {
     BEGIN(OBJ_LIST_UNIMPORTANT),
-    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT),
-    SET_LIGHT_COLOR(255, 225, 0),
-    SET_LIGHT_FALLOFF(0, 0, 2),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     BILLBOARD(),
     SET_FLOAT(oGraphYOffset, 25),
     SET_INT(oAnimState, OBJ_ANIM_STATE_INIT_ANIM),
@@ -1068,9 +1061,7 @@ const BehaviorScript bhvCoinSparkles[] = {
 
 const BehaviorScript bhvCoinSparklesSpawner[] = {
     BEGIN(OBJ_LIST_DEFAULT),
-    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT),
-    SET_LIGHT_COLOR(255, 225, 0),
-    SET_LIGHT_FALLOFF(0, 0, 2),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     DISABLE_RENDERING(),
     BEGIN_REPEAT(3),
         CALL_NATIVE(bhv_golden_coin_sparkles_loop),
@@ -1247,7 +1238,7 @@ const BehaviorScript bhvFlame[] = {
     BEGIN(OBJ_LIST_LEVEL),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT),
     SET_LIGHT_COLOR(255, 50, 0),
-    SET_LIGHT_FALLOFF(0, 0, 2),
+    SET_LIGHT_FALLOFF(10, 1000),
     BILLBOARD(),
     SET_HOME(),
     SCALE(/*Unused*/ 0, /*Field*/ 700),
@@ -1264,9 +1255,9 @@ const BehaviorScript bhvFlame[] = {
 const BehaviorScript bhvBlueFlame[] = {
     BEGIN(OBJ_LIST_LEVEL),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT),
-    SET_LIGHT_COLOR(100, 100, 255),
-    SET_LIGHT_FALLOFF(0, 0, 2),
     BILLBOARD(),
+    SET_LIGHT_COLOR(0x64, 100, 255),
+    SET_LIGHT_FALLOFF(10, 1000),
     SET_HOME(),
     SCALE(/*Unused*/ 0, /*Field*/ 700),
     SET_INTERACT_TYPE(INTERACT_FLAME),
@@ -1438,9 +1429,7 @@ const BehaviorScript bhvUkikiCageChild[] = {
 
 const BehaviorScript bhvUkikiCageStar[] = {
     BEGIN(OBJ_LIST_DEFAULT),
-    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT),
-    SET_LIGHT_COLOR(255, 225, 0),
-    SET_LIGHT_FALLOFF(0, 0, 1),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     SET_HOME(),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_ukiki_cage_star_loop),
@@ -1566,9 +1555,7 @@ const BehaviorScript bhvFlamethrower[] = {
 
 const BehaviorScript bhvFlamethrowerFlame[] = {
     BEGIN(OBJ_LIST_GENACTOR),
-    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT),
-    SET_LIGHT_COLOR(255, 50, 0),
-    SET_LIGHT_FALLOFF(0, 0, 2),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     SET_INTERACT_TYPE(INTERACT_FLAME),
     SET_HITBOX_WITH_OFFSET(/*Radius*/ 50, /*Height*/ 25, /*Downwards offset*/ 25),
     BILLBOARD(),
@@ -1583,9 +1570,7 @@ const BehaviorScript bhvFlamethrowerFlame[] = {
 
 const BehaviorScript bhvBouncingFireball[] = {
     BEGIN(OBJ_LIST_DEFAULT),
-    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT)),
-    SET_LIGHT_COLOR(255, 50, 0),
-    SET_LIGHT_FALLOFF(0, 0, 2),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     DISABLE_RENDERING(),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_bouncing_fireball_spawner_loop),
@@ -1608,7 +1593,7 @@ const BehaviorScript bhvBouncingFireballFlame[] = {
 
 const BehaviorScript bhvBowserShockWave[] = {
     BEGIN(OBJ_LIST_DEFAULT),
-    OR_INT(oFlags, (OBJ_FLAG_ACTIVE_FROM_AFAR | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT)),
+    OR_INT(oFlags, (OBJ_FLAG_ACTIVE_FROM_AFAR | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     SET_INT(oOpacity, 255),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_bowser_shock_wave_loop),
@@ -1617,9 +1602,7 @@ const BehaviorScript bhvBowserShockWave[] = {
 
 const BehaviorScript bhvFireParticleSpawner[] = {
     BEGIN(OBJ_LIST_DEFAULT),
-    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT),
-    SET_LIGHT_COLOR(255, 50, 0),
-    SET_LIGHT_FALLOFF(0, 0, 2),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     BILLBOARD(),
     SET_FLOAT(oGraphYOffset, 70),
     SET_INT(oAnimState, OBJ_ANIM_STATE_INIT_ANIM),
@@ -1634,21 +1617,10 @@ const BehaviorScript bhvBlackSmokeMario[] = {
     OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_MOVE_XZ_USING_FVEL | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     BILLBOARD(),
     SET_FLOAT(oGraphYOffset, 50),
-#ifdef BURN_SMOKE_FIX
     SET_INT(oOpacity, 255),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_black_smoke_mario_loop),
     END_LOOP(),
-#else
-    BEGIN_REPEAT(8),
-        CALL_NATIVE(bhv_black_smoke_mario_loop),
-        DELAY(1),
-        CALL_NATIVE(bhv_black_smoke_mario_loop),
-        DELAY(1),
-        CALL_NATIVE(bhv_black_smoke_mario_loop),
-    END_REPEAT(),
-    DEACTIVATE(),
-#endif
 };
 
 const BehaviorScript bhvBlackSmokeBowser[] = {
@@ -1978,9 +1950,7 @@ const BehaviorScript bhvBowserKey[] = {
 
 const BehaviorScript bhvGrandStar[] = {
     BEGIN(OBJ_LIST_LEVEL),
-    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT),
-    SET_LIGHT_COLOR(255, 225, 0),
-    SET_LIGHT_FALLOFF(0, 0, 1),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     SET_INTERACT_TYPE(INTERACT_STAR_OR_KEY),
     SET_INT(oInteractionSubtype, INT_SUBTYPE_GRAND_STAR),
     SET_HITBOX(/*Radius*/ 160, /*Height*/ 100),
@@ -2086,9 +2056,7 @@ const BehaviorScript bhvBowserBodyAnchor[] = {
 
 const BehaviorScript bhvBowserFlameSpawn[] = {
     BEGIN(OBJ_LIST_DEFAULT),
-    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT),
-    SET_LIGHT_COLOR(255, 50, 0),
-    SET_LIGHT_FALLOFF(0, 0, 2),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     SET_MODEL(MODEL_NONE),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_bowser_flame_spawn_loop),
@@ -2123,9 +2091,7 @@ const BehaviorScript bhvFallingBowserPlatform[] = {
 
 const BehaviorScript bhvBlueBowserFlame[] = {
     BEGIN(OBJ_LIST_LEVEL),
-    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT),
-    SET_LIGHT_COLOR(100, 100, 255),
-    SET_LIGHT_FALLOFF(0, 0, 2),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     SET_INTERACT_TYPE(INTERACT_FLAME),
     BILLBOARD(),
     SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 0, /*Gravity*/ -400, /*Bounciness*/ -70, /*Drag strength*/ 1000, /*Friction*/ 1000, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
@@ -2300,7 +2266,7 @@ const BehaviorScript bhvMoatGrills[] = {
     DEACTIVATE(),
 #else
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
-    LOAD_COLLISION_DATA(castle_grounds_seg7_collision_moat_grills),
+    LOAD_COLLISION_DATA(moat_grills_collision),
     SET_FLOAT(oCollisionDistance, 30000),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_moat_grills_loop),
@@ -2395,9 +2361,7 @@ const BehaviorScript bhvLllRotatingBlockWithFireBars[] = {
 
 const BehaviorScript bhvLllRotatingHexFlame[] = {
     BEGIN(OBJ_LIST_LEVEL),
-    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT)),
-    SET_LIGHT_COLOR(255, 50, 0),
-    SET_LIGHT_FALLOFF(0, 0, 2),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     SET_INTERACT_TYPE(INTERACT_FLAME),
     SET_HITBOX_WITH_OFFSET(/*Radius*/ 50, /*Height*/ 100, /*Downwards offset*/ 50),
     SET_INT(oIntangibleTimer, 0),
@@ -2430,9 +2394,7 @@ const BehaviorScript bhvLllFloatingWoodBridge[] = {
 
 const BehaviorScript bhvVolcanoFlames[] = {
     BEGIN(OBJ_LIST_UNIMPORTANT),
-    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT)),
-    SET_LIGHT_COLOR(255, 50, 0),
-    SET_LIGHT_FALLOFF(0, 0, 2),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     BILLBOARD(),
     BEGIN_LOOP(),
         ADD_INT(oAnimState, 1),
@@ -2499,9 +2461,7 @@ const BehaviorScript bhvKoopaShell[] = {
 
 const BehaviorScript bhvKoopaShellFlame[] = {
     BEGIN(OBJ_LIST_UNIMPORTANT),
-    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT),
-    SET_LIGHT_COLOR(255, 200, 0),
-    SET_LIGHT_FALLOFF(0, 0, 5),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     SET_INTERACT_TYPE(INTERACT_FLAME),
     BILLBOARD(),
     BEGIN_LOOP(),
@@ -2686,7 +2646,7 @@ const BehaviorScript bhvExclamationBox[] = {
     OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     LOAD_COLLISION_DATA(exclamation_box_outline_seg8_collision_08025F78),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
-    SET_FLOAT(oCollisionDistance, 300),
+    SET_FLOAT(oCollisionDistance, 300000),
     SET_HOME(),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_exclamation_box_loop),
@@ -3249,9 +3209,7 @@ const BehaviorScript bhvSparkle[] = {
 
 const BehaviorScript bhvSparkleSpawn[] = {
     BEGIN(OBJ_LIST_UNIMPORTANT),
-    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE| OBJ_FLAG_EMIT_LIGHT),
-    SET_LIGHT_COLOR(255, 225, 0),
-    SET_LIGHT_FALLOFF(0, 0, 2),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_sparkle_spawn_loop),
     END_LOOP(),
@@ -3557,9 +3515,7 @@ const BehaviorScript bhvToadMessage[] = {
 
 const BehaviorScript bhvUnlockDoorStar[] = {
     BEGIN(OBJ_LIST_LEVEL),
-    OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT)),
-    SET_LIGHT_COLOR(255, 225, 0),
-    SET_LIGHT_FALLOFF(0, 0, 1),
+    OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     CALL_NATIVE(bhv_unlock_door_star_init),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_unlock_door_star_loop),
@@ -3867,9 +3823,7 @@ const BehaviorScript bhvSignOnWall[] = {
 
 const BehaviorScript bhvHomingAmp[] = {
     BEGIN(OBJ_LIST_GENACTOR),
-    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_MOVE_XZ_USING_FVEL | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT)),
-    SET_LIGHT_COLOR(255, 235, 0),
-    SET_LIGHT_FALLOFF(0, 0, 8),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_MOVE_XZ_USING_FVEL | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     LOAD_ANIMATIONS(oAnimations, dAmpAnimsList),
     ANIMATE(AMP_ANIM_DEFAULT),
     SET_FLOAT(oGraphYOffset, 40),
@@ -3882,9 +3836,7 @@ const BehaviorScript bhvHomingAmp[] = {
 
 const BehaviorScript bhvCirclingAmp[] = {
     BEGIN(OBJ_LIST_GENACTOR),
-    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_MOVE_XZ_USING_FVEL | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT)),
-    SET_LIGHT_COLOR(255, 235, 0),
-    SET_LIGHT_FALLOFF(0, 0, 8),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_MOVE_XZ_USING_FVEL | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     LOAD_ANIMATIONS(oAnimations, dAmpAnimsList),
     ANIMATE(AMP_ANIM_DEFAULT),
     SET_FLOAT(oGraphYOffset, 40),
@@ -3981,9 +3933,7 @@ const BehaviorScript bhvObjectWaterWave[] = {
 
 const BehaviorScript bhvExplosion[] = {
     BEGIN(OBJ_LIST_DESTRUCTIVE),
-    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT)),
-    SET_LIGHT_COLOR(255, 175, 0),
-    SET_LIGHT_FALLOFF(0, 0, 5),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     BILLBOARD(),
     SET_INTERACT_TYPE(INTERACT_DAMAGE),
     SET_INT(oDamageOrCoinValue, 2),
@@ -4176,9 +4126,7 @@ const BehaviorScript bhvBowserBomb[] = {
 
 const BehaviorScript bhvBowserBombExplosion[] = {
     BEGIN(OBJ_LIST_DEFAULT),
-    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT),
-    SET_LIGHT_COLOR(255, 175, 0),
-    SET_LIGHT_FALLOFF(0, 0, 0),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     BILLBOARD(),
     SET_FLOAT(oGraphYOffset, -288),
     SET_INT(oAnimState, OBJ_ANIM_STATE_INIT_ANIM),
@@ -4201,9 +4149,7 @@ const BehaviorScript bhvBowserBombSmoke[] = {
 
 const BehaviorScript bhvCelebrationStar[] = {
     BEGIN(OBJ_LIST_LEVEL),
-    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT),
-    SET_LIGHT_COLOR(255, 225, 0),
-    SET_LIGHT_FALLOFF(0, 0, 1),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     CALL_NATIVE(bhv_celebration_star_init),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_celebration_star_loop),
@@ -4509,7 +4455,7 @@ const BehaviorScript bhvHiddenAt120Stars[] = {
     DEACTIVATE(),
 #else
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
-    LOAD_COLLISION_DATA(castle_grounds_seg7_collision_cannon_grill),
+    LOAD_COLLISION_DATA(cannon_grill_collision),
     SET_FLOAT(oCollisionDistance, 4000),
     CALL_NATIVE(bhv_castle_cannon_grate_init),
     BEGIN_LOOP(),
@@ -4533,7 +4479,6 @@ const BehaviorScript bhvSnowmansHead[] = {
     BEGIN(OBJ_LIST_DEFAULT),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     DROP_TO_FLOOR(),
-    SET_FLOAT(oGraphYOffset, 110),
     CALL_NATIVE(bhv_snowmans_head_init),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_snowmans_head_loop),
@@ -4618,9 +4563,7 @@ const BehaviorScript bhvVanishCap[] = {
 
 const BehaviorScript bhvStar[] = {
     BEGIN(OBJ_LIST_LEVEL),
-    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT),
-    SET_LIGHT_COLOR(255, 200, 0),
-    SET_LIGHT_FALLOFF(5, 0, 1),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     CALL_NATIVE(bhv_init_room),
     CALL_NATIVE(bhv_collect_star_init),
     BEGIN_LOOP(),
@@ -4663,9 +4606,7 @@ const BehaviorScript bhvRedCoin[] = {
 
 const BehaviorScript bhvBowserCourseRedCoinStar[] = {
     BEGIN(OBJ_LIST_LEVEL),
-    OR_INT(oFlags, (OBJ_FLAG_PERSISTENT_RESPAWN | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT)),
-    SET_LIGHT_COLOR(255, 200, 0),
-    SET_LIGHT_FALLOFF(0, 0, 5),
+    OR_INT(oFlags, (OBJ_FLAG_PERSISTENT_RESPAWN | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_bowser_course_red_coin_star_loop),
     END_LOOP(),
@@ -4729,9 +4670,7 @@ const BehaviorScript bhvLllRollingLog[] = {
 
 const BehaviorScript bhv1upWalking[] = {
     BEGIN(OBJ_LIST_LEVEL),
-    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT)),
-    SET_LIGHT_COLOR(127, 255, 200),
-    SET_LIGHT_FALLOFF(0, 0, 8),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     BILLBOARD(),
     SET_HITBOX_WITH_OFFSET(/*Radius*/ 30, /*Height*/ 30, /*Downwards offset*/ 0),
     SET_FLOAT(oGraphYOffset, 30),
@@ -4743,9 +4682,7 @@ const BehaviorScript bhv1upWalking[] = {
 
 const BehaviorScript bhv1upRunningAway[] = {
     BEGIN(OBJ_LIST_LEVEL),
-    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT)),
-    SET_LIGHT_COLOR(127, 255, 200),
-    SET_LIGHT_FALLOFF(0, 0, 8),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO)),
     BILLBOARD(),
     SET_HITBOX_WITH_OFFSET(/*Radius*/ 30, /*Height*/ 30, /*Downwards offset*/ 0),
     SET_FLOAT(oGraphYOffset, 30),
@@ -4757,9 +4694,7 @@ const BehaviorScript bhv1upRunningAway[] = {
 
 const BehaviorScript bhv1upSliding[] = {
     BEGIN(OBJ_LIST_LEVEL),
-    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE| OBJ_FLAG_EMIT_LIGHT),
-    SET_LIGHT_COLOR(127, 255, 200),
-    SET_LIGHT_FALLOFF(0, 0, 8),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO),
     BILLBOARD(),
     SET_HITBOX_WITH_OFFSET(/*Radius*/ 30, /*Height*/ 30, /*Downwards offset*/ 0),
     SET_FLOAT(oGraphYOffset, 30),
@@ -4772,9 +4707,7 @@ const BehaviorScript bhv1upSliding[] = {
 
 const BehaviorScript bhv1Up[] = {
     BEGIN(OBJ_LIST_LEVEL),
-    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE| OBJ_FLAG_EMIT_LIGHT),
-    SET_LIGHT_COLOR(127, 255, 200),
-    SET_LIGHT_FALLOFF(0, 0, 8),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO),
     BILLBOARD(),
     SET_HITBOX_WITH_OFFSET(/*Radius*/ 30, /*Height*/ 30, /*Downwards offset*/ 0),
     SET_FLOAT(oGraphYOffset, 30),
@@ -4787,9 +4720,7 @@ const BehaviorScript bhv1Up[] = {
 
 const BehaviorScript bhv1upJumpOnApproach[] = {
     BEGIN(OBJ_LIST_LEVEL),
-    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT)),
-    SET_LIGHT_COLOR(127, 255, 200),
-    SET_LIGHT_FALLOFF(0, 0, 8),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     BILLBOARD(),
     SET_HITBOX_WITH_OFFSET(/*Radius*/ 30, /*Height*/ 30, /*Downwards offset*/ 0),
     SET_FLOAT(oGraphYOffset, 30),
@@ -5844,9 +5775,7 @@ const BehaviorScript bhvFirePiranhaPlant[] = {
 
 const BehaviorScript bhvMovingFlame[] = {
     BEGIN(OBJ_LIST_GENACTOR),
-    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT)),
-    SET_LIGHT_COLOR(255, 50, 0),
-    SET_LIGHT_FALLOFF(0, 0, 2),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     BILLBOARD(),
     SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 30, /*Gravity*/ 0, /*Bounciness*/ -50, /*Drag strength*/ 1000, /*Friction*/ 1000, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
     BEGIN_LOOP(),
@@ -5857,9 +5786,7 @@ const BehaviorScript bhvMovingFlame[] = {
 
 const BehaviorScript bhvMovingFlameEmber[] = {
     BEGIN(OBJ_LIST_UNIMPORTANT),
-    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT),
-    SET_LIGHT_COLOR(255, 50, 0),
-    SET_LIGHT_FALLOFF(0, 0, 2),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE /*| OBJ_FLAG_EMIT_LIGHT*/),
     BILLBOARD(),
     SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 0, /*Gravity*/ 200, /*Bounciness*/ 0, /*Drag strength*/ 1000, /*Friction*/ 1000, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
     BEGIN_LOOP(),
@@ -6093,8 +6020,8 @@ const BehaviorScript bhvDDDPole[] = {
 const BehaviorScript bhvRedCoinStarMarker[] = {
     BEGIN(OBJ_LIST_DEFAULT),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT),
-    SET_LIGHT_COLOR(0, 0, 255),
-    SET_LIGHT_FALLOFF(0, 0, 5),
+    SET_LIGHT_COLOR(30, 50, 230),
+    SET_LIGHT_FALLOFF(10, 750),
     DROP_TO_FLOOR(),
     SCALE(/*Unused*/ 0, /*Field*/ 150),
     SET_INT(oFaceAnglePitch, 0x4000),
@@ -6180,98 +6107,250 @@ const BehaviorScript bhvIntroScene[] = {
 };
 
 const BehaviorScript bhvPointLight[] = {
-    BEGIN(OBJ_LIST_LEVEL),
-    OR_INT(oFlags,OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE/* | OBJ_FLAG_EMIT_LIGHT*/),
-    SET_LIGHT_COLOR(255, 255, 255),
-    SET_LIGHT_FALLOFF(0, 0, 0),
+    BEGIN(OBJ_LIST_DEFAULT),
+    OR_INT(oFlags, OBJ_FLAG_EMIT_LIGHT),
+    SET_LIGHT_COLOR(0xFF, 0xF4, 0x00),
+    SET_LIGHT_FALLOFF(0, 1000),
+    SET_FLOAT(oDrawingDistance, 2000),
     BEGIN_LOOP(),
     END_LOOP(),
 };
 
 const BehaviorScript bhvCastleLight[] = {
-    BEGIN(OBJ_LIST_LEVEL),
-    OR_INT(oFlags, (OBJ_FLAG_EMIT_LIGHT)),
-    SET_LIGHT_COLOR(255, 240, 0),
-    SET_LIGHT_FALLOFF(1, 0, 1),
+    BEGIN(OBJ_LIST_DEFAULT),
+    SET_LIGHT_FALLOFF(1, 1500),
+    CALL_NATIVE(bhv_init_room),
+    SET_FLOAT(oDrawingDistance, 2000),
     BEGIN_LOOP(),
         SET_INT(oIntangibleTimer, 0),
-        CALL_NATIVE(bhv_beta_holdable_object_loop),
+        CALL_NATIVE(bhv_CastleLight_Loop),
+    END_LOOP(),
+};
+
+const BehaviorScript bhvRelativeLight[] = {
+    BEGIN(OBJ_LIST_DEFAULT),
+    CALL_NATIVE(bhv_init_room),
+    SET_FLOAT(oDrawingDistance, 2000000),
+    BEGIN_LOOP(),
+        CALL_NATIVE(bhv_bitdw_light_loop),
+    END_LOOP(),
+};
+
+const BehaviorScript bhvMansionLight[] = {
+    BEGIN(OBJ_LIST_DEFAULT),
+    SET_INT(oRoom, 1),
+    BEGIN_LOOP(),
+        CALL_NATIVE(bhv_CastleLight_Loop),
+    END_LOOP(),
+};
+
+const BehaviorScript bhvMansionLight2[] = {
+    BEGIN(OBJ_LIST_DEFAULT),
+    SET_INT(oRoom, 2),
+    BEGIN_LOOP(),
+        CALL_NATIVE(bhv_CastleLight_Loop),
+    END_LOOP(),
+};
+
+const BehaviorScript bhvMansionLight3[] = {
+    BEGIN(OBJ_LIST_DEFAULT),
+    SET_LIGHT_FALLOFF(10, 1500),
+    SET_INT(oRoom, 13),
+    BEGIN_LOOP(),
+        CALL_NATIVE(bhv_CastleLight_Loop),
+    END_LOOP(),
+};
+
+
+const BehaviorScript bhvAquariumsLights[] = {
+    BEGIN(OBJ_LIST_DEFAULT),
+    OR_INT(oFlags, OBJ_FLAG_EMIT_LIGHT),
+    SET_LIGHT_COLOR(255, 255, 255),
+    SET_LIGHT_FALLOFF(10, 1000),
+    BEGIN_LOOP(),
+        CALL_NATIVE(bhv_Aquariums_Lights_loop),
     END_LOOP(),
 };
 
 const BehaviorScript bhvJRBRoomLight[] = {
-    BEGIN(OBJ_LIST_LEVEL),
-    OR_INT(oFlags, (OBJ_FLAG_EMIT_LIGHT)),
-    SET_LIGHT_COLOR(0, 75, 255),
-    SET_LIGHT_FALLOFF(0, 0, 1),
+    BEGIN(OBJ_LIST_DEFAULT),
+    OR_INT(oFlags, OBJ_FLAG_EMIT_LIGHT),
+    CALL_NATIVE(bhv_init_room),
     BEGIN_LOOP(),
-        SET_INT(oIntangibleTimer, 0),
-        CALL_NATIVE(bhv_beta_holdable_object_loop),
+        CALL_NATIVE(bhv_jrb_room_light),
     END_LOOP(),
 };
 
-const BehaviorScript bhvPointLightLLL[] = {
-    BEGIN(OBJ_LIST_LEVEL),
-    OR_INT(oFlags,OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT),
-    SET_LIGHT_COLOR(255, 50, 50),
-    SET_LIGHT_FALLOFF(0, 3, 0),
-    BEGIN_LOOP(),
-    END_LOOP(),
-};
+const BehaviorScript bhvPointLightLLL[] = {};
 
-const BehaviorScript bhvPointDark[] = {
-    BEGIN(OBJ_LIST_LEVEL),
-    OR_INT(oFlags,OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT),
-    SET_LIGHT_COLOR(255, 50, 50),
-    SET_LIGHT_FALLOFF(0, 10, 0),
-    BEGIN_LOOP(),
-    END_LOOP(),
-};
+const BehaviorScript bhvPointDark[] = {};
 
-const BehaviorScript bhvPointLightRed[] = {
-    BEGIN(OBJ_LIST_LEVEL),
-    OR_INT(oFlags,OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT),
-    SET_LIGHT_COLOR(255, 50, 50),
-    SET_LIGHT_FALLOFF(0, 0, 5),
-    BEGIN_LOOP(),
-    END_LOOP(),
-};
+const BehaviorScript bhvPointLightRed[] = {};
 
-const BehaviorScript bhvPointLightIce[] = {
-    BEGIN(OBJ_LIST_LEVEL),
-    OR_INT(oFlags,OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE/* | OBJ_FLAG_EMIT_LIGHT*/),
-    SET_LIGHT_COLOR(225, 225, 255),
-    SET_LIGHT_FALLOFF(0, 2, 0),
-    BEGIN_LOOP(),
-    END_LOOP(),
-};
+const BehaviorScript bhvPointLightIce[] = {};
 
 const BehaviorScript bhvBBHRedLight[] = {
-    BEGIN(OBJ_LIST_LEVEL),
-    OR_INT(oFlags,OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT),
+    BEGIN(OBJ_LIST_DEFAULT),
+    OR_INT(oFlags, OBJ_FLAG_EMIT_LIGHT),
     SET_LIGHT_COLOR(255, 50, 0),
-    SET_LIGHT_FALLOFF(0, 0, 5),
+    SET_LIGHT_FALLOFF(10, 1000),
+    SET_INT(oRoom, 8),
     BEGIN_LOOP(),
+        CALL_NATIVE(bhv_bbh_red_light_loop),
     END_LOOP(),
 };
 
-const BehaviorScript bhvBBHMoon[] = {
-    BEGIN(OBJ_LIST_LEVEL),
-    OR_INT(oFlags,OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT),
-    SET_LIGHT_COLOR(255, 240, 0),
-    SET_LIGHT_FALLOFF(0, 0, 5),
+const BehaviorScript bhvHMCRedLight[] = {
+    BEGIN(OBJ_LIST_DEFAULT),
+    //OR_INT(oFlags, OBJ_FLAG_EMIT_LIGHT),
+    SET_LIGHT_COLOR(255, 50, 0),
+    SET_LIGHT_FALLOFF(7, 1500),
+    CALL_NATIVE(bhv_init_room),
     BEGIN_LOOP(),
+        CALL_NATIVE(bhv_CastleLight_Loop),
+    END_LOOP(),
+};
+const BehaviorScript bhvHMCYellowLight[] = {
+    BEGIN(OBJ_LIST_DEFAULT),
+    //OR_INT(oFlags, OBJ_FLAG_EMIT_LIGHT),
+    SET_LIGHT_COLOR(0xFB, 0xFF, 0x00),
+    SET_LIGHT_FALLOFF(7, 1500),
+    CALL_NATIVE(bhv_init_room),
+    BEGIN_LOOP(),
+        CALL_NATIVE(bhv_CastleLight_Loop),
     END_LOOP(),
 };
 
-const BehaviorScript bhvCastleGroundsFLoatingPlatform[] = {
-    BEGIN(OBJ_LIST_SURFACE),
+const BehaviorScript bhvHMCLights[] = {
+    BEGIN(OBJ_LIST_DEFAULT),
+    //OR_INT(oFlags, OBJ_FLAG_EMIT_LIGHT),
+    SET_LIGHT_COLOR(0xFB, 0xFF, 0x00),
+    SET_LIGHT_FALLOFF(7, 1500),
+    BEGIN_LOOP(),
+        CALL_NATIVE(bhv_hmc_lights_loop),
+    END_LOOP(),
+};
+
+
+const BehaviorScript bhvHMCRedLights[] = {
+    BEGIN(OBJ_LIST_DEFAULT),
+    //OR_INT(oFlags, OBJ_FLAG_EMIT_LIGHT),
+    SET_LIGHT_COLOR(0xFB, 0xFF, 0x00),
+    SET_LIGHT_FALLOFF(7, 1500),
+    BEGIN_LOOP(),
+        CALL_NATIVE(bhv_hmc_red_lights_loop),
+    END_LOOP(),
+};
+
+const BehaviorScript bhvStarIcePlatform[] = {};
+
+
+const BehaviorScript bhvOverworldDoor[] = {
+};
+
+const BehaviorScript bhvOverworldBricksLocked[] = {
+};
+
+
+const BehaviorScript bhvBlackyaAnchorMario[] = {
+    BEGIN(OBJ_LIST_GENACTOR),
     OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
-    LOAD_COLLISION_DATA(floating_platform_collision),
-    SET_FLOAT(oFloatingPlatformHeightOffset, 64),
+    BILLBOARD(),
+    SET_FLOAT(oParentRelativePosY, -60),
+    SET_FLOAT(oParentRelativePosZ, 150),
+    BEGIN_LOOP(),
+        CALL_NATIVE(bhv_blackya_anchor_mario_loop),
+    END_LOOP(),
+};
+
+const BehaviorScript bhvBlackya[] = {
+    BEGIN(OBJ_LIST_GENACTOR),
+    OR_INT(oFlags, (OBJ_FLAG_HOLDABLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    LOAD_ANIMATIONS(oAnimations, chuckya_seg8_anims_0800C070),
+    ANIMATE(CHUCKYA_ANIM_SPAWN),
+    SET_INT(oInteractType, INTERACT_GRABBABLE),
+    SET_HITBOX(/*Radius*/ 150, /*Height*/ 100),
+    SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 30, /*Gravity*/ -400, /*Bounciness*/ -50, /*Drag strength*/ 1000, /*Friction*/ 1000, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
+    SPAWN_OBJ(/*Model*/ MODEL_NONE, /*Behavior*/ bhvBlackyaAnchorMario),
+    SET_INT(oNumLootCoins, 5),
+    SET_INT(oIntangibleTimer, 0),
     SET_HOME(),
     BEGIN_LOOP(),
-        CALL_NATIVE(bhv_floating_platform_loop),
+        CALL_NATIVE(bhv_chuckya_loop),
+    END_LOOP(),
+};
+
+const BehaviorScript bhvJungleDoor[] = {
+};
+
+const BehaviorScript bhvVolcanoLight[] = {
+    BEGIN(OBJ_LIST_LEVEL),
+    OR_INT(oFlags,OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT),
+    SET_LIGHT_COLOR(255, 55, 0),
+    SET_LIGHT_FALLOFF(0, 15000),
+    BEGIN_LOOP(),
+        CALL_NATIVE(bhv_volcano_light_loop),
+    END_LOOP(),
+};
+
+const BehaviorScript bhvLightCastleGrounds[] = {};
+
+const BehaviorScript bhvCustomSkybox[] = {
+    BEGIN(OBJ_LIST_LEVEL),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    BEGIN_LOOP(),
+        SET_INT(oIntangibleTimer, 0),
+        CALL_NATIVE(bhv_custom_skybox_loop),
+    END_LOOP(),
+};
+
+const BehaviorScript bhvSnowmansBaseCCM[] = {
+    BEGIN(OBJ_LIST_SURFACE),
+    LOAD_COLLISION_DATA(snowman_base_collision),
+    SET_HOME(),
+    BEGIN_LOOP(),
+        CALL_NATIVE(bhv_snowman_base_loop),
+    END_LOOP(),
+};
+
+const BehaviorScript bhvInsideCastleWater[] = {
+    BEGIN(OBJ_LIST_LEVEL),
+    SET_HOME(),
+    CALL_NATIVE(bhv_init_room),
+    BEGIN_LOOP(),
+        CALL_NATIVE(bhv_water_level_castle_inside),
+    END_LOOP(),
+};
+
+const BehaviorScript bhvLight[] = {
+    BEGIN(OBJ_LIST_DEFAULT),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    CALL_NATIVE(bhv_init_room),
+    BEGIN_LOOP(),
+    CALL_NATIVE(bhv_light_loop),
+    END_LOOP(),
+};
+
+const BehaviorScript bhvBOBStarZone[] = {
+    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN_LOOP(),
+        CALL_NATIVE(bhv_bob_star_zone),
+    END_LOOP(),
+};
+
+const BehaviorScript bhvCabinLight[] = {
+    BEGIN(OBJ_LIST_DEFAULT),
+    CALL_NATIVE(bhv_init_room),
+    BEGIN_LOOP(),
+        CALL_NATIVE(bhv_ccm_cabin_light),
+    END_LOOP(),
+};
+
+const BehaviorScript bhvAquariumLightsCol[] = {
+    BEGIN(OBJ_LIST_SURFACE),
+    OR_INT(oFlags, OBJ_FLAG_HAS_ACTIVE_LIGHT),
+    LOAD_COLLISION_DATA(aquarium_lights_collision),
+    BEGIN_LOOP(),
         CALL_NATIVE(load_object_collision_model),
     END_LOOP(),
 };

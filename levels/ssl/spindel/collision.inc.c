@@ -20,7 +20,7 @@ const Collision ssl_seg7_collision_spindel[] = {
     COL_VERTEX(307, 78, -188),
     COL_VERTEX(307, 189, -77),
     COL_VERTEX(307, 0, 0),
-    COL_TRI_INIT(SURFACE_DEFAULT, 32),
+    COL_TRI_INIT(NEWTERRAIN(0, 0, 0, 0), 32),
     COL_TRI(8, 9, 7),
     COL_TRI(0, 1, 2),
     COL_TRI(0, 3, 1),

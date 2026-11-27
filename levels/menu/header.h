@@ -39,6 +39,7 @@ extern const Gfx dl_menu_texture_course_upper[];
 extern const Gfx dl_menu_texture_niveau_upper[];
 extern const Gfx dl_menu_texture_kurs_upper[];
 extern const Collision main_menu_seg7_collision[];
+extern Gfx light_skybox_Cube_mesh_layer_1_with_revert[];
 #ifdef VERSION_EU
 extern const u8 eu_course_strings_en_table[];
 extern const u8 eu_course_strings_fr_table[];
@@ -49,4 +50,5 @@ extern const u8 eu_course_strings_de_table[];
 extern const LevelScript level_main_menu_entry_file_select[];
 extern const LevelScript level_main_menu_entry_act_select[];
 
+#include "light_skybox/geo_header.h"
 #endif

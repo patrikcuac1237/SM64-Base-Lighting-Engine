@@ -104,6 +104,7 @@ index 90b4fe7..bdc9c49 100644
 +    gCurrentObject->oLightColor = color;
 +
 +    gCurBhvCommand++;
+gCurBhvCommand++;
 +    return BHV_PROC_CONTINUE;
 +}
 +

@@ -1,0 +1,14 @@
+extern const GeoLayout torch_geo[];
+extern u8 torch_acacia_log_i4[];
+extern u8 torch_oak_log_top_ci8[];
+extern u8 torch_oak_log_top_ci8_pal_rgba16[];
+extern Vtx torch_torch_mesh_layer_1_vtx_0[92];
+extern Gfx torch_torch_mesh_layer_1_tri_0[];
+extern Vtx torch_torch_mesh_layer_1_vtx_1[7];
+extern Gfx torch_torch_mesh_layer_1_tri_1[];
+extern Gfx mat_torch__8[];
+extern Gfx mat_revert_torch__8[];
+extern Gfx mat_torch__7[];
+extern Gfx mat_revert_torch__7[];
+extern Gfx torch_torch_mesh_layer_1[];
+extern Gfx torch_material_revert_render_settings[];

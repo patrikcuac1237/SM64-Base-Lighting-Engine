@@ -1,5 +1,4 @@
 // celebration_star.inc.c
-
 void bhv_celebration_star_init(void) {
     o->oHomeX = gMarioObject->header.gfx.pos[0];
     o->oPosY = gMarioObject->header.gfx.pos[1] + 30.0f;
@@ -52,7 +51,7 @@ void celeb_star_act_face_camera(void) {
         o->oFaceAngleYaw = gMarioObject->header.gfx.angle[1];
     }
 
-    if (o->oTimer == 59) {
+    if (o->oTimer == 90) {
         o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
     }
 }
@@ -67,6 +66,7 @@ void bhv_celebration_star_loop(void) {
             celeb_star_act_face_camera();
             break;
     }
+    AddStarLight();
 }
 
 void bhv_celebration_star_sparkle_loop(void) {

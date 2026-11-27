@@ -12,7 +12,7 @@ const Collision capswitch_collision_050033D0[] = {
     COL_VERTEX(-291, 353, 254),
     COL_VERTEX(292, 353, 254),
 
-    COL_TRI_INIT(SURFACE_SWITCH, 10),
+    COL_TRI_INIT(NEWTERRAIN(3, 0, 0, 0), 10),
     COL_TRI(0, 1, 2),
     COL_TRI(1, 3, 4),
     COL_TRI(1, 4, 2),
@@ -39,7 +39,7 @@ const Collision capswitch_collision_05003448[] = {
     COL_VERTEX(-291, 145, 254),
     COL_VERTEX(292, 145, 254),
 
-    COL_TRI_INIT(SURFACE_SWITCH, 10),
+    COL_TRI_INIT(NEWTERRAIN(3, 0, 0, 0), 10),
     COL_TRI(0, 1, 2),
     COL_TRI(1, 3, 4),
     COL_TRI(1, 4, 2),

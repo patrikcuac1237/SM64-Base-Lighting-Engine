@@ -1,0 +1,13 @@
+extern const GeoLayout tilting_square_platform_geo[];
+extern u8 tilting_square_platform_lll_textures_04000_rgba16_ci4[];
+extern u8 tilting_square_platform_lll_textures_04000_rgba16_pal_rgba16[];
+extern u8 tilting_square_platform_segment2_13C58_rgba16_i4[];
+extern Vtx tilting_square_platform_000_displaylist_mesh_layer_1_vtx_0[4];
+extern Gfx tilting_square_platform_000_displaylist_mesh_layer_1_tri_0[];
+extern Vtx tilting_square_platform_000_displaylist_mesh_layer_1_vtx_1[5];
+extern Gfx tilting_square_platform_000_displaylist_mesh_layer_1_tri_1[];
+extern Gfx mat_tilting_square_platform__0_layer1[];
+extern Gfx mat_revert_tilting_square_platform__0_layer1[];
+extern Gfx mat_tilting_square_platform__1_layer1[];
+extern Gfx mat_revert_tilting_square_platform__1_layer1[];
+extern Gfx tilting_square_platform_000_displaylist_mesh_layer_1_with_revert[];

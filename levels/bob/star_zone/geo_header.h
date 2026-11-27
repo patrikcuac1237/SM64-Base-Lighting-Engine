@@ -1,0 +1,14 @@
+extern const GeoLayout star_zone_geo[];
+extern u8 star_zone_bob_textures_05800_rgba16_ci8[];
+extern u8 star_zone_bob_textures_05800_rgba16_pal_rgba16[];
+extern u8 star_zone_bob_textures_04800_rgba16_ci8[];
+extern u8 star_zone_bob_textures_04800_rgba16_pal_rgba16[];
+extern Vtx star_zone_star_zone_mesh_layer_1_vtx_0[14];
+extern Gfx star_zone_star_zone_mesh_layer_1_tri_0[];
+extern Vtx star_zone_star_zone_mesh_layer_1_vtx_1[26];
+extern Gfx star_zone_star_zone_mesh_layer_1_tri_1[];
+extern Gfx mat_star_zone_grass[];
+extern Gfx mat_revert_star_zone_grass[];
+extern Gfx mat_star_zone_white_grass[];
+extern Gfx mat_revert_star_zone_white_grass[];
+extern Gfx star_zone_star_zone_mesh_layer_1_with_revert[];

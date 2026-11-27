@@ -1,0 +1,13 @@
+extern const GeoLayout bubble_geo_opt_1[];
+extern const GeoLayout bubble_geo[];
+extern u8 bubble_bubble_rgba16_ci8[];
+extern u8 bubble_bubble_rgba16_pal_rgba16[];
+extern u8 bubble_mr_i_bubble_rgba16_rgba16[];
+extern Vtx bubble_000_displaylist_mesh_layer_4_vtx_0[3];
+extern Gfx bubble_000_displaylist_mesh_layer_4_tri_0[];
+extern Gfx mat_bubble__0[];
+extern Gfx mat_revert_bubble__0[];
+extern Gfx mat_bubble__1[];
+extern Gfx mat_revert_bubble__1[];
+extern Gfx bubble_000_displaylist_mesh_layer_4_with_revert[];
+extern Gfx bubble_000_displaylist_mesh_layer_4_opt_1_with_revert[];

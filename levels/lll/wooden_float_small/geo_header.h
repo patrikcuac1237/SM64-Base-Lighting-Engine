@@ -1,0 +1,13 @@
+extern const GeoLayout wooden_float_small_geo[];
+extern u8 wooden_float_small__2_rgba16_ci8[];
+extern u8 wooden_float_small__2_rgba16_pal_rgba16[];
+extern u8 wooden_float_small__0_rgba16_ia16[];
+extern Vtx wooden_float_small_000_displaylist_mesh_layer_1_vtx_0[16];
+extern Gfx wooden_float_small_000_displaylist_mesh_layer_1_tri_0[];
+extern Vtx wooden_float_small_000_displaylist_mesh_layer_1_vtx_1[8];
+extern Gfx wooden_float_small_000_displaylist_mesh_layer_1_tri_1[];
+extern Gfx mat_wooden_float_small__0_layer1[];
+extern Gfx mat_revert_wooden_float_small__0_layer1[];
+extern Gfx mat_wooden_float_small__1_layer1[];
+extern Gfx mat_revert_wooden_float_small__1_layer1[];
+extern Gfx wooden_float_small_000_displaylist_mesh_layer_1_with_revert[];

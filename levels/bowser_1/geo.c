@@ -14,3 +14,4 @@
 #include "levels/bowser_1/header.h"
 
 #include "levels/bowser_1/areas/1/geo.inc.c"
+#include "bowser_1_sky/geo.inc.c"

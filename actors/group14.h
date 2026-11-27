@@ -145,4 +145,5 @@ extern const Collision whomp_seg6_collision_06020A0C[];
 
 #include "piranha_plant/geo_header.h"
 
+//#include "koopa_with_shell/geo_header.h"
 #endif

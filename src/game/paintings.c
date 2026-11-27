@@ -518,55 +518,46 @@ void floor_painting_continuous_rippling(struct Painting *painting, struct Painti
  */
 void painting_update_floors(struct Painting *painting) {
     s16 paintingId = painting->id;
-    s8 rippleLeft = 0;
-    s8 rippleMiddle = 0;
-    s8 rippleRight = 0;
-    s8 enterLeft = 0;
-    s8 enterMiddle = 0;
-    s8 enterRight = 0;
+    s8 rippleLeft = 0, rippleMiddle = 0, rippleRight = 0;
+    s8 enterLeft = 0, enterMiddle = 0, enterRight = 0;
 
-    /* The area in front of every painting in the game (except HMC and CotMC, which   *\
-    |* act a little differently) is made up of 3 special floor triangles with special *|
-    |* (unique) surface types. This code checks which surface Mario is currently on   *|
-    \* and sets a bitfield accordingly.                                               */
+    // EXTRAEMOS EL ID LIMPIO (8 bits)
+    u8 currentFloorId = (u8)(gPaintingMarioFloorType & 0xFF);
 
-    // check if Mario's current floor is one of the special floors
-    if (gPaintingMarioFloorType == paintingId * 3 + SURFACE_PAINTING_WOBBLE_A6) {
+    // Comparamos el ID extraído contra el cálculo base original
+    // 0xA6 es el ID de SURFACE_PAINTING_WOBBLE_A6
+    if (currentFloorId == (paintingId * 3 + 0xA6)) {
         rippleLeft = RIPPLE_LEFT;
     }
-    if (gPaintingMarioFloorType == paintingId * 3 + SURFACE_PAINTING_WOBBLE_A7) {
+    if (currentFloorId == (paintingId * 3 + 0xA7)) {
         rippleMiddle = RIPPLE_MIDDLE;
     }
-    if (gPaintingMarioFloorType == paintingId * 3 + SURFACE_PAINTING_WOBBLE_A8) {
+    if (currentFloorId == (paintingId * 3 + 0xA8)) {
         rippleRight = RIPPLE_RIGHT;
     }
-    if (gPaintingMarioFloorType == paintingId * 3 + SURFACE_PAINTING_WARP_D3) {
+    
+    // 0xD3 es el ID de SURFACE_PAINTING_WARP_D3
+    if (currentFloorId == (paintingId * 3 + 0xD3)) {
         enterLeft = ENTER_LEFT;
     }
-    if (gPaintingMarioFloorType == paintingId * 3 + SURFACE_PAINTING_WARP_D4) {
+    if (currentFloorId == (paintingId * 3 + 0xD4)) {
         enterMiddle = ENTER_MIDDLE;
     }
-    if (gPaintingMarioFloorType == paintingId * 3 + SURFACE_PAINTING_WARP_D5) {
+    if (currentFloorId == (paintingId * 3 + 0xD5)) {
         enterRight = ENTER_RIGHT;
     }
 
     painting->lastFloor = painting->currFloor;
-    // at most 1 of these will be nonzero;
     painting->currFloor = rippleLeft + rippleMiddle + rippleRight + enterLeft + enterMiddle + enterRight;
 
-    // floorEntered is true iff currFloor is true and lastFloor is false
-    // (Mario just entered the floor on this frame)
+    // El resto de la función (floorEntered, marioIsUnder, etc.) se queda exactamente igual
     painting->floorEntered = (painting->lastFloor ^ painting->currFloor) & painting->currFloor;
-
     painting->marioWasUnder = painting->marioIsUnder;
-    // Check if Mario has fallen below the painting (used for floor paintings)
     if (gPaintingMarioYPos < painting->posY) {
         painting->marioIsUnder = TRUE;
     } else {
         painting->marioIsUnder = FALSE;
     }
-
-    // Mario "went under" if he was not under last frame, but is under now
     painting->marioWentUnder = (painting->marioWasUnder ^ painting->marioIsUnder) & painting->marioIsUnder;
 }
 
@@ -688,8 +679,7 @@ void painting_generate_mesh(struct Painting *painting, s16 *mesh, s16 numTris) {
         gPaintingMesh[i].pos[1] = mesh[i * 3 + 2];
         // The "z coordinate" of each vertex in the mesh is either 1 or 0. Instead of being an
         // actual coordinate, it just determines whether the vertex moves
-        gPaintingMesh[i].pos[2] = ripple_if_movable(painting, mesh[i * 3 + 3],
-                                                    gPaintingMesh[i].pos[0], gPaintingMesh[i].pos[1]);
+        gPaintingMesh[i].pos[2] = ripple_if_movable(painting, mesh[i * 3 + 3], gPaintingMesh[i].pos[0], gPaintingMesh[i].pos[1]);
     }
 }
 
@@ -888,7 +878,7 @@ Gfx *render_painting(u8 *img, s16 tWidth, s16 tHeight, s16 *textureMap, s16 mapV
     for (group = 0; group < remGroupTris; group++) {
         gSP1Triangle(gfx++, group * 3, group * 3 + 1, group * 3 + 2, 0);
     }
-
+    
     gSPEndDisplayList(gfx);
     return dlist;
 }
@@ -1256,7 +1246,6 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
 Gfx *geo_painting_update(s32 callContext, UNUSED struct GraphNode *node, UNUSED Mat4 mtx) {
     struct Surface *surface;
 
-    // Reset the update counter
     if (callContext != GEO_CONTEXT_RENDER) {
         gLastPaintingUpdateCounter = gAreaUpdateCounter - 1;
         gPaintingUpdateCounter = gAreaUpdateCounter;
@@ -1264,9 +1253,27 @@ Gfx *geo_painting_update(s32 callContext, UNUSED struct GraphNode *node, UNUSED 
         gLastPaintingUpdateCounter = gPaintingUpdateCounter;
         gPaintingUpdateCounter = gAreaUpdateCounter;
 
-        // Store Mario's position
+        // Buscamos el suelo bajo Mario
         find_floor(gMarioObject->oPosX, gMarioObject->oPosY, gMarioObject->oPosZ, &surface);
-        gPaintingMarioFloorType = surface->type;
+        
+        if (surface != NULL) {
+            // 1. Extraemos el SPEC (Bits 8-11)
+            u32 phys = (surface->type >> 8) & 0xF;
+
+            // 2. ¿Es el ID que definiste para SPECFLAG_PAINTING?
+            if (phys == SPECFLAG_PAINTING) {
+                // Extraemos el ID limpio de la pintura (Bits 0-7)
+                // Al motor de la pintura le da igual el resto, así que le pasamos 
+                // el ID puro. Forzamos 0x4000 si tu código original lo usaba como flag.
+                gPaintingMarioFloorType = (surface->type & 0xFF) | 0x4000;
+            } else {
+                // Si pisa una luz normal u otro terreno, para el sistema de pintura es "nada"
+                gPaintingMarioFloorType = 0;
+            }
+        } else {
+            gPaintingMarioFloorType = 0;
+        }
+
         gPaintingMarioXPos = gMarioObject->oPosX;
         gPaintingMarioYPos = gMarioObject->oPosY;
         gPaintingMarioZPos = gMarioObject->oPosZ;

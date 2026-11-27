@@ -1,0 +1,13 @@
+extern const GeoLayout wf_geo_0009B8_2[];
+extern u8 rotating_platform_wf_textures_05000_rgba16_rgba16[];
+extern u8 rotating_platform_bob_textures_05800_rgba16_ci8[];
+extern u8 rotating_platform_bob_textures_05800_rgba16_ci8_pal_rgba16[];
+extern Vtx rotating_platform_000_displaylist_mesh_layer_1_vtx_0[36];
+extern Gfx rotating_platform_000_displaylist_mesh_layer_1_tri_0[];
+extern Vtx rotating_platform_000_displaylist_mesh_layer_1_vtx_1[12];
+extern Gfx rotating_platform_000_displaylist_mesh_layer_1_tri_1[];
+extern Gfx mat_rotating_platform__1[];
+extern Gfx mat_rotating_platform__0[];
+extern Gfx mat_revert_rotating_platform__0[];
+extern Gfx rotating_platform_000_displaylist_mesh_layer_1[];
+extern Gfx rotating_platform_material_revert_render_settings[];

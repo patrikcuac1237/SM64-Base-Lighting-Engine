@@ -28,6 +28,8 @@
 
 #include "config.h"
 
+#include "main.h"
+
 #define TOAD_STAR_1_REQUIREMENT 12
 #define TOAD_STAR_2_REQUIREMENT 25
 #define TOAD_STAR_3_REQUIREMENT 35
@@ -309,8 +311,8 @@ static Gfx *make_gfx_mario_alpha(struct GraphNodeGenerated *node, s16 alpha) {
         SET_GRAPH_NODE_LAYER(node->fnNode.node.flags, LAYER_TRANSPARENT);
         gfxHead = alloc_display_list(3 * sizeof(*gfxHead));
         gfx = gfxHead;
-        if (gMarioState->flags & MARIO_VANISH_CAP) {
-            gDPSetAlphaCompare(gfx++, G_AC_DITHER);
+        if (gMarioState->flags & (MARIO_VANISH_CAP | MARIO_TELEPORTING)) {
+            gDPSetAlphaCompare(gfx++, gConfig.bWithoutCamLight ? G_AC_DITHER : G_AC_NONE);
         } else {
             gDPSetAlphaCompare(gfx++, G_AC_NONE);
         }
@@ -638,6 +640,55 @@ Gfx *geo_mirror_mario_backface_culling(s32 callContext, struct GraphNode *node, 
             gSPEndDisplayList(&gfx[2]);
         }
         SET_GRAPH_NODE_LAYER(asGenerated->fnNode.node.flags, LAYER_OPAQUE);
+    }
+    return gfx;
+}
+
+u8 curMarioLightCount = 0;
+Lights1 marioLights[5];
+
+extern Lights1 defaultLight;
+extern Lights1 camLight;
+extern Lights1 *curLight;
+
+Gfx *geo_mario_lights(s32 callContext, struct GraphNode *node, UNUSED Mat4 *mtx) {
+    struct GraphNodeGenerated *asGenerated = (struct GraphNodeGenerated *) node;
+    Gfx *gfx = NULL;
+
+    if (callContext == GEO_CONTEXT_RENDER) {
+        // 1. Obtenemos el objeto actual que se está renderizando.
+        // gCurGraphNodeObject es una global del motor que apunta al objeto en proceso.
+        struct Object *curObj = (struct Object *) gCurGraphNodeObject;
+
+        if (curObj != NULL) {
+            // 2. Llamamos a tu función lógica y devolvemos su Display List.
+            // Esto reemplaza todo el bucle manual de marioLights.
+            gfx = createPointLightsDl(curObj);
+        }
+
+        // 3. Aplicamos el parámetro del Geo Layout si es necesario (opcional)
+        asGenerated->fnNode.node.flags = 
+            (asGenerated->fnNode.node.flags & 0xFF) | (asGenerated->parameter << 8);
+    }
+
+    return gfx;
+}
+
+Gfx *geo_mario_reset_lights(s32 callContext, struct GraphNode *node, UNUSED Mat4 *mtx) {
+    struct GraphNodeGenerated *asGenerated = (struct GraphNodeGenerated *) node;
+    Gfx *gfx = NULL;
+    Gfx *dl = NULL;
+
+    if (callContext == GEO_CONTEXT_RENDER) {
+        gfx = alloc_display_list(5 * sizeof(*gfx));
+        dl = gfx;
+        gSPNumLights(dl++, NUMLIGHTS_2);
+        gSPLight(dl++, &curLight->l[0], 1);
+        gSPLight(dl++, &camLight.l[0], 2);
+        gSPLight(dl++, &curLight->a, 3);
+        gSPEndDisplayList(dl++);
+        asGenerated->fnNode.node.flags = 
+            (asGenerated->fnNode.node.flags & 0xFF) | (asGenerated->parameter << 8);
     }
     return gfx;
 }

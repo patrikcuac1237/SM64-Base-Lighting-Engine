@@ -448,6 +448,7 @@ void select_gfx_pool(void) {
  * - Yields to the VI framerate twice, locking the game at 30 FPS.
  * - Selects which framebuffer will be rendered and displayed to next time.
  */
+//#define UNLOCK_FPS
 void display_and_vsync(void) {
     osRecvMesg(&gGfxVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
     if (gGoddardVblankCallback != NULL) {
@@ -473,7 +474,6 @@ void display_and_vsync(void) {
     }
     gGlobalTimer++;
 }
-
 #if !defined(DISABLE_DEMO) && defined(KEEP_MARIO_HEAD)
 // this function records distinct inputs over a 255-frame interval to RAM locations and was likely
 // used to record the demo sequences seen in the final game. This function is unused.
@@ -732,7 +732,6 @@ void setup_game_memory(void) {
     load_segment_decompress(SEGMENT_SEGMENT2, _segment2_mio0SegmentRomStart, _segment2_mio0SegmentRomEnd);
 }
 
-void setup_global_light();
 
 /**
  * Main game loop thread. Runs forever as long as the game continues.
@@ -768,6 +767,7 @@ void thread5_game_loop(UNUSED void *arg) {
 #ifdef WIDE
     gConfig.widescreen = save_file_get_widescreen_mode();
 #endif
+    gConfig.MovesChange = save_file_get__moves_change();
     render_init();
 
     while (TRUE) {
@@ -797,7 +797,6 @@ void thread5_game_loop(UNUSED void *arg) {
 
         audio_game_loop_tick();
         select_gfx_pool();
-        setup_global_light();
         read_controller_inputs(THREAD_5_GAME_LOOP);
         fast_profiler_update(PROFILER_TIME_CONTROLLERS);
 

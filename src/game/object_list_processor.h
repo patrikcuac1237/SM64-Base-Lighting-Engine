@@ -19,12 +19,13 @@ enum gTimeStopStateFlags {
     TIME_STOP_ALL_OBJECTS       = (1 << 4),
     TIME_STOP_MARIO_OPENED_DOOR = (1 << 5),
     TIME_STOP_ACTIVE            = (1 << 6),
+    TIME_STOP_PAUSE             = (1 << 7),
 };
 
 /**
  * The maximum number of objects that can be loaded at once.
  */
-#define OBJECT_POOL_CAPACITY 240
+#define OBJECT_POOL_CAPACITY 300
 
 /**
  * Every object is categorized into an object list, which controls the order
@@ -129,6 +130,4 @@ void unload_objects_from_area(UNUSED s32 unused, s32 areaIndex);
 void spawn_objects_from_info(UNUSED s32 unused, struct SpawnInfo *spawnInfo);
 void clear_objects(void);
 void update_objects(UNUSED s32 unused);
-
-
 #endif // OBJECT_LIST_PROCESSOR_H

@@ -13,18 +13,7 @@
 
 #include "levels/lll/header.h"
 
-#include "levels/lll/areas/1/4/geo.inc.c"
-#include "levels/lll/areas/1/5/geo.inc.c"
-#include "levels/lll/areas/1/6/geo.inc.c"
-#include "levels/lll/areas/1/7/geo.inc.c"
-#include "levels/lll/areas/1/8/geo.inc.c"
-#include "levels/lll/areas/1/9/geo.inc.c"
 #include "levels/lll/areas/1/10/geo.inc.c"
-#include "levels/lll/areas/1/11/geo.inc.c"
-#include "levels/lll/areas/1/12/geo.inc.c"
-#include "levels/lll/areas/1/13/geo.inc.c"
-#include "levels/lll/areas/1/14/geo.inc.c"
-#include "levels/lll/areas/1/15/geo.inc.c"
 #include "levels/lll/moving_octagonal_mesh_platform/geo.inc.c"
 #include "levels/lll/drawbridge_part/geo.inc.c"
 #include "levels/lll/rotating_block_fire_bars/geo.inc.c"
@@ -42,3 +31,8 @@
 #include "levels/lll/areas/1/geo.inc.c"
 #include "levels/lll/volcano_falling_trap/geo.inc.c"
 #include "levels/lll/areas/2/geo.inc.c"
+
+#include "levels/lll/LLLArea1/geo.inc.c"
+#include "lll_skybox/geo.inc.c"
+#include "LLLArea2/geo.inc.c"
+#include "dark_skybox/geo.inc.c"

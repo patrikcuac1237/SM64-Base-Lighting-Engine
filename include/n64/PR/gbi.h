@@ -2628,14 +2628,22 @@ typedef union {
 #else
 # define NUML(n)	(((n)+1)*32 + 0x80000000)
 #endif
-#define NUMLIGHTS_0	1
-#define NUMLIGHTS_1	1
-#define NUMLIGHTS_2	2
-#define NUMLIGHTS_3	3
-#define NUMLIGHTS_4	4
-#define NUMLIGHTS_5	5
-#define NUMLIGHTS_6	6
-#define NUMLIGHTS_7	7
+#define NUMLIGHTS_0		1
+#define NUMLIGHTS_1		1
+#define NUMLIGHTS_2		2
+#define NUMLIGHTS_3		3
+#define NUMLIGHTS_4		4
+#define NUMLIGHTS_5		5
+#define NUMLIGHTS_6		6
+#define NUMLIGHTS_7		7
+#define NUMLIGHTS_8		8
+#define NUMLIGHTS_9		9
+#define NUMLIGHTS_10	10
+#define NUMLIGHTS_11	11
+#define NUMLIGHTS_12	12
+#define NUMLIGHTS_13	13
+#define NUMLIGHTS_14	14
+#define NUMLIGHTS_15	15
 /*
  * n should be one of: NUMLIGHTS_0, NUMLIGHTS_1, ..., NUMLIGHTS_7
  * NOTE: in addition to the number of directional lights specified, 
@@ -2654,6 +2662,13 @@ typedef union {
 #define LIGHT_6		6
 #define LIGHT_7		7
 #define LIGHT_8		8
+#define LIGHT_9		9
+#define LIGHT_10	10
+#define LIGHT_11	11
+#define LIGHT_12	12
+#define LIGHT_13	13
+#define LIGHT_14	14
+#define LIGHT_15	15
 /*
  * l should point to a Light struct
  * n should be one of: LIGHT_1, LIGHT_2, ..., LIGHT_8

@@ -17,8 +17,8 @@
 #include "engine/math_util.h"
 #include "puppycam2.h"
 #include "puppyprint.h"
-
 #include "config.h"
+extern struct Config gConfig;
 
 /* @file hud.c
  * This file implements HUD rendering and power meter animations.
@@ -124,26 +124,37 @@ void render_hud_tex_lut(s32 x, s32 y, Texture *texture) {
     gDPPipeSync(gDisplayListHead++);
     gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture);
     gSPDisplayList(gDisplayListHead++, &dl_hud_img_load_tex_block);
-    gSPTextureRectangle(gDisplayListHead++, x << 2, y << 2, (x + 15) << 2, (y + 15) << 2,
-                        G_TX_RENDERTILE, 0, 0, 4 << 10, 1 << 10);
+    if (gConfig.widescreen)
+    {
+        gSPTextureRectangle(gDisplayListHead++, (x + 12) << 2, y << 2, (x + 24) << 2, (y + 15) << 2, G_TX_RENDERTILE, 0, 0, (5 << 10)*2, (1 << 10)*4);
+    }
+    else
+    {
+        gSPTextureRectangle(gDisplayListHead++, x << 2, y << 2, (x + 15) << 2, (y + 15) << 2, G_TX_RENDERTILE, 0, 0, (4 << 10)*2, (1 << 10)*4);
+    }
 }
 
 /**
  * Renders a rgba16 8x8 glyph texture from a table list.
  */
 void render_hud_small_tex_lut(s32 x, s32 y, Texture *texture) {
-    gDPSetTile(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0,
-                G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD);
+    gDPSetTile(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, 6, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, 5, G_TX_NOLOD);
+    
     gDPTileSync(gDisplayListHead++);
-    gDPSetTile(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 2, 0, G_TX_RENDERTILE, 0,
-                G_TX_CLAMP, 3, G_TX_NOLOD, G_TX_CLAMP, 3, G_TX_NOLOD);
-    gDPSetTileSize(gDisplayListHead++, G_TX_RENDERTILE, 0, 0, (8 - 1) << G_TEXTURE_IMAGE_FRAC, (8 - 1) << G_TEXTURE_IMAGE_FRAC);
+    gDPSetTile(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 8, 0, G_TX_RENDERTILE, 0, G_TX_CLAMP, 6, G_TX_NOLOD, G_TX_CLAMP, 5, G_TX_NOLOD);
+    gDPSetTileSize(gDisplayListHead++, G_TX_RENDERTILE, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (64 - 1) << G_TEXTURE_IMAGE_FRAC);
     gDPPipeSync(gDisplayListHead++);
     gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture);
     gDPLoadSync(gDisplayListHead++);
-    gDPLoadBlock(gDisplayListHead++, G_TX_LOADTILE, 0, 0, 8 * 8 - 1, CALC_DXT(8, G_IM_SIZ_16b_BYTES));
-    gSPTextureRectangle(gDisplayListHead++, x << 2, y << 2, (x + 7) << 2, (y + 7) << 2, G_TX_RENDERTILE,
-                        0, 0, 4 << 10, 1 << 10);
+    gDPLoadBlock(gDisplayListHead++, G_TX_LOADTILE, 0, 0, 32 * 64 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES));
+    if (gConfig.widescreen)
+    {
+        gSPTextureRectangle(gDisplayListHead++, (x + 12) << 2, y << 2, (x + 17) << 2, (y + 7) << 2, G_TX_RENDERTILE, 0, 0, (10 << 10)*2, (4 << 10)*2);
+    }
+    else
+    {
+        gSPTextureRectangle(gDisplayListHead++, x << 2, y << 2, (x + 7) << 2, (y + 7) << 2, G_TX_RENDERTILE, 0, 0, (8 << 10)*2, (4 << 10)*1.75);
+    }
 }
 
 /**
@@ -172,7 +183,12 @@ void render_dl_power_meter(s16 numHealthWedges) {
         return;
     }
 
-    guTranslate(mtx, (f32) sPowerMeterHUD.x, (f32) sPowerMeterHUD.y, 0);
+    if (gConfig.widescreen)
+    {
+        guTranslate(mtx, (f32) sPowerMeterHUD.x + 20, (f32) sPowerMeterHUD.y, 0);
+    } else {
+        guTranslate(mtx, (f32) sPowerMeterHUD.x, (f32) sPowerMeterHUD.y, 0);
+    }
 
     gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(mtx++),
               G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH);
@@ -388,15 +404,46 @@ void render_hud_breath_meter(void) {
 }
 #endif
 
-#define HUD_TOP_Y 209
+#define HUD_TOP_Y 9
 
 /**
  * Renders the amount of lives Mario has.
  */
 void render_hud_mario_lives(void) {
-    print_text(GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(22), HUD_TOP_Y, ","); // 'Mario Head' glyph
-    print_text(GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(38), HUD_TOP_Y, "*"); // 'X' glyph
-    print_text_fmt_int(GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(54), HUD_TOP_Y, "%d", gHudDisplay.lives);
+    u8 strLives[4];
+    // Posición base similar a las monedas pero desde la izquierda
+    s16 x = 22; 
+    s16 y = HUD_TOP_Y;
+
+    u8 gHudSymMarioLives[] = { GLYPH_MARIO_HEAD, GLOBAR_CHAR_TERMINATOR };
+    u8 gHudSymX[]          = { GLYPH_MULTIPLY,   GLOBAR_CHAR_TERMINATOR };
+
+    // Convertimos vidas a texto
+    int_to_str(gHudDisplay.lives, strLives);
+
+    // 1. IMPORTANTE: Cambiamos al modo de texto RGBA16 y reseteamos el color
+    gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
+    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
+
+    if (gConfig.widescreen)
+    {
+        x = 0;
+        // Usamos la misma lógica de espaciado que en las monedas (x-7, x+5, x+17)
+        print_hud_lut_string(HUD_LUT_GLOBAL, x - 7, y, gHudSymMarioLives);
+        print_hud_lut_string(HUD_LUT_GLOBAL, x + 5, y, gHudSymX);
+        print_hud_lut_string(HUD_LUT_GLOBAL, x + 17, y, strLives);
+    } 
+    else 
+    {
+        // Para 4:3 usamos el cálculo de borde izquierdo original
+        s16 xLeft = GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(x);
+        print_hud_lut_string(HUD_LUT_GLOBAL, xLeft,      y, gHudSymMarioLives);
+        print_hud_lut_string(HUD_LUT_GLOBAL, xLeft + 16, y, gHudSymX);
+        print_hud_lut_string(HUD_LUT_GLOBAL, xLeft + 32, y, strLives);
+    }
+
+    // Cerramos el modo de texto
+    gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 }
 
 #ifdef VANILLA_STYLE_CUSTOM_DEBUG
@@ -415,9 +462,30 @@ void render_debug_mode(void) {
  * Renders the amount of coins collected.
  */
 void render_hud_coins(void) {
-    print_text(168, HUD_TOP_Y, "$"); // 'Coin' glyph
-    print_text(184, HUD_TOP_Y, "*"); // 'X' glyph
-    print_text_fmt_int(198, HUD_TOP_Y, "%d", gHudDisplay.coins);
+    u8 strCoins[4];
+    s16 y = HUD_TOP_Y;
+    u8 gHudSymCoin[] = { GLYPH_COIN,     GLOBAR_CHAR_TERMINATOR };
+    u8 gHudSymX[]    = { GLYPH_MULTIPLY, GLOBAR_CHAR_TERMINATOR };
+
+    int_to_str(gHudDisplay.coins, strCoins);
+
+    gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
+    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
+
+    if (gConfig.widescreen) {
+        // Posición fija simplificada para Widescreen
+        s32 baseX = gHudDisplay.stars > 100 ? 215 : 205; 
+        print_hud_lut_string(HUD_LUT_GLOBAL, baseX - 11, y, gHudSymCoin);
+        print_hud_lut_string(HUD_LUT_GLOBAL, baseX,      y, gHudSymX);
+        print_hud_lut_string(HUD_LUT_GLOBAL, baseX + 11, y, strCoins);
+    } else {
+        // Posición original 4:3
+        print_hud_lut_string(HUD_LUT_GLOBAL, 168, y, gHudSymCoin);
+        print_hud_lut_string(HUD_LUT_GLOBAL, 184, y, gHudSymX);
+        print_hud_lut_string(HUD_LUT_GLOBAL, 198, y, strCoins);
+    }
+
+    gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 }
 
 #define HUD_STARS_X 78
@@ -428,11 +496,31 @@ void render_hud_coins(void) {
  */
 void render_hud_stars(void) {
     if (gHudFlash == HUD_FLASH_STARS && gGlobalTimer & 0x8) return;
-    s8 showX = (gHudDisplay.stars < 100);
-    print_text(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(HUD_STARS_X), HUD_TOP_Y, "^"); // 'Star' glyph
-    if (showX) print_text((GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(HUD_STARS_X) + 16), HUD_TOP_Y, "*"); // 'X' glyph
-    print_text_fmt_int((showX * 14) + GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(HUD_STARS_X - 16),
-                       HUD_TOP_Y, "%d", gHudDisplay.stars);
+
+    u8 strStars[4];
+    s16 y = HUD_TOP_Y;
+    u8 gHudSymStar[] = { GLYPH_STAR,     GLOBAR_CHAR_TERMINATOR };
+    u8 gHudSymX[]    = { GLYPH_MULTIPLY, GLOBAR_CHAR_TERMINATOR };
+
+    int_to_str(gHudDisplay.stars, strStars);
+
+    gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
+    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
+    if (gConfig.widescreen) {
+        s32 textX = gHudDisplay.stars > 100 ? 264 : 272;
+
+        print_hud_lut_string(HUD_LUT_GLOBAL, textX - 24, y, gHudSymStar);
+        print_hud_lut_string(HUD_LUT_GLOBAL, textX - 12, y, gHudSymX);
+        print_hud_lut_string(HUD_LUT_GLOBAL, textX,      y, strStars);
+    } else {
+        s32 baseX = GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(HUD_STARS_X);
+        
+        print_hud_lut_string(HUD_LUT_GLOBAL, baseX,      y, gHudSymStar);
+        print_hud_lut_string(HUD_LUT_GLOBAL, baseX + 16, y, gHudSymX);
+        print_hud_lut_string(HUD_LUT_GLOBAL, baseX + 30, y, strStars);
+    }
+
+    gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 }
 
 /**
@@ -450,31 +538,56 @@ void render_hud_keys(void) {
 /**
  * Renders the timer when Mario start sliding in PSS.
  */
+
+#include "text_strings.h"
+// Define esto en la parte superior de tu archivo o en tu cabecera de HUD
+#define HUD_TIMER_Y 30
+
 void render_hud_timer(void) {
-    Texture *(*hudLUT)[58] = segmented_to_virtual(&main_hud_lut);
+    u8 strMins[4], strSecs[4], strFrac[4];
+    u8 textTime[] = { TEXT_TIME };
+    u8 strApos[]  = { GLYPH_APOSTROPHE,   GLOBAR_CHAR_TERMINATOR };
+    u8 strQuote[] = { GLYPH_DOUBLE_QUOTE, GLOBAR_CHAR_TERMINATOR };
+
     u16 timerValFrames = gHudDisplay.timer;
-    u16 timerMins = timerValFrames / (30 * 60);
-    u16 timerSecs = (timerValFrames - (timerMins * 1800)) / 30;
-    u16 timerFracSecs = ((timerValFrames - (timerMins * 1800) - (timerSecs * 30)) & 0xFFFF) / 3;
+    u16 timerMins      = timerValFrames / (30 * 60);
+    u16 timerSecs      = (timerValFrames - (timerMins * 1800)) / 30;
+    u16 timerFracSecs  = ((timerValFrames - (timerMins * 1800) - (timerSecs * 30)) & 0xFFFF) / 3;
 
-#if MULTILANG
-    switch (eu_get_language()) {
-        case LANGUAGE_ENGLISH: print_text(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(150), 185,  "TIME"); break;
-        case LANGUAGE_FRENCH:  print_text(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(155), 185, "TEMPS"); break;
-        case LANGUAGE_GERMAN:  print_text(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(150), 185,  "ZEIT"); break;
+    // Convertimos los valores numéricos
+    int_to_str(timerMins, strMins);
+    int_to_str(timerSecs, strSecs);
+    int_to_str(timerFracSecs, strFrac);
+
+    // Activamos el modo de texto unificado
+    gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
+    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
+
+    // 1. "TIME"
+    print_hud_lut_string(HUD_LUT_GLOBAL, GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(gConfig.widescreen ? 130 : 150), HUD_TIMER_Y, textTime);
+
+    // 2. Minutos
+    print_hud_lut_string(HUD_LUT_GLOBAL, GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(91), HUD_TIMER_Y, strMins);
+
+    // 3. Apóstrofe
+    print_hud_lut_string(HUD_LUT_GLOBAL, GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(gConfig.widescreen ? 83 : 81), HUD_TIMER_Y - 5, strApos);
+
+    // 4. Segundos con cero a la izquierda
+    if (timerSecs < 10) {
+        u8 zeroStr[] = { 0, GLOBAR_CHAR_TERMINATOR };
+        print_hud_lut_string(HUD_LUT_GLOBAL, GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(gConfig.widescreen ? 74 : 71), HUD_TIMER_Y, zeroStr);
+        print_hud_lut_string(HUD_LUT_GLOBAL, GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(gConfig.widescreen ? 65 : 62), HUD_TIMER_Y, strSecs);
+    } else {
+        print_hud_lut_string(HUD_LUT_GLOBAL, GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(gConfig.widescreen ? 74 : 71), HUD_TIMER_Y, strSecs);
     }
-#else
-    print_text(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(150), 185, "TIME");
-#endif
 
-    print_text_fmt_int(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(91), 185, "%0d", timerMins);
-    print_text_fmt_int(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(71), 185, "%02d", timerSecs);
-    print_text_fmt_int(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(37), 185, "%d", timerFracSecs);
+    // 5. Doble Comilla
+    print_hud_lut_string(HUD_LUT_GLOBAL, GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(gConfig.widescreen ? 55 : 46), HUD_TIMER_Y - 5, strQuote);
 
-    gSPDisplayList(gDisplayListHead++, dl_hud_img_begin);
-    render_hud_tex_lut(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(81), 32, (*hudLUT)[GLYPH_APOSTROPHE]);
-    render_hud_tex_lut(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(46), 32, (*hudLUT)[GLYPH_DOUBLE_QUOTE]);
-    gSPDisplayList(gDisplayListHead++, dl_hud_img_end);
+    // 6. Centésimas/Fracciones
+    print_hud_lut_string(HUD_LUT_GLOBAL, GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(gConfig.widescreen ? 46 : 37), HUD_TIMER_Y, strFrac);
+
+    gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 }
 
 /**
@@ -489,43 +602,56 @@ void set_hud_camera_status(s16 status) {
  * Renders camera HUD glyphs using a table list, depending of
  * the camera status called, a defined glyph is rendered.
  */
+#define CAM_GLYPH_OFFSET 100
+
+// Helper para crear el glifo redireccionado
+#define CAM_GLYPH(x) (u8)(x + CAM_GLYPH_OFFSET)
+ // Definimos las cadenas usando tus glifos existentes
+u8 gHudSymCamera[]    = { GLYPH_CAM_CAMERA, GLYPH_SPACE }; // Ajusta si el nombre es distinto
+u8 gHudSymCamMario[]  = { GLYPH_CAM_MARIO_HEAD, GLYPH_SPACE }; 
+u8 gHudSymCamLakitu[] = { GLYPH_CAM_LAKITU_HEAD, GLYPH_SPACE }; 
+u8 gHudSymCamFixed[]  = { GLYPH_CAM_FIXED, GLYPH_SPACE };
+
 void render_hud_camera_status(void) {
-    Texture *(*cameraLUT)[6] = segmented_to_virtual(&main_hud_camera_lut);
-    s32 x = GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(54);
+    s32 x = GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(gConfig.widescreen ? 46 : 54);
     s32 y = 205;
+    u8 headGlyph;
 
     if (sCameraHUD.status == CAM_STATUS_NONE) {
         return;
     }
 
-    gSPDisplayList(gDisplayListHead++, dl_hud_img_begin);
-    render_hud_tex_lut(x, y, (*cameraLUT)[GLYPH_CAM_CAMERA]);
+    // Iniciamos modo texto para asegurar el escalado 32x64 de print_hud_lut_string
+    gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
+    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
 
+    // 1. Icono de Cámara (Mapeado al índice 100)
+    u8 strCamera[] = { CAM_GLYPH(GLYPH_CAM_CAMERA), GLOBAR_CHAR_TERMINATOR };
+    print_hud_lut_string(HUD_LUT_GLOBAL, gConfig.widescreen ? (x - 7) : x, y, strCamera);
+
+    // 2. Selección de Cabeza
     switch (sCameraHUD.status & CAM_STATUS_MODE_GROUP) {
-        case CAM_STATUS_MARIO:
-            render_hud_tex_lut(x + 16, y, (*cameraLUT)[GLYPH_CAM_MARIO_HEAD]);
-            break;
-        case CAM_STATUS_LAKITU:
-            render_hud_tex_lut(x + 16, y, (*cameraLUT)[GLYPH_CAM_LAKITU_HEAD]);
-            break;
-        case CAM_STATUS_FIXED:
-            render_hud_tex_lut(x + 16, y, (*cameraLUT)[GLYPH_CAM_FIXED]);
-            break;
+        case CAM_STATUS_MARIO:  headGlyph = GLYPH_CAM_MARIO_HEAD;  break;
+        case CAM_STATUS_LAKITU: headGlyph = GLYPH_CAM_LAKITU_HEAD; break;
+        case CAM_STATUS_FIXED:  headGlyph = GLYPH_CAM_FIXED;       break;
+        default:                headGlyph = GLYPH_CAM_MARIO_HEAD;  break;
     }
 
-    switch (sCameraHUD.status & CAM_STATUS_C_MODE_GROUP) {
-        case CAM_STATUS_C_DOWN:
-            render_hud_small_tex_lut(x + 4, y + 16, (*cameraLUT)[GLYPH_CAM_ARROW_DOWN]);
-            break;
-        case CAM_STATUS_C_UP:
-            render_hud_small_tex_lut(x + 4, y - 8, (*cameraLUT)[GLYPH_CAM_ARROW_UP]);
-            break;
+    // 3. Renderizar Cabeza (Mapeada al índice 101, 102 o 103)
+    u8 strHead[] = { CAM_GLYPH(headGlyph), GLOBAR_CHAR_TERMINATOR };
+    print_hud_lut_string(HUD_LUT_GLOBAL, gConfig.widescreen ? (x + 5) : (x + 16), y, strHead);
+
+    // 4. Flechas C
+    if ((sCameraHUD.status & CAM_STATUS_C_MODE_GROUP) == CAM_STATUS_C_DOWN) {
+        u8 strArrow[] = { CAM_GLYPH(GLYPH_CAM_ARROW_DOWN), GLOBAR_CHAR_TERMINATOR };
+        print_hud_lut_string(HUD_LUT_GLOBAL, gConfig.widescreen ? (x - 2) : (x + 4), y + 16, strArrow);
+    } else if ((sCameraHUD.status & CAM_STATUS_C_MODE_GROUP) == CAM_STATUS_C_UP) {
+        u8 strArrow[] = { CAM_GLYPH(GLYPH_CAM_ARROW_UP), GLOBAR_CHAR_TERMINATOR };
+        print_hud_lut_string(HUD_LUT_GLOBAL, gConfig.widescreen ? (x - 2) : (x + 4), y - 8, strArrow);
     }
 
-    gSPDisplayList(gDisplayListHead++, dl_hud_img_end);
+    gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 }
-
-extern int gPointLightCompatibilityMode;
 
 /**
  * Render HUD strings using hudDisplayFlags with it's render functions,

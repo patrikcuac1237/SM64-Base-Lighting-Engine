@@ -18,6 +18,8 @@
 
 #include "config.h"
 
+extern s16 s8DirModeYawOffset;
+
 void play_flip_sounds(struct MarioState *m, s16 frame1, s16 frame2, s16 frame3) {
     s32 animFrame = m->marioObj->header.gfx.animInfo.animFrame;
     if (animFrame == frame1 || animFrame == frame2 || animFrame == frame3) {
@@ -61,27 +63,35 @@ s32 lava_boost_on_wall(struct MarioState *m) {
 }
 
 s32 check_fall_damage(struct MarioState *m, u32 hardFallAction) {
-#ifdef NO_FALL_DAMAGE
-    return FALSE;
-#endif
-
     f32 fallHeight = m->peakHeight - m->pos[1];
 
     f32 damageHeight = FALL_DAMAGE_HEIGHT_SMALL;
-
-    if (m->action != ACT_TWIRLING && m->floor->type != SURFACE_BURNING) {
+    f32 damageLarge = FALL_DAMAGE_HEIGHT_LARGE;
+    if (gMarioState->flags & MARIO_METAL_CAP) {
+        damageHeight = 2500.f;
+        damageLarge = 4000.f;
+    }
+    
+    if (m->action != ACT_TWIRLING && !IS_SURFACE_BURNING(m->floor)) {
         if (m->vel[1] < -55.0f) {
-            if (fallHeight > FALL_DAMAGE_HEIGHT_LARGE) {
+            if (fallHeight > damageLarge) {
                 m->hurtCounter += (m->flags & MARIO_CAP_ON_HEAD) ? 16 : 24;
+                if (!(gMarioState->flags & MARIO_METAL_CAP)) {
+                    m->squishTimer = 30;
+                }
 #if ENABLE_RUMBLE
                 queue_rumble_data(5, 80);
 #endif
                 set_camera_shake_from_hit(SHAKE_FALL_DAMAGE);
                 play_sound(SOUND_MARIO_ATTACKED, m->marioObj->header.gfx.cameraToObject);
                 return drop_and_set_mario_action(m, hardFallAction, 4);
-            } else if (fallHeight > damageHeight && !mario_floor_is_slippery(m)) {
+            } else if (fallHeight > damageHeight) {
                 m->hurtCounter += (m->flags & MARIO_CAP_ON_HEAD) ? 8 : 12;
-                m->squishTimer = 30;
+                if (gMarioState->flags & MARIO_METAL_CAP) {
+
+                } else {
+                    m->squishTimer = 30;
+                }
 #if ENABLE_RUMBLE
                 queue_rumble_data(5, 80);
 #endif
@@ -107,14 +117,25 @@ s32 should_get_stuck_in_ground(UNUSED struct MarioState *m) {
 }
 #else
 s32 should_get_stuck_in_ground(struct MarioState *m) {
-    u32 terrainType = m->area->terrainType & TERRAIN_MASK;
     struct Surface *floor = m->floor;
-    s32 flags = floor->flags;
-    s32 type = floor->type;
+    
+    if (floor == NULL) return FALSE;
 
-    if (floor != NULL && (terrainType == TERRAIN_SNOW || terrainType == TERRAIN_SAND)
-        && type != SURFACE_BURNING && SURFACE_IS_NOT_HARD(type)) {
-        if (!(flags & SURFACE_FLAG_DYNAMIC) && m->peakHeight - m->pos[1] > 1000.0f && floor->normal.y >= COS30) {
+    // Extraemos los datos de nuestra macro NEWTERRAIN
+    s16 surfaceSound = GET_SURFACE_SOUND(floor);
+    s16 surfaceProp  = GET_SURFACE_PROP(floor);
+    s16 type = floor->type; // Para el chequeo de HARD (bits 0-7)
+
+    // 1. Detectamos si el sonido es Nieve o Arena
+    s32 isSoftSound = (surfaceSound == SOUND_TERRAIN_SNOW || surfaceSound == SOUND_TERRAIN_SAND);
+    
+    // 2. Detectamos si NO es una superficie ardiente (usando nuestra propiedad 2)
+    s32 isNotBurning = (surfaceProp != SPECFLAG_BURNING);
+
+    if (isSoftSound && isNotBurning && SURFACE_IS_NOT_HARD(type)) {
+        if (!(floor->flags & SURFACE_FLAG_DYNAMIC) && 
+            m->peakHeight - m->pos[1] > 1000.0f && 
+            floor->normal.y >= COS30) {
             return TRUE;
         }
     }
@@ -364,8 +385,20 @@ u32 common_air_action_step(struct MarioState *m, u32 landAction, s32 animation, 
             break;
 
         case AIR_STEP_LANDED:
-            if (!check_fall_damage_or_get_stuck(m, ACT_HARD_BACKWARD_AIR_KB)){
-                set_mario_action(m, landAction, 0);
+            if (!gConfig.MovesChange) {
+                if (!check_fall_damage_or_get_stuck(m, ACT_HARD_BACKWARD_GROUND_KB)){
+                    set_mario_action(m, landAction, 0);
+                }
+            } else {
+                if (m->forwardVel > 0.0f) {
+                if (!check_fall_damage_or_get_stuck(m, ACT_HARD_GROUND_KNOCKBACK)){
+                    set_mario_action(m, landAction, 0);
+                }  
+                } else {
+                    if (!check_fall_damage_or_get_stuck(m, ACT_HARD_BACKWARD_GROUND_KB)){
+                        set_mario_action(m, landAction, 0);
+                    }
+                }
             }
             break;
 
@@ -400,7 +433,8 @@ u32 common_air_action_step(struct MarioState *m, u32 landAction, s32 animation, 
                     if (m->forwardVel >= 38.0f) {
                         m->particleFlags |= PARTICLE_VERTICAL_STAR;
                         m->forwardVel = -m->forwardVel;
-                        set_mario_action(m, ACT_BACKWARD_AIR_KB, 0);
+                        m->bIsForward = FALSE;
+                        set_mario_action(m, ACT_AIR_KNOCKBACK, 0);
                     } else {
                         if (m->forwardVel > 8.0f) {
                             mario_set_forward_vel(m, -8.0f);
@@ -435,6 +469,10 @@ s32 act_jump(struct MarioState *m) {
     if (m->actionTimer < 1) {
         m->actionTimer++;
         if (m->input & INPUT_Z_PRESSED && m->forwardVel > 10.0f) {
+            if (gConfig.cheats !=0x00) {
+            m->forwardVel = -m->forwardVel;
+            return set_jumping_action(m, ACT_LONG_JUMP, 0);
+            }
             return set_jumping_action(m, ACT_LONG_JUMP, 0);
         }
     }
@@ -499,10 +537,6 @@ s32 act_triple_jump(struct MarioState *m) {
 }
 
 s32 act_backflip(struct MarioState *m) {
-    if (gConfig.cheats !=0x00) {
-        m->forwardVel = -m->forwardVel;
-        return set_mario_action(m, ACT_HARD_FORWARD_AIR_KB, 0);
-    }
     if (m->input & INPUT_Z_PRESSED) {
         return set_mario_action(m, ACT_GROUND_POUND, 0);
     }
@@ -519,63 +553,44 @@ s32 act_backflip(struct MarioState *m) {
 }
 
 s32 act_freefall(struct MarioState *m) {
-    if (gConfig.cheats !=0x00) {
-        if (m->actionState == ACT_STATE_GETTING_BLOWN_ACCEL_BACKWARDS) {
-        if (m->forwardVel > -60.0f) {
-            m->forwardVel -= 6.0f;
-        } else {
-            m->actionState = ACT_STATE_GETTING_BLOWN_SLOW_DOWN;
-        }
-    } else {
-        if (m->forwardVel < -16.0f) {
-            m->forwardVel += 0.98f;
-        }
+    if (++(m->actionTimer) <= 5) {
+        if (gConfig.MovesChange && (m->input & INPUT_A_PRESSED)) {
+            // Usamos un switch para m->prevAction. Es más limpio y eficiente que mil "if".
+            switch (m->prevAction) {
+                
+                // CASO 1: Acciones de movimiento terrestre
+                case ACT_WALKING:
+                case ACT_DECELERATING:
+                case ACT_BRAKING:
+                case ACT_MOVE_PUNCHING:
+                case ACT_CROUCH_SLIDE:
+                    return set_jump_from_landing(m); // Terminamos con return si la acción cambia
 
-        if (m->vel[1] < 0.0f && m->windGravity < 4.0f) {
-            m->windGravity += 0.05f;
-        }
-    }
+                // CASO 2: Deslizamientos de barriga
+                case ACT_DIVE_SLIDE:
+                case ACT_SLIDE_KICK_SLIDE:
+                case ACT_STOMACH_SLIDE:
+                    return set_mario_action(m, ACT_FORWARD_ROLLOUT, (m->forwardVel < 0.0f));
 
-#ifndef PREVENT_CAP_LOSS
-    if (++(m->actionTimer) == 20) {
-        mario_blow_off_cap(m, -m->forwardVel);
-    }
-#endif
+                // CASO 3: Salto Doble (Solo si venimos de aterrizar un salto simple)
+                case ACT_JUMP_LAND:
+                    return set_mario_action(m, ACT_DOUBLE_JUMP, 0);
 
-    mario_set_forward_vel(m, m->forwardVel);
-    set_mario_animation(m, MARIO_ANIM_BACKWARD_AIR_KB);
-
-        if (m->forwardVel >= 0.0f) {
-        set_mario_animation(m, MARIO_ANIM_AIR_FORWARD_KB);
-    }
-
-    switch (perform_air_step(m, 0)) {
-        case AIR_STEP_LANDED:
-            if (m->forwardVel <= 0.0f) {
-            set_mario_action(m, ACT_HARD_BACKWARD_AIR_KB, 0);
+                // CASO 4: Salto Triple o Vuelo (Solo si venimos de aterrizar un doble)
+                case ACT_DOUBLE_JUMP_LAND:
+                    if (m->flags & MARIO_WING_CAP) {
+                        return set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0);
+                    } else if (m->forwardVel > 20.0f) {
+                        return set_mario_action(m, ACT_TRIPLE_JUMP, 0);
+                    } else {
+                        return set_mario_action(m, ACT_JUMP, 0);
+                    }
+                
+                // CASO POR DEFECTO: Si es ACT_JUMP o cualquier otro no listado, no hace nada
+                default:
+                    break;
             }
-            if (m->forwardVel >= 0.0f) {
-            set_mario_action(m, ACT_HARD_FORWARD_AIR_KB, 0);
-            }
-
-            break;
-
-        case AIR_STEP_HIT_WALL:
-            set_mario_animation(m, MARIO_ANIM_AIR_FORWARD_KB);
-            mario_bonk_reflection(m, FALSE);
-
-            if (m->vel[1] > 0.0f) {
-                m->vel[1] = 0.0f;
-            }
-
-            mario_set_forward_vel(m, -m->forwardVel);
-            break;
-
-
-    }
-
-
-    return FALSE;
+        }
     }
     s32 animation;
 
@@ -588,7 +603,7 @@ s32 act_freefall(struct MarioState *m) {
     }
 
     switch (m->actionArg) {
-        case 0:
+        default:
             animation = MARIO_ANIM_GENERAL_FALL;
             break;
         case 1:
@@ -685,11 +700,6 @@ s32 act_wall_kick_air(struct MarioState *m) {
 }
 
 s32 act_long_jump(struct MarioState *m) {
-    if (gConfig.cheats !=0x00) {
-        m->forwardVel = -m->forwardVel;
-        m->particleFlags |= PARTICLE_VERTICAL_STAR;
-        return set_mario_action(m, ACT_BACKWARD_AIR_KB, 0);
-    }
     s32 animation;
     if (!m->marioObj->oMarioLongJumpIsSlow) {
         animation = MARIO_ANIM_FAST_LONGJUMP;
@@ -818,6 +828,7 @@ s32 act_dive(struct MarioState *m) {
             break;
 
         case AIR_STEP_LANDED:
+            m->bIsForward = TRUE;
             if (should_get_stuck_in_ground(m) && m->faceAngle[0] == -DEGREES(60)) {
 #if ENABLE_RUMBLE
                 queue_rumble_data(5, 80);
@@ -825,7 +836,7 @@ s32 act_dive(struct MarioState *m) {
                 play_sound(SOUND_MARIO_OOOF2, m->marioObj->header.gfx.cameraToObject);
                 m->particleFlags |= PARTICLE_MIST_CIRCLE;
                 drop_and_set_mario_action(m, ACT_HEAD_STUCK_IN_GROUND, 0);
-            } else if (!check_fall_damage(m, ACT_HARD_FORWARD_GROUND_KB)) {
+            } else if (!check_fall_damage(m, ACT_HARD_GROUND_KNOCKBACK)) {
                 if (m->heldObj == NULL) {
                     set_mario_action(m, ACT_DIVE_SLIDE, 0);
                 } else {
@@ -839,7 +850,8 @@ s32 act_dive(struct MarioState *m) {
             
             mario_bonk_reflection(m, TRUE);
             m->particleFlags |= PARTICLE_VERTICAL_STAR;
-            drop_and_set_mario_action(m, ACT_BACKWARD_AIR_KB, 0);
+            m->bIsForward = FALSE;
+            drop_and_set_mario_action(m, ACT_AIR_KNOCKBACK, 0);
             break;
 
         case AIR_STEP_HIT_LAVA_WALL:
@@ -878,11 +890,41 @@ s32 act_air_throw(struct MarioState *m) {
             lava_boost_on_wall(m);
             break;
     }
-
     return FALSE;
 }
 
 s32 act_water_jump(struct MarioState *m) {
+    if (!gConfig.MovesChange) {
+        if (m->forwardVel < 15.0f) {
+        mario_set_forward_vel(m, 15.0f);
+    }
+
+    play_mario_sound(m, SOUND_ACTION_WATER_JUMP, 0);
+    set_mario_animation(m, MARIO_ANIM_SINGLE_JUMP);
+
+    switch (perform_air_step(m, AIR_STEP_CHECK_LEDGE_GRAB)) {
+        case AIR_STEP_LANDED:
+            set_mario_action(m, ACT_JUMP_LAND, 0);
+            set_camera_mode(m->area->camera, m->area->camera->defMode, 1);
+            break;
+
+        case AIR_STEP_HIT_WALL:
+            mario_set_forward_vel(m, 15.0f);
+            break;
+
+        case AIR_STEP_GRABBED_LEDGE:
+            set_mario_animation(m, MARIO_ANIM_IDLE_ON_LEDGE);
+            set_mario_action(m, ACT_LEDGE_GRAB, 0);
+            set_camera_mode(m->area->camera, m->area->camera->defMode, 1);
+            break;
+
+        case AIR_STEP_HIT_LAVA_WALL:
+            lava_boost_on_wall(m);
+            break;
+    }
+
+    return FALSE;
+    } else {
     if (check_kick_or_dive_in_air(m)) {
         return TRUE;
     }
@@ -920,6 +962,7 @@ if (m->input & INPUT_Z_PRESSED) {
     }
 
     return FALSE;
+    }
 }
 
 s32 act_hold_water_jump(struct MarioState *m) {
@@ -958,18 +1001,34 @@ s32 act_hold_water_jump(struct MarioState *m) {
 }
 
 s32 act_steep_jump(struct MarioState *m) {
+    u32 landAction;
     if (m->input & INPUT_B_PRESSED) {
         return set_mario_action(m, ACT_DIVE, 0);
     }
-
     play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, 0);
+    if (m->actionArg != 0) {
+        m->flags &= ~MARIO_JUMPING;
+        set_mario_animation(m, MARIO_ANIM_GENERAL_FALL);
+        landAction = ACT_JUMP_LAND;
+    } else {
+        set_mario_animation(m, MARIO_ANIM_SINGLE_JUMP);
+        landAction = ACT_JUMP_LAND;
+    }
+
     mario_set_forward_vel(m, 0.98f * m->forwardVel);
 
     switch (perform_air_step(m, 0)) {
         case AIR_STEP_LANDED:
-            if (!check_fall_damage_or_get_stuck(m, ACT_HARD_BACKWARD_GROUND_KB)) {
+            if (m->forwardVel > 0.0f) {
+              if (!check_fall_damage_or_get_stuck(m, ACT_HARD_GROUND_KNOCKBACK)){
                 m->faceAngle[0] = 0;
-                set_mario_action(m, m->forwardVel < 0.0f ? ACT_BEGIN_SLIDING : ACT_JUMP_LAND, 0);
+                set_mario_action(m, m->forwardVel < 0.0f ? ACT_BEGIN_SLIDING : landAction, 0);
+            }  
+            } else {
+                if (!check_fall_damage_or_get_stuck(m, ACT_HARD_BACKWARD_GROUND_KB)){
+                    m->faceAngle[0] = 0;
+                    set_mario_action(m, m->forwardVel < 0.0f ? ACT_BEGIN_SLIDING : landAction, 0);
+                }
             }
             break;
 
@@ -981,9 +1040,6 @@ s32 act_steep_jump(struct MarioState *m) {
             lava_boost_on_wall(m);
             break;
     }
-
-    set_mario_animation(m, MARIO_ANIM_SINGLE_JUMP);
-    m->marioObj->header.gfx.angle[1] = m->marioObj->oMarioSteepJumpYaw;
     return FALSE;
 }
 
@@ -1038,62 +1094,139 @@ s32 act_ground_pound(struct MarioState *m) {
             }
             set_camera_shake_from_hit(SHAKE_GROUND_POUND);
         }
-#ifndef DISABLE_GROUNDPOUND_BONK
         else if (stepResult == AIR_STEP_HIT_WALL) {
-            mario_set_forward_vel(m, -16.0f);
-            
-            m->particleFlags |= PARTICLE_VERTICAL_STAR;
-            set_mario_action(m, ACT_BACKWARD_AIR_KB, 0);
+            if (gConfig.MovesChange) {
+                mario_set_forward_vel(m, -16.0f);
+                
+                m->particleFlags |= PARTICLE_VERTICAL_STAR;
+                m->bIsForward = FALSE;
+                set_mario_action(m, ACT_AIR_KNOCKBACK, 0);
+            }
         }
-#endif
     }
-
-    if (m->input & INPUT_B_PRESSED) {
-        if (m->actionState == 0) {
-            m->vel[1] = 30.0f;
-            m->forwardVel = 60.0f;
-            m->faceAngle[1] = m->intendedYaw;
-            return set_mario_action(m, ACT_DIVE, 0);
-        } else
-            m->vel[1] = 30.0f;
-            m->forwardVel = 60.0f;
-            m->faceAngle[1] = m->intendedYaw;
-            return set_mario_action(m, ACT_DIVE, 0);
-    }
-    if (m->input & INPUT_A_PRESSED) {
-        if (m->actionState == 0) {
-            m->vel[1] = 40.0f;
-            return set_mario_action(m, ACT_TWIRL_YAW, 0);
-        } else
-            m->vel[1] = 40.0f;
-            return set_mario_action(m, ACT_TWIRL_YAW, 0);
+        if (m->input & INPUT_B_PRESSED) {
+    if (gConfig.MovesChange) {
+            if (m->actionState == 0) {
+                m->vel[1] = 10.0f;
+                m->forwardVel = 30.0f;
+                m->faceAngle[1] = m->intendedYaw;
+                play_sound(SOUND_OBJ_RELEASE_MARIO, m->marioObj->header.gfx.cameraToObject);
+                return set_mario_action(m, ACT_DIVE, 0);
+            } else {
+                m->vel[1] = 10.0f;
+                m->forwardVel = 30.0f;
+                m->faceAngle[1] = m->intendedYaw;
+                play_sound(SOUND_OBJ_RELEASE_MARIO, m->marioObj->header.gfx.cameraToObject);
+                return set_mario_action(m, ACT_DIVE, 0);
+            }
+            }
+        }
+        if (gConfig.MovesChange) {
+                if (m->input & INPUT_A_PRESSED) {
+                    if (m->actionState == 0) {
+                        m->vel[1] = 30.0f;
+                        return set_mario_action(m, ACT_TWIRL_YAW, 1);
+                    } else {
+                        m->vel[1] = 30.0f;
+                        return set_mario_action(m, ACT_TWIRL_YAW, 1);
+                }
+            }
     }
     return FALSE;
 }
 
 s32 act_burning_jump(struct MarioState *m) {
-    play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, m->actionArg == 0 ? 0 : -1);
-    mario_set_forward_vel(m, m->forwardVel);
+    if (gConfig.cheats != 0x00) {
+#if ENABLE_RUMBLE
+    if (!(m->flags & MARIO_MARIO_SOUND_PLAYED)) {
+#endif
+        play_sound_if_no_flag(m, SOUND_MARIO_ON_FIRE, MARIO_MARIO_SOUND_PLAYED);
+#if ENABLE_RUMBLE
+        queue_rumble_data(5, 80);
+    }
+#endif
 
-    if (perform_air_step(m, 0) == AIR_STEP_LANDED) {
-        play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING);
-        set_mario_action(m, ACT_BURNING_GROUND, 0);
+    if (!(m->input & INPUT_NONZERO_ANALOG)) {
+        m->forwardVel = approach_f32(m->forwardVel, 0.0f, 0.35f, 0.35f);
     }
 
-    set_mario_animation(m, m->actionArg == 0 ? MARIO_ANIM_SINGLE_JUMP : MARIO_ANIM_FIRE_LAVA_BURN);
-    m->particleFlags |= PARTICLE_FIRE;
-    play_sound(SOUND_MOVING_LAVA_BURN, m->marioObj->header.gfx.cameraToObject);
+    update_lava_boost_or_twirling(m);
 
-    m->marioObj->oMarioBurnTimer += 3;
+    switch (perform_air_step(m, 0)) {
+        case AIR_STEP_LANDED:
+            if (IS_SURFACE_BURNING(m->floor)) {
+                m->actionState = ACT_STATE_LAVA_BOOST_HIT_LAVA;
+                if (!(m->flags & MARIO_METAL_CAP)) {
+                    m->hurtCounter += (m->flags & MARIO_CAP_ON_HEAD) ? 12 : 18;
+                }
+                m->vel[1] = 84.0f;
+                play_sound(SOUND_MARIO_ON_FIRE, m->marioObj->header.gfx.cameraToObject);
+#if ENABLE_RUMBLE
+                queue_rumble_data(5, 80);
+#endif
+            } else {
+                play_mario_heavy_landing_sound(m, SOUND_ACTION_TERRAIN_BODY_HIT_GROUND);
+                if (m->actionState < ACT_STATE_LAVA_BOOST_SET_LANDING_ACTION && m->vel[1] < 0.0f) {
+                    m->vel[1] = -m->vel[1] * 0.4f;
+                    mario_set_forward_vel(m, m->forwardVel * 0.5f);
+                    m->actionState++;
+                } else {
+                    set_mario_action(m, ACT_LAVA_BOOST_LAND, 0);
+                }
+            }
+            break;
 
-    m->health -= 10;
+        case AIR_STEP_HIT_WALL:
+            mario_bonk_reflection(m, FALSE);
+            break;
+
+        case AIR_STEP_HIT_LAVA_WALL:
+            lava_boost_on_wall(m);
+            break;
+    }
+
+    set_mario_animation(m, MARIO_ANIM_FIRE_LAVA_BURN);
+    if ((m->area->terrainType & TERRAIN_MASK) != TERRAIN_SNOW && !(m->flags & MARIO_METAL_CAP)
+        && m->vel[1] > 0.0f) {
+        m->particleFlags |= PARTICLE_FIRE;
+        if (m->actionState == ACT_STATE_LAVA_BOOST_HIT_LAVA) {
+            play_sound(SOUND_MOVING_LAVA_BURN, m->marioObj->header.gfx.cameraToObject);
+        }
+    }
+
     if (m->health < 0x100) {
-        m->health = 0xFF;
+        level_trigger_warp(m, WARP_OP_DEATH);
     }
+
+    m->marioBodyState->eyeState = MARIO_EYES_DEAD;
 #if ENABLE_RUMBLE
     reset_rumble_timers_slip();
 #endif
-    return FALSE;
+    return FALSE;   
+    } else {
+        play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, m->actionArg == 0 ? 0 : -1);
+        mario_set_forward_vel(m, m->forwardVel);
+
+        if (perform_air_step(m, 0) == AIR_STEP_LANDED) {
+            play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING);
+            set_mario_action(m, ACT_BURNING_GROUND, 0);
+        }
+
+        set_mario_animation(m, m->actionArg == 0 ? MARIO_ANIM_SINGLE_JUMP : MARIO_ANIM_FIRE_LAVA_BURN);
+        m->particleFlags |= PARTICLE_FIRE;
+        play_sound(SOUND_MOVING_LAVA_BURN, m->marioObj->header.gfx.cameraToObject);
+
+        m->marioObj->oMarioBurnTimer += 3;
+
+        m->health -= 10;
+        if (m->health < 0x100) {
+            m->health = 0xFF;
+        }
+    #if ENABLE_RUMBLE
+        reset_rumble_timers_slip();
+    #endif
+        return FALSE;
+    }
 }
 
 s32 act_burning_fall(struct MarioState *m) {
@@ -1201,7 +1334,7 @@ u32 common_air_knockback_step(struct MarioState *m, u32 landAction, u32 hardFall
             }
 #endif
             if (!check_fall_damage_or_get_stuck(m, hardFallAction)) {
-                if (m->action == ACT_THROWN_FORWARD || m->action == ACT_THROWN_BACKWARD) {
+                if (m->action == ACT_THROWN_BACKWARD) {
                     set_mario_action(m, landAction, m->hurtCounter);
                 } else {
                     set_mario_action(m, landAction, m->actionArg);
@@ -1211,10 +1344,16 @@ u32 common_air_knockback_step(struct MarioState *m, u32 landAction, u32 hardFall
 
         case AIR_STEP_HIT_WALL:
             set_mario_animation(m, MARIO_ANIM_BACKWARD_AIR_KB);
-            mario_bonk_reflection(m, FALSE);
-            m->particleFlags |= PARTICLE_VERTICAL_STAR;
-            
+            if (m->action == ACT_SOFT_BONK || m->action == ACT_THROWN_BACKWARD) {
+                mario_bonk_reflection(m, FALSE);
+                mario_set_forward_vel(m, -m->forwardVel);
+            } else {
+                mario_bonk_reflection(m, FALSE);
+            }
 
+            if (m->vel[1] > 0.0f) {
+                m->vel[1] = 0.0f;
+            }
             break;
 
         case AIR_STEP_HIT_LAVA_WALL:
@@ -1234,183 +1373,71 @@ s32 check_wall_kick(struct MarioState *m) {
     return FALSE;
 }
 
-s32 act_backward_air_kb(struct MarioState *m) {
-    u32 landAction;
-    if (m->actionArg != 0) {
-        landAction = ACT_HARD_BACKWARD_AIR_KB;
-    } else {
-        landAction = ACT_BACKWARD_GROUND_KB;
-    }
-
+s32 act_air_knockback(struct MarioState *m) {
     if (check_wall_kick(m)) {
         return TRUE;
     }
 
-    if (m->forwardVel >= 0.0f) {
-    if (m->actionArg != 0) {
-        landAction = ACT_HARD_FORWARD_AIR_KB;
-    } else {
-        landAction = ACT_FORWARD_GROUND_KB;
-    }
-        set_mario_animation(m, MARIO_ANIM_AIR_FORWARD_KB);
-    }
-
     play_knockback_sound(m);
-    common_air_knockback_step(m, landAction, ACT_HARD_BACKWARD_AIR_KB, MARIO_ANIM_BACKWARD_AIR_KB, m->forwardVel);
-        if (m->forwardVel >= 0.0f) {
-        set_mario_animation(m, MARIO_ANIM_AIR_FORWARD_KB);
-    }
-    m->forwardVel *= 0.98f;
-    return FALSE;
-}
-
-s32 act_forward_air_kb(struct MarioState *m) {
-    u32 landAction;
-    if (m->actionArg != 0) {
-        landAction = ACT_HARD_BACKWARD_AIR_KB;
+    if (!gConfig.MovesChange) {
+        common_air_knockback_step(m, ACT_GROUND_KNOCKBACK, ACT_HARD_GROUND_KNOCKBACK,  m->bIsForward ? MARIO_ANIM_AIR_FORWARD_KB : MARIO_ANIM_BACKWARD_AIR_KB, m->bIsForward ? 16.0f : -16.0f);
     } else {
-        landAction = ACT_FORWARD_GROUND_KB;
-    }  
-
-    if (m->forwardVel <= 0.0f) {
-    if (m->actionArg != 0) {
-        landAction = ACT_HARD_BACKWARD_AIR_KB;
-    } else {
-        landAction = ACT_BACKWARD_GROUND_KB;
+        common_air_knockback_step(m,ACT_GROUND_KNOCKBACK, ACT_HARD_GROUND_KNOCKBACK, m->bIsForward ? MARIO_ANIM_AIR_FORWARD_KB : MARIO_ANIM_BACKWARD_AIR_KB, m->forwardVel);
+        m->forwardVel *= 0.98f;
     }
-    }
-
-    play_knockback_sound(m);
-
-    common_air_knockback_step(m, landAction, ACT_HARD_FORWARD_AIR_KB, MARIO_ANIM_AIR_FORWARD_KB, m->forwardVel);
-    if (m->forwardVel <= 0.0f) {
-        set_mario_animation(m, MARIO_ANIM_BACKWARD_AIR_KB);
-    }
-
-    m->forwardVel *= 0.98f;
     return FALSE;
 }
 
 s32 act_hard_backward_air_kb(struct MarioState *m) {
-    u32 landAction;
-    if (m->actionArg != 0) {
-        landAction = ACT_HARD_BACKWARD_GROUND_KB;
-    } else {
-        landAction = ACT_HARD_BACKWARD_GROUND_KB;
-    }
-
     if (check_wall_kick(m)) {
         return TRUE;
     }
 
-    if (m->forwardVel >= 0.0f) {
-    if (m->actionArg != 0) {
-        landAction = ACT_HARD_FORWARD_GROUND_KB;
-    } else {
-        landAction = ACT_HARD_FORWARD_GROUND_KB;
-    }
-        set_mario_animation(m, MARIO_ANIM_AIR_FORWARD_KB);
-    }
-
     play_knockback_sound(m);
-    common_air_knockback_step(m, landAction, ACT_HARD_BACKWARD_AIR_KB, MARIO_ANIM_BACKWARD_AIR_KB, m->forwardVel);
+    if (!gConfig.MovesChange) {
         if (m->forwardVel >= 0.0f) {
-        set_mario_animation(m, MARIO_ANIM_AIR_FORWARD_KB);
+            common_air_knockback_step(m, ACT_HARD_GROUND_KNOCKBACK, ACT_HARD_GROUND_KNOCKBACK, MARIO_ANIM_AIR_FORWARD_KB, 16.0f);
+        } else {
+            common_air_knockback_step(m, ACT_HARD_BACKWARD_GROUND_KB, ACT_HARD_BACKWARD_GROUND_KB, MARIO_ANIM_BACKWARD_AIR_KB, -16.0f);
+        }
+    } else {
+        common_air_knockback_step(m, m->forwardVel > 0 ? ACT_HARD_GROUND_KNOCKBACK : ACT_HARD_BACKWARD_GROUND_KB, m->forwardVel > 0 ? ACT_HARD_GROUND_KNOCKBACK : ACT_HARD_BACKWARD_GROUND_KB, m->forwardVel > 0 ? MARIO_ANIM_AIR_FORWARD_KB : MARIO_ANIM_BACKWARD_AIR_KB, m->forwardVel);
+        m->forwardVel *= 0.98f;
     }
-    m->forwardVel *= 0.98f;
     return FALSE;
 }
-
-s32 act_hard_forward_air_kb(struct MarioState *m) {
-    u32 landAction;
-    if (m->actionArg != 0) {
-        landAction = ACT_HARD_FORWARD_GROUND_KB;
-    } else {
-        landAction = ACT_HARD_FORWARD_GROUND_KB;
-    }
-
-    if (m->forwardVel <= 0.0f) {
-    if (m->actionArg != 0) {
-        landAction = ACT_HARD_BACKWARD_GROUND_KB;
-    } else {
-        landAction = ACT_HARD_BACKWARD_GROUND_KB;
-    }
-    }
-
-    play_knockback_sound(m);
-
-    common_air_knockback_step(m, landAction, ACT_HARD_FORWARD_AIR_KB, MARIO_ANIM_AIR_FORWARD_KB, m->forwardVel);
-    if (m->forwardVel <= 0.0f) {
-        set_mario_animation(m, MARIO_ANIM_BACKWARD_AIR_KB);
-    }
-
-    m->forwardVel *= 0.98f;
-    return FALSE;
-}
-
 
 s32 act_thrown_backward(struct MarioState *m) {
     s16 pitch;
     u32 landAction;
+    s32 animation;
+    u32 hardFallAction = ACT_HARD_BACKWARD_GROUND_KB; 
     if (m->actionArg != 0) {
-        landAction = ACT_HARD_BACKWARD_AIR_KB;
+        landAction = ACT_HARD_BACKWARD_GROUND_KB;
+        animation = MARIO_ANIM_BACKWARD_AIR_KB;
+        hardFallAction = ACT_HARD_BACKWARD_GROUND_KB;
     } else {
-        landAction = ACT_BACKWARD_AIR_KB;
+        landAction = ACT_GROUND_KNOCKBACK;
+        animation = MARIO_ANIM_BACKWARD_AIR_KB;
+        hardFallAction = ACT_HARD_BACKWARD_GROUND_KB;
     }
-
-    if (m->forwardVel >= 0.0f) {
+    
+    if (m->bIsForward == TRUE) {
     if (m->actionArg != 0) {
-        landAction = ACT_HARD_FORWARD_AIR_KB;
+        landAction = ACT_HARD_GROUND_KNOCKBACK;
+        animation = MARIO_ANIM_AIR_FORWARD_KB;
     } else {
-        landAction = ACT_FORWARD_AIR_KB;
+        landAction = ACT_GROUND_KNOCKBACK;
+        animation = MARIO_ANIM_AIR_FORWARD_KB;
     }
-        set_mario_animation(m, MARIO_ANIM_AIR_FORWARD_KB);
+        hardFallAction = ACT_HARD_GROUND_KNOCKBACK;
     }
 
     play_sound_if_no_flag(m, SOUND_MARIO_WAAAOOOW, MARIO_MARIO_SOUND_PLAYED);
 
-    common_air_knockback_step(m, landAction, ACT_HARD_BACKWARD_AIR_KB, MARIO_ANIM_BACKWARD_AIR_KB, m->forwardVel);
+    common_air_knockback_step(m, landAction, hardFallAction, animation, m->forwardVel);
 
-        if (m->forwardVel >= 0.0f) {
-        set_mario_animation(m, MARIO_ANIM_AIR_FORWARD_KB);
-                pitch = atan2s(m->forwardVel, -m->vel[1]);
-        if (pitch > 0x1800) {
-            pitch = 0x1800;
-        }
-
-        m->marioObj->header.gfx.angle[0] = pitch + 0x1800;
-    }
-
-    if (m->vel[1] <= 0.0f) {
-        if (++(m->actionTimer) == 20) {
-        mario_blow_off_cap(m, -m->forwardVel);
-        }
-    }
-    m->forwardVel *= 0.98f;
-    return FALSE;
-}
-
-s32 act_thrown_forward(struct MarioState *m) {
-    s16 pitch;
-
-    u32 landAction;
-    if (m->actionArg != 0) {
-        landAction = ACT_HARD_FORWARD_AIR_KB;
-    } else {
-        landAction = ACT_FORWARD_AIR_KB;
-    }
-
-    if (m->forwardVel <= 0.0f) {
-    if (m->actionArg != 0) {
-        landAction = ACT_HARD_BACKWARD_AIR_KB;
-    } else {
-        landAction = ACT_BACKWARD_AIR_KB;
-    }
-    }
-
-    play_sound_if_no_flag(m, SOUND_MARIO_WAAAOOOW, MARIO_MARIO_SOUND_PLAYED);
-
-    if (common_air_knockback_step(m, landAction, ACT_HARD_FORWARD_AIR_KB, MARIO_ANIM_AIR_FORWARD_KB, m->forwardVel) == AIR_STEP_NONE) {
+    if (m->bIsForward == TRUE) {
         pitch = atan2s(m->forwardVel, -m->vel[1]);
         if (pitch > 0x1800) {
             pitch = 0x1800;
@@ -1418,20 +1445,10 @@ s32 act_thrown_forward(struct MarioState *m) {
 
         m->marioObj->header.gfx.angle[0] = pitch + 0x1800;
     }
-
-    if (m->forwardVel <= 0.0f) {
-        set_mario_animation(m, MARIO_ANIM_BACKWARD_AIR_KB);
-                pitch = atan2s(m->forwardVel, -m->vel[1]);
-        if (pitch > 0x0000) {
-            pitch = 0x0000;
-        }
-
-        m->marioObj->header.gfx.angle[0] = pitch + 0x0000;
-    }    
-
     m->forwardVel *= 0.98f;
     return FALSE;
 }
+
 
 s32 act_soft_bonk(struct MarioState *m) {
     if (check_wall_kick(m)) {
@@ -1445,7 +1462,7 @@ s32 act_soft_bonk(struct MarioState *m) {
 }
 
 s32 act_getting_blown(struct MarioState *m) {
-    if (m->actionState == ACT_STATE_GETTING_BLOWN_ACCEL_BACKWARDS) {
+        if (m->actionState == ACT_STATE_GETTING_BLOWN_ACCEL_BACKWARDS) {
         if (m->forwardVel > -60.0f) {
             m->forwardVel -= 6.0f;
         } else {
@@ -1453,7 +1470,7 @@ s32 act_getting_blown(struct MarioState *m) {
         }
     } else {
         if (m->forwardVel < -16.0f) {
-            m->forwardVel += 0.98f;
+            m->forwardVel *= 0.98f;
         }
 
         if (m->vel[1] < 0.0f && m->windGravity < 4.0f) {
@@ -1461,28 +1478,30 @@ s32 act_getting_blown(struct MarioState *m) {
         }
     }
 
-#ifndef PREVENT_CAP_LOSS
     if (++(m->actionTimer) == 20) {
-        mario_blow_off_cap(m, -m->forwardVel);
-    }
-#endif
+            mario_blow_off_cap(m, 50.0f);
+        }
 
     mario_set_forward_vel(m, m->forwardVel);
-    set_mario_animation(m, MARIO_ANIM_BACKWARD_AIR_KB);
-
+    m->bIsForward = FALSE;
+    if (gConfig.MovesChange) {
         if (m->forwardVel >= 0.0f) {
-        set_mario_animation(m, MARIO_ANIM_AIR_FORWARD_KB);
+            set_mario_animation(m, MARIO_ANIM_AIR_FORWARD_KB);
+            m->bIsForward = TRUE;
+        } else {
+            set_mario_animation(m, MARIO_ANIM_BACKWARD_AIR_KB);
+            m->bIsForward = FALSE;
+        }
+    } else {
+        set_mario_animation(m, MARIO_ANIM_BACKWARD_AIR_KB);
     }
 
     switch (perform_air_step(m, 0)) {
         case AIR_STEP_LANDED:
-            if (m->forwardVel <= 0.0f) {
-            set_mario_action(m, ACT_HARD_BACKWARD_AIR_KB, 0);
+            if (m->forwardVel > 0.0f) {
+                m->forwardVel = -m->forwardVel;
             }
-            if (m->forwardVel >= 0.0f) {
-            set_mario_action(m, ACT_HARD_FORWARD_AIR_KB, 0);
-            }
-
+            set_mario_action(m, ACT_HARD_GROUND_KNOCKBACK, 0);
             break;
 
         case AIR_STEP_HIT_WALL:
@@ -1501,7 +1520,7 @@ s32 act_getting_blown(struct MarioState *m) {
 
 
     return FALSE;
-}
+    }
 
 s32 act_air_hit_wall(struct MarioState *m) {
     if (m->heldObj != NULL) {
@@ -1510,19 +1529,23 @@ s32 act_air_hit_wall(struct MarioState *m) {
 
     if (++(m->actionTimer) <= 2) {
         if (m->input & INPUT_A_PRESSED) {
+            if (gConfig.MovesChange) {
+                m->particleFlags |= PARTICLE_SPARKLES;
+            }
             m->vel[1] = 52.0f;
             m->faceAngle[1] += 0x8000;
             return set_mario_action(m, ACT_WALL_KICK_AIR, 0);
         }
     } else if (m->forwardVel >= 38.0f) {
         m->wallKickTimer = 5;
-        /*if (m->vel[1] > 0.0f) {
+        if (m->vel[1] > 0.0f) {
             m->vel[1] = 0.0f;
-        }*/
+        }
 
         m->particleFlags |= PARTICLE_VERTICAL_STAR;
         m->forwardVel = -m->forwardVel;
-        return set_mario_action(m, ACT_BACKWARD_AIR_KB, 0);
+        m->bIsForward = FALSE;
+        return set_mario_action(m, ACT_AIR_KNOCKBACK, 0);
     } else {
         m->wallKickTimer = 5;
         if (m->vel[1] > 0.0f) {
@@ -1553,8 +1576,14 @@ s32 act_forward_rollout(struct MarioState *m) {
     switch (perform_air_step(m, 0)) {
         case AIR_STEP_NONE:
             if (m->actionState == 1) {
-                if (set_mario_animation(m, MARIO_ANIM_FORWARD_SPINNING) == 4) {
+                if (m->actionArg == 1) {
+                    if (set_mario_animation(m, MARIO_ANIM_BACKWARD_SPINNING) == 4) {
                     play_sound(SOUND_ACTION_SPIN, m->marioObj->header.gfx.cameraToObject);
+                }
+                } else {
+                    if (set_mario_animation(m, MARIO_ANIM_FORWARD_SPINNING) == 4) {
+                        play_sound(SOUND_ACTION_SPIN, m->marioObj->header.gfx.cameraToObject);
+                    }
                 }
             } else {
                 set_mario_animation(m, MARIO_ANIM_GENERAL_FALL);
@@ -1562,133 +1591,30 @@ s32 act_forward_rollout(struct MarioState *m) {
             break;
 
         case AIR_STEP_LANDED:
-            common_air_action_step(m, ACT_FREEFALL_LAND, ACT_FREEFALL, AIR_STEP_CHECK_LEDGE_GRAB);
-            break;
-
-        case AIR_STEP_HIT_WALL:
-
-            if (m->forwardVel > 16.0f) {
-#if ENABLE_RUMBLE
-                queue_rumble_data(5, 40);
-#endif
-                mario_bonk_reflection(m, FALSE);
-                m->faceAngle[1] += 0x8000;
-
-                if (m->wall != NULL) {
-                    set_mario_action(m, ACT_AIR_HIT_WALL, 0);
-                } else {
-                    if (m->vel[1] > 0.0f) {
-                        m->vel[1] = 0.0f;
-                    }
-
-                    if (m->forwardVel >= 38.0f) {
-                        m->particleFlags |= PARTICLE_VERTICAL_STAR;
-                        m->forwardVel = -m->forwardVel;
-                        set_mario_action(m, ACT_BACKWARD_AIR_KB, 0);
-                    } else {
-                        if (m->forwardVel > 8.0f) {
-                            mario_set_forward_vel(m, -8.0f);
-                        }
-                        return set_mario_action(m, ACT_SOFT_BONK, 0);
-                    }
+            if (gConfig.MovesChange) {
+                if (m->input & INPUT_B_PRESSED) {
+                    m->particleFlags |= PARTICLE_SPARKLES;
+                    return set_mario_action(m, ACT_JUMP_KICK, 0);
                 }
-            } else {
-                mario_set_forward_vel(m, 0.0f);
             }
+            set_mario_action(m, ACT_FREEFALL_LAND_STOP, 0);
+            play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING);
             break;
-
-        case AIR_STEP_GRABBED_LEDGE:
-            set_mario_action(m, ACT_LEDGE_GRAB, 0);
+        case AIR_STEP_HIT_WALL:
+            m->forwardVel = 0.0f;
             break;
-
-        case AIR_STEP_GRABBED_CEILING:
-            set_mario_action(m, ACT_START_HANGING, 0);
-            break;
-
         case AIR_STEP_HIT_LAVA_WALL:
             lava_boost_on_wall(m);
             break;
     }
-
-    if (m->actionState == 1 && is_anim_past_end(m)) {
+    if (m->actionArg == 1) {
+        if (m->actionState == 1 && m->marioObj->header.gfx.animInfo.animFrame == 2) {
         m->actionState = 2;
     }
-    return FALSE;
-}
-
-s32 act_backward_rollout(struct MarioState *m) {
-    s32 animation;
-    if (m->actionState == 0) {
-        m->vel[1] = 30.0f;
-        m->actionState = 1;
-    }
-
-    play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, 0);
-
-    update_air_without_turn(m);
-
-    switch (perform_air_step(m, 0)) {
-        case AIR_STEP_NONE:
-            if (m->actionState == 1) {
-                if (set_mario_animation(m, MARIO_ANIM_BACKWARD_SPINNING) == 4) {
-                    play_sound(SOUND_ACTION_SPIN, m->marioObj->header.gfx.cameraToObject);
-                }
-            } else {
-                set_mario_animation(m, MARIO_ANIM_GENERAL_FALL);
-            }
-            break;
-
-        case AIR_STEP_LANDED:
-            common_air_action_step(m, ACT_FREEFALL_LAND, ACT_FREEFALL, AIR_STEP_CHECK_LEDGE_GRAB);
-            break;
-
-        case AIR_STEP_HIT_WALL:
-
-            if (m->forwardVel > 16.0f) {
-#if ENABLE_RUMBLE
-                queue_rumble_data(5, 40);
-#endif
-                mario_bonk_reflection(m, FALSE);
-                m->faceAngle[1] += 0x8000;
-
-                if (m->wall != NULL) {
-                    set_mario_action(m, ACT_AIR_HIT_WALL, 0);
-                } else {
-                    if (m->vel[1] > 0.0f) {
-                        m->vel[1] = 0.0f;
-                    }
-
-                    if (m->forwardVel >= 38.0f) {
-                        m->particleFlags |= PARTICLE_VERTICAL_STAR;
-                        m->forwardVel = -m->forwardVel;
-                        set_mario_action(m, ACT_BACKWARD_AIR_KB, 0);
-                    } else {
-                        if (m->forwardVel > 8.0f) {
-                            mario_set_forward_vel(m, -8.0f);
-                        }
-                        return set_mario_action(m, ACT_SOFT_BONK, 0);
-                    }
-                }
-            } else {
-                mario_set_forward_vel(m, 0.0f);
-            }
-            break;
-
-        case AIR_STEP_GRABBED_LEDGE:
-            set_mario_action(m, ACT_LEDGE_GRAB, 0);
-            break;
-
-        case AIR_STEP_GRABBED_CEILING:
-            set_mario_action(m, ACT_START_HANGING, 0);
-            break;
-
-        case AIR_STEP_HIT_LAVA_WALL:
-            lava_boost_on_wall(m);
-            break;
-    }
-
-    if (m->actionState == 1 && m->marioObj->header.gfx.animInfo.animFrame == 2) {
-        m->actionState = 2;
+    } else {
+        if (m->actionState == 1 && is_anim_past_end(m)) {
+            m->actionState = 2;
+        }
     }
     return FALSE;
 }
@@ -1708,14 +1634,15 @@ s32 act_butt_slide_air(struct MarioState *m) {
             } else {
                 set_mario_action(m, ACT_BUTT_SLIDE, 0);
             }
-            play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING);
+            play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_BODY_HIT_GROUND);
             break;
 
         case AIR_STEP_HIT_WALL:
             
             mario_bonk_reflection(m, TRUE);
             m->particleFlags |= PARTICLE_VERTICAL_STAR;
-            drop_and_set_mario_action(m, ACT_BACKWARD_AIR_KB, 0);
+            m->bIsForward = FALSE;
+            drop_and_set_mario_action(m, ACT_AIR_KNOCKBACK, 0);
             break;
 
         case AIR_STEP_HIT_LAVA_WALL:
@@ -1746,7 +1673,7 @@ s32 act_hold_butt_slide_air(struct MarioState *m) {
             } else {
                 set_mario_action(m, ACT_HOLD_BUTT_SLIDE, 0);
             }
-            play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING);
+            play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_BODY_HIT_GROUND);
             break;
 
         case AIR_STEP_HIT_WALL:
@@ -1755,7 +1682,7 @@ s32 act_hold_butt_slide_air(struct MarioState *m) {
             mario_drop_held_object(m);
             m->forwardVel = -m->forwardVel;
             m->particleFlags |= PARTICLE_VERTICAL_STAR;
-            set_mario_action(m, ACT_BACKWARD_AIR_KB, 0);
+            set_mario_action(m, ACT_AIR_KNOCKBACK, 0);
             break;
 
         case AIR_STEP_HIT_LAVA_WALL:
@@ -1785,7 +1712,7 @@ s32 act_lava_boost(struct MarioState *m) {
 
     switch (perform_air_step(m, 0)) {
         case AIR_STEP_LANDED:
-            if (m->floor->type == SURFACE_BURNING) {
+            if (IS_SURFACE_BURNING(m->floor)) {
                 m->actionState = ACT_STATE_LAVA_BOOST_HIT_LAVA;
                 if (!(m->flags & MARIO_METAL_CAP)) {
                     m->hurtCounter += (m->flags & MARIO_CAP_ON_HEAD) ? 12 : 18;
@@ -1866,13 +1793,14 @@ s32 act_slide_kick(struct MarioState *m) {
             } else {
                 set_mario_action(m, ACT_SLIDE_KICK_SLIDE, 0);
             }
-            play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING);
+            play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_BODY_HIT_GROUND);
             break;
 
         case AIR_STEP_HIT_WALL:
             mario_bonk_reflection(m, TRUE);
             m->particleFlags |= PARTICLE_VERTICAL_STAR;
-            drop_and_set_mario_action(m, ACT_BACKWARD_AIR_KB, 0);
+            m->bIsForward = FALSE;
+            drop_and_set_mario_action(m, ACT_AIR_KNOCKBACK, 0);
             break;
 
         case AIR_STEP_HIT_LAVA_WALL:
@@ -1917,6 +1845,33 @@ s32 act_jump_kick(struct MarioState *m) {
 }
 
 s32 act_shot_from_cannon(struct MarioState *m) {
+    set_camera_mode(m->area->camera, m->area->camera->defMode, 1);
+    if (gConfig.cheats !=0x00) {
+    s16 pitch;
+
+    play_sound_if_no_flag(m, SOUND_MARIO_WAAAOOOW, MARIO_MARIO_SOUND_PLAYED);
+
+    common_air_knockback_step(m, ACT_HARD_GROUND_KNOCKBACK, ACT_HARD_BACKWARD_AIR_KB, MARIO_ANIM_BACKWARD_AIR_KB, m->forwardVel);
+
+        if (m->forwardVel >= 0.0f) {
+        set_mario_animation(m, MARIO_ANIM_AIR_FORWARD_KB);
+                pitch = atan2s(m->forwardVel, -m->vel[1]);
+        if (pitch > 0x1800) {
+            pitch = 0x1800;
+        }
+
+        m->marioObj->header.gfx.angle[0] = pitch + 0x1800;
+    }
+    if (gConfig.cheats != 0x00) {
+        if (m->vel[1] <= 0.0f) {
+            if (++(m->actionTimer) == 20) {
+            mario_blow_off_cap(m, -m->forwardVel);
+            }
+        }
+    }
+    return FALSE;
+}
+
     if (m->area->camera->mode != CAMERA_MODE_BEHIND_MARIO) {
         m->statusForCamera->cameraEvent = CAM_EVENT_SHOT_FROM_CANNON;
     }
@@ -1942,11 +1897,7 @@ s32 act_shot_from_cannon(struct MarioState *m) {
             break;
 
         case AIR_STEP_HIT_WALL:
-            mario_bonk_reflection(m, TRUE);
-            mario_set_forward_vel(m, m->forwardVel);
-            m->particleFlags |= PARTICLE_VERTICAL_STAR;
-            drop_and_set_mario_action(m, ACT_BACKWARD_AIR_KB, 0);
-            set_camera_mode(m->area->camera, m->area->camera->defMode, 1);
+            mario_bonk_reflection(m, FALSE);
             break;
 
         case AIR_STEP_HIT_LAVA_WALL:
@@ -2061,7 +2012,8 @@ s32 act_flying(struct MarioState *m) {
                            m->marioObj->header.gfx.cameraToObject);
 
                 m->particleFlags |= PARTICLE_VERTICAL_STAR;
-                set_mario_action(m, ACT_BACKWARD_AIR_KB, 0);
+                m->bIsForward = FALSE;
+                set_mario_action(m, ACT_AIR_KNOCKBACK, 0);
                 set_camera_mode(m->area->camera, m->area->camera->defMode, 1);
             } else {
                 if (m->actionTimer++ == 0) {
@@ -2305,78 +2257,43 @@ s32 set_thrown_backward_action_arg(struct MarioState *m) {
     return set_mario_action(m, ACT_THROWN_BACKWARD, 1);
 }
 s32 act_twirl_yaw(struct MarioState *m) {
-    s16 startTwirlYaw = m->twirlYaw;
-    s16 yawVelTarget;
-    if (++(m->actionTimer) == 40) {
-        yawVelTarget = 0x2900;
-    }
-    if (++(m->actionTimer) == 40) {
-        yawVelTarget = 0x0800;
-        if (m->angleVel[1] > 0) {
-        m->angleVel[1] -= 0x400;
-        if (m->angleVel[1] < 0) {
-            m->angleVel[1] = 0;
+        if (++(m->actionTimer) == 37) {
+            return set_mario_action(m, ACT_STEEP_JUMP, 1);
+            m->faceAngle[0] = 0;
         }
+        mario_set_forward_vel(m, 0.98f * m->forwardVel);
 
-        m->twirlYaw += m->angleVel[1];
-    }
-        return set_mario_action(m, ACT_FALLING, 0);
-    }
+        set_mario_animation(m, MARIO_ANIM_TWIRL_JUMP);
+        play_flip_sounds(m, 6, 10, 15);
+        update_lava_boost_or_twirling(m);
 
-    m->twirlYaw += m->angleVel[1];
-    m->angleVel[1] = approach_s32_symmetric(m->angleVel[1], yawVelTarget, 0x200);
+        switch (perform_air_step(m, AIR_STEP_CHECK_LEDGE_GRAB)) {
 
-    set_mario_animation(m, m->actionArg == 0 ? MARIO_ANIM_START_TWIRL : MARIO_ANIM_TWIRL);
-    if (is_anim_past_end(m)) {
-        m->actionArg = 1;
-    }
+            case AIR_STEP_LANDED:
+                if (!check_fall_damage_or_get_stuck(m, ACT_HARD_BACKWARD_GROUND_KB)) {
+                    m->faceAngle[0] = 0;
+                    set_mario_action(m, m->forwardVel < 0.0f ? ACT_BEGIN_SLIDING : ACT_FREEFALL_LAND, 0);
+                }
+                break;
 
-    if (startTwirlYaw > m->twirlYaw) {
-        play_sound(SOUND_ACTION_TWIRL, m->marioObj->header.gfx.cameraToObject);
-    }
+            case AIR_STEP_HIT_WALL:
+                mario_set_forward_vel(m, 0.0f);
+                break;
 
-    update_lava_boost_or_twirling(m);
+            case AIR_STEP_GRABBED_LEDGE:
+                set_mario_animation(m, MARIO_ANIM_IDLE_ON_LEDGE);
+                drop_and_set_mario_action(m, ACT_LEDGE_GRAB, 0);
+                break;
 
-    common_air_action_step(m, ACT_FREEFALL_LAND, MARIO_ANIM_TWIRL, MARIO_ANIM_TWIRL);
-    
-    m->marioObj->header.gfx.angle[1] += m->twirlYaw;
-    
-#if ENABLE_RUMBLE
-    reset_rumble_timers_slip();
-#endif
-    return FALSE;
-}
-
-s32 act_fall(struct MarioState *m) {
-    s16 startTwirlYaw = m->twirlYaw;
-    s32 animation;
-
-    if (m->input & INPUT_B_PRESSED) {
-        return set_mario_action(m, ACT_DIVE, 0);
-    }
-
-    switch (m->actionArg) {
-        case 0:
-            animation = MARIO_ANIM_GENERAL_FALL;
-            break;
-        case 1:
-            animation = MARIO_ANIM_FALL_FROM_SLIDE;
-            break;
-        case 2:
-            animation = MARIO_ANIM_FALL_FROM_SLIDE_KICK;
-            break;
-    }
-if (is_anim_at_end(m) && m->angleVel[1] == 0) {
-        m->faceAngle[1] += m->twirlYaw;
-    }
-    
-    common_air_action_step(m, ACT_FREEFALL_LAND, animation, AIR_STEP_CHECK_LEDGE_GRAB);
-    return FALSE;
-}
-
-s32 do_knockback_from_shot_from_cannon(struct MarioState *m) {
-    m->forwardVel = -m->forwardVel;
-    return set_mario_action(m, ACT_BACKWARD_AIR_KB, 0);
+            case AIR_STEP_HIT_LAVA_WALL:
+                lava_boost_on_wall(m);
+                break;
+        }
+        
+    #if ENABLE_RUMBLE
+        reset_rumble_timers_slip();
+    #endif
+        return FALSE;
 }
 
 s32 check_common_airborne_cancels(struct MarioState *m) {
@@ -2412,7 +2329,7 @@ s32 mario_execute_airborne_action(struct MarioState *m) {
     switch (m->action) {
         case ACT_JUMP:                 cancel = act_jump(m);                 break;
         case ACT_DOUBLE_JUMP:          cancel = act_double_jump(m);          break;
-        case ACT_FREEFALL:             cancel = act_freefall(m);             break;
+        case ACT_FREEFALL:             cancel = gConfig.cheats !=0x00 ? act_getting_blown(m) : act_freefall(m);             break;
         case ACT_HOLD_JUMP:            cancel = act_hold_jump(m);            break;
         case ACT_HOLD_FREEFALL:        cancel = act_hold_freefall(m);        break;
         case ACT_SIDE_FLIP:            cancel = act_side_flip(m);            break;
@@ -2424,15 +2341,13 @@ s32 mario_execute_airborne_action(struct MarioState *m) {
         case ACT_BURNING_JUMP:         cancel = act_burning_jump(m);         break;
         case ACT_BURNING_FALL:         cancel = act_burning_fall(m);         break;
         case ACT_TRIPLE_JUMP:          cancel = act_triple_jump(m);          break;
-        case ACT_BACKFLIP:             cancel = act_backflip(m);             break;
-        case ACT_LONG_JUMP:            cancel = act_long_jump(m);            break;
+        case ACT_BACKFLIP:             cancel = gConfig.cheats !=0x00 ? act_hard_backward_air_kb(m) : act_backflip(m);             break;
+        case ACT_LONG_JUMP:            cancel = gConfig.cheats ? act_air_knockback(m) : act_long_jump(m); break;
         case ACT_RIDING_SHELL_JUMP:
         case ACT_RIDING_SHELL_FALL:    cancel = act_riding_shell_air(m);     break;
         case ACT_DIVE:                 cancel = act_dive(m);                 break;
         case ACT_AIR_THROW:            cancel = act_air_throw(m);            break;
-        case ACT_BACKWARD_AIR_KB:      cancel = act_backward_air_kb(m);      break;
-        case ACT_FORWARD_AIR_KB:       cancel = act_forward_air_kb(m);       break;
-        case ACT_HARD_FORWARD_AIR_KB:  cancel = act_hard_forward_air_kb(m);  break;
+        case ACT_AIR_KNOCKBACK:      cancel = act_air_knockback(m);      break;
         case ACT_HARD_BACKWARD_AIR_KB: cancel = act_hard_backward_air_kb(m); break;
         case ACT_SOFT_BONK:            cancel = act_soft_bonk(m);            break;
         case ACT_AIR_HIT_WALL:         cancel = act_air_hit_wall(m);         break;
@@ -2442,11 +2357,9 @@ s32 mario_execute_airborne_action(struct MarioState *m) {
         case ACT_HOLD_BUTT_SLIDE_AIR:  cancel = act_hold_butt_slide_air(m);  break;
         case ACT_LAVA_BOOST:           cancel = act_lava_boost(m);           break;
         case ACT_GETTING_BLOWN:        cancel = act_getting_blown(m);        break;
-        case ACT_BACKWARD_ROLLOUT:     cancel = act_backward_rollout(m);     break;
         case ACT_CRAZY_BOX_BOUNCE:     cancel = act_crazy_box_bounce(m);     break;
         case ACT_SPECIAL_TRIPLE_JUMP:  cancel = act_special_triple_jump(m);  break;
         case ACT_GROUND_POUND:         cancel = act_ground_pound(m);         break;
-        case ACT_THROWN_FORWARD:       cancel = act_thrown_forward(m);       break;
         case ACT_THROWN_BACKWARD:      cancel = act_thrown_backward(m);      break;
         case ACT_FLYING_TRIPLE_JUMP:   cancel = act_flying_triple_jump(m);   break;
         case ACT_SLIDE_KICK:           cancel = act_slide_kick(m);           break;
@@ -2455,10 +2368,7 @@ s32 mario_execute_airborne_action(struct MarioState *m) {
         case ACT_RIDING_HOOT:          cancel = act_riding_hoot(m);          break;
         case ACT_TOP_OF_POLE_JUMP:     cancel = act_top_of_pole_jump(m);     break;
         case ACT_VERTICAL_WIND:        cancel = act_vertical_wind(m);        break;
-        case ACT_THROWN_BACKWARD1:     cancel = set_thrown_backward_action_arg(m); break;
         case ACT_TWIRL_YAW:            cancel = act_twirl_yaw(m);            break;
-        case ACT_FALLING:              cancel = act_fall(m);                 break;
-        case ACT_BACKWARD_CANNON:       cancel = do_knockback_from_shot_from_cannon(m); break;
     }
     /* clang-format on */
 

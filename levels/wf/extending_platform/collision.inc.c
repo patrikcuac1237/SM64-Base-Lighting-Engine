@@ -10,7 +10,7 @@ const Collision wf_seg7_collision_platform[] = {
     COL_VERTEX(215, 0, 205),
     COL_VERTEX(215, 102, 205),
     COL_VERTEX(215, 0, -204),
-    COL_TRI_INIT(SURFACE_DEFAULT, 10),
+    COL_TRI_INIT(NEWTERRAIN(0, 0, 0, 0), 10),
     COL_TRI(0, 1, 2),
     COL_TRI(0, 2, 3),
     COL_TRI(4, 0, 3),

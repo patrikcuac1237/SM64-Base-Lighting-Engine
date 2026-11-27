@@ -1,0 +1,13 @@
+extern const GeoLayout pyramid_top_geo[];
+extern u8 pyramid_top_bob_textures_00800_rgba16_ci8[];
+extern u8 pyramid_top_bob_textures_00800_rgba16_pal_rgba16[];
+extern u8 pyramid_top_bob_textures_0A800_rgba16_rgba16[];
+extern Vtx pyramid_top_ssl_geo_000618_mesh_layer_1_vtx_0[12];
+extern Gfx pyramid_top_ssl_geo_000618_mesh_layer_1_tri_0[];
+extern Vtx pyramid_top_ssl_geo_000618_mesh_layer_1_vtx_1[4];
+extern Gfx pyramid_top_ssl_geo_000618_mesh_layer_1_tri_1[];
+extern Gfx mat_pyramid_top_f3dlite_material_001[];
+extern Gfx mat_revert_pyramid_top_f3dlite_material_001[];
+extern Gfx mat_pyramid_top_f3dlite_material_002[];
+extern Gfx mat_revert_pyramid_top_f3dlite_material_002[];
+extern Gfx pyramid_top_ssl_geo_000618_mesh_layer_1_with_revert[];

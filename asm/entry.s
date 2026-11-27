@@ -16,11 +16,11 @@ entry_point:
     addiu $t0, %lo(_mainSegmentBssStart)
     addiu $t1, %lo(_mainSegmentBssSize)
 .clear_bytes:
-    addi  $t1, $t1, -8 # Subtract 8 bytes from the amount remaining
-    sw    $zero, ($t0)  # Clear 4 bytes
-    sw    $zero, 4($t0) # Clear the next 4 bytes
-    bnez  $t1, .clear_bytes # Continue clearing until clear_bytes is 0
-     addi  $t0, $t0, 8 # Increment the address of bytes to clear
+    addi  $t1, $t1, -16   # Restamos 16 bytes ahora
+    sd    $zero, ($t0)    # Limpia 8 bytes de un golpe
+    sd    $zero, 8($t0)   # Limpia otros 8 bytes
+    bnez  $t1, .clear_bytes 
+     addi  $t0, $t0, 16    # Incrementamos 16
     lui   $t2, %hi(main_func) # Get the high half of the init function address
     lui   $sp, %hi(gIdleThreadStack) # Set the high half of the stack pointer to that of the idle thread stack
     addiu $t2, %lo(main_func) # Get the low half of the init function address

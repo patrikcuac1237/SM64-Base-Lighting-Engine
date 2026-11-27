@@ -1,0 +1,16 @@
+extern u64 pyramid_elevator_bob_textures_0A800_rgba16_rgba16[];
+extern u64 pyramid_elevator_bob_textures_01000_rgba16_rgba16[];
+extern u64 pyramid_elevator_bob_textures_08800_rgba16_rgba16[];
+extern Vtx pyramid_elevator_ssl_seg7_dl_070233A8_mesh_vtx_0[34];
+extern Gfx pyramid_elevator_ssl_seg7_dl_070233A8_mesh_tri_0[];
+extern Vtx pyramid_elevator_ssl_seg7_dl_070233A8_mesh_vtx_1[96];
+extern Gfx pyramid_elevator_ssl_seg7_dl_070233A8_mesh_tri_1[];
+extern Vtx pyramid_elevator_ssl_seg7_dl_070233A8_mesh_vtx_2[32];
+extern Gfx pyramid_elevator_ssl_seg7_dl_070233A8_mesh_tri_2[];
+extern Gfx mat_pyramid_elevator_f3dlite_material_001[];
+extern Gfx mat_revert_pyramid_elevator_f3dlite_material_001[];
+extern Gfx mat_pyramid_elevator_f3dlite_material_002[];
+extern Gfx mat_revert_pyramid_elevator_f3dlite_material_002[];
+extern Gfx mat_pyramid_elevator_f3dlite_material_003[];
+extern Gfx mat_revert_pyramid_elevator_f3dlite_material_003[];
+extern Gfx pyramid_elevator_ssl_seg7_dl_070233A8_mesh[];

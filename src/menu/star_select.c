@@ -97,7 +97,7 @@ void render_100_coin_star(u8 stars) {
     #ifdef WIDE
         if (gConfig.widescreen) {
             sStarSelectorModels[6] = spawn_object_abs_with_rot(o, 0, MODEL_STAR,
-                                                            bhvActSelectorStarType, (370 * 4.0f) / 3, 24, -300, 0, 0, 0);
+                                                            bhvActSelectorStarType, 370, 24, -300, 0, 0, 0);
         } else {
             sStarSelectorModels[6] = spawn_object_abs_with_rot(o, 0, MODEL_STAR,
                                                             bhvActSelectorStarType, 370, 24, -300, 0, 0, 0);
@@ -153,19 +153,13 @@ void bhv_act_selector_init(void) {
         sInitSelectedActNum = sVisibleStars;
     }
 
-    //! Useless, since sInitSelectedActNum has already been set in this
-    //! scenario by the code that shows the next uncollected star.
-    if (sObtainedStars == 0) {
-        sInitSelectedActNum = 1;
-    }
-
     // Render star selector objects
 #ifdef WIDE
     if (gConfig.widescreen) {
         for (i = 0; i < sVisibleStars; i++) {
             sStarSelectorModels[i] =
                 spawn_object_abs_with_rot(o, 0, selectorModelIDs[i], bhvActSelectorStarType,
-                                        ((75 + (sVisibleStars * -75) + (i * 152)) * 4.0f) / 3, 248, -300, 0, 0, 0);
+                                        ((115 + (sVisibleStars * -75) + (i * 127)) * 4.0f) / 3, 248, -300, 0, 0, 0);
             sStarSelectorModels[i]->oStarSelectorSize = 1.0f;
         }
     } else {
@@ -269,21 +263,18 @@ void print_course_number(void) {
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
 
     int_to_str(gCurrCourseNum, courseNum);
-
-    if (gCurrCourseNum < 10) { // 1 digit number
-        print_hud_lut_string(HUD_LUT_GLOBAL, 152, 158, courseNum);
-    } else { // 2 digit number
-        print_hud_lut_string(HUD_LUT_GLOBAL, 143, 158, courseNum);
-    }
+    print_hud_lut_string(HUD_LUT_GLOBAL, gConfig.widescreen ? (gCurrCourseNum > 10 ? 131 : 135) : (gCurrCourseNum > 10 ? 143 : 152), 158, courseNum);
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 }
 
 #define ACT_NAME_X 163
-
+extern u8 gDialogCharWidths[];
+extern Gfx light_skybox_Cube_mesh_layer_0_with_revert[];
 /**
  * Print act selector strings, some with special checks.
  */
+//#include "levels/menu/geo.c"
 void print_act_selector_strings(void) {
 #if MULTILANG
     unsigned char myScore[][10] = { {TEXT_MYSCORE}, {TEXT_MY_SCORE_FR}, {TEXT_MY_SCORE_DE} };
@@ -334,7 +325,7 @@ void print_act_selector_strings(void) {
     // Print the coin highscore.
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
-    print_hud_my_score_coins(1, gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(gCurrCourseNum), 155, 106);
+    print_hud_my_score_coins(1, gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(gCurrCourseNum), gConfig.widescreen ? 147 : 155, 106);
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
@@ -372,7 +363,24 @@ void print_act_selector_strings(void) {
 #if MULTILANG
         print_menu_generic_string(get_str_x_pos_from_center(ACT_NAME_X, selectedActName, 8.0f), 81, selectedActName);
 #else
-        actNameX = get_str_x_pos_from_center(ACT_NAME_X, selectedActName, 8.0f);
+        s32 actWidth = 0;
+        u8 *ptr = selectedActName;
+
+        while (*ptr != DIALOG_CHAR_TERMINATOR) {
+            if (*ptr == DIALOG_CHAR_SPACE) {
+                actWidth += gConfig.widescreen ? 2 : 4;
+            } else {
+                if (gConfig.widescreen) {
+                    actWidth += (s32)(gDialogCharWidths[*ptr] / 1.25f);
+                } else {
+                    actWidth += gDialogCharWidths[*ptr];
+                }
+            }
+            ptr++;
+        }
+
+        actNameX = 160 - (actWidth / 2);
+
         print_menu_generic_string(actNameX, 81, selectedActName);
 #endif
     }
@@ -383,7 +391,12 @@ void print_act_selector_strings(void) {
 #if MULTILANG
         print_menu_generic_string(143 - sVisibleStars * 15 + i * 30, 38, starNumbers);
 #else
-        print_menu_generic_string(139 - sVisibleStars * 17 + i * 34, 38, starNumbers);
+        if (gConfig.widescreen)
+        {
+            print_menu_generic_string(157 - sVisibleStars * 17 + i * 28.25, 38, starNumbers);
+        } else {
+            print_menu_generic_string(139 - sVisibleStars * 17 + i * 34, 38, starNumbers);
+        }
 #endif
     }
 

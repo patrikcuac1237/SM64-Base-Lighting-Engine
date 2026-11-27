@@ -15,17 +15,20 @@ f32 floating_platform_find_home_y(void) {
 }
 
 void floating_platform_act_move_to_home(void) {
+    // Calculamos la posición relativa de Mario respecto a la plataforma rotada
+    // sp6 en el original
+    f32 relX = (gMarioObject->header.gfx.pos[0] - o->oPosX) * coss(-o->oMoveAngleYaw) 
+               + (gMarioObject->header.gfx.pos[2] - o->oPosZ) * sins(-o->oMoveAngleYaw);
+    // sp4 en el original
+    f32 relZ = (gMarioObject->header.gfx.pos[2] - o->oPosZ) * coss(-o->oMoveAngleYaw) 
+               - (gMarioObject->header.gfx.pos[0] - o->oPosX) * sins(-o->oMoveAngleYaw);
+
     if (gMarioObject->platform == o) {
-        f32 dx = gMarioObject->header.gfx.pos[0] - o->oPosX;
-        f32 dz = gMarioObject->header.gfx.pos[2] - o->oPosZ;
-        f32 cy = coss(-o->oMoveAngleYaw);
-        f32 sy = sins(o->oMoveAngleYaw);
-        o->oFaceAnglePitch = ((dz * cy) + (dx * sy)) * 0.5;
-        o->oFaceAngleRoll = -((dx * cy) + (dz * sy)) * 0.5;
-        o->oVelY -= 10.0f;
-        if (o->oVelY < 0.0f) {
-            o->oVelY = 0.0f;
-        }
+        o->oFaceAnglePitch = relZ * 2;
+        o->oFaceAngleRoll = -relX * 2;
+
+        o->oVelY -= 1.0f;
+        if (o->oVelY < 0.0f) o->oVelY = 0.0f;
 
         o->oFloatingPlatformMarioWeightWobbleOffset += o->oVelY;
         if (o->oFloatingPlatformMarioWeightWobbleOffset > 90.0f) {
@@ -35,7 +38,6 @@ void floating_platform_act_move_to_home(void) {
         o->oFaceAnglePitch /= 2;
         o->oFaceAngleRoll /= 2;
         o->oFloatingPlatformMarioWeightWobbleOffset -= 5.0f;
-
         o->oVelY = 10.0f;
 
         if (o->oFloatingPlatformMarioWeightWobbleOffset < 0.0f) {
@@ -43,11 +45,11 @@ void floating_platform_act_move_to_home(void) {
         }
     }
 
-    o->oPosY = o->oHomeY - 64.0f - o->oFloatingPlatformMarioWeightWobbleOffset
+    // Aplicar la oscilación de la superficie del agua y el peso de Mario
+    o->oPosY = o->oHomeY - 64.0f - o->oFloatingPlatformMarioWeightWobbleOffset 
                + sins(o->oFloatingPlatformWaterSurfaceWobbleOffset * 0x800) * 10.0f;
 
     o->oFloatingPlatformWaterSurfaceWobbleOffset++;
-
     if (o->oFloatingPlatformWaterSurfaceWobbleOffset == 32) {
         o->oFloatingPlatformWaterSurfaceWobbleOffset = 0;
     }
@@ -56,10 +58,13 @@ void floating_platform_act_move_to_home(void) {
 void bhv_floating_platform_loop(void) {
     o->oHomeY = floating_platform_find_home_y();
 
-    // o->oAction = o->oFloatingPlatformIsOnFloor;
-    if (o->oFloatingPlatformIsOnFloor) {
-        o->oPosY = o->oHomeY;
-    } else {
+    // Importante: Si NO está en el suelo (F4 == 0), se mueve.
+    if (o->oFloatingPlatformIsOnFloor == FALSE) {
         floating_platform_act_move_to_home();
+    } else {
+        o->oPosY = o->oHomeY;
+        // Resetear inclinación si toca el suelo
+        o->oFaceAnglePitch = 0;
+        o->oFaceAngleRoll = 0;
     }
 }

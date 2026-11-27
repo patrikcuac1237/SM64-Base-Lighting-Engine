@@ -45,7 +45,7 @@ void bhv_wall_tiny_star_particle_loop(void) {
     }
 
     cur_obj_move_using_fvel_and_gravity();
-    o->oAnimState = 4;
+    o->oAnimState = 3;
     cur_obj_scale(o->oCollisionParticleScale);
     o->oCollisionParticleScale -= 0.015f;
 }
@@ -59,6 +59,7 @@ void bhv_tiny_star_particles_init(void) {
         particle->oMoveAngleYaw = gMarioObject->oMoveAngleYaw + sTinyStarMovementParams[2 * i] + 0x8000;
         particle->oVelY = sins(sTinyStarMovementParams[2 * i + 1]) * 25.0f;
         particle->oForwardVel = coss(sTinyStarMovementParams[2 * i + 1]) * 25.0f;
+        particle->header.gfx.angle[1] += 5;
     }
 }
 
@@ -71,14 +72,14 @@ void bhv_pound_tiny_star_particle_loop(void) {
     }
 
     cur_obj_move_using_fvel_and_gravity();
-    o->oAnimState = 4;
+    o->oAnimState = 3;
     cur_obj_scale(o->oCollisionParticleScale);
     o->oCollisionParticleScale -= 0.015f;
 }
 
 void bhv_pound_tiny_star_particle_init(void) {
     s32 i;
-    s32 amt = 8;
+    s32 amt = 5;
 
     struct Object *particle;
     for (i = 0; i < amt; i++) {

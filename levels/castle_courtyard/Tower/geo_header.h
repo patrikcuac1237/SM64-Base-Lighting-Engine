@@ -1,0 +1,15 @@
+extern const GeoLayout castle_courtyard_tower_geo[];
+extern u8 Tower_castle_grounds_textures_07800_rgba16_ci8[];
+extern u8 Tower_castle_grounds_textures_07800_rgba16_ci8_pal_rgba16[];
+extern u8 Tower_castle_grounds_textures_01000_rgba16_ci8[];
+extern u8 Tower_castle_grounds_textures_01000_rgba16_ci8_pal_rgba16[];
+extern Vtx Tower_000_displaylist_mesh_layer_1_vtx_0[44];
+extern Gfx Tower_000_displaylist_mesh_layer_1_tri_0[];
+extern Vtx Tower_000_displaylist_mesh_layer_1_vtx_1[32];
+extern Gfx Tower_000_displaylist_mesh_layer_1_tri_1[];
+extern Gfx mat_Tower__1[];
+extern Gfx mat_revert_Tower__1[];
+extern Gfx mat_Tower__0[];
+extern Gfx mat_revert_Tower__0[];
+extern Gfx Tower_000_displaylist_mesh_layer_1[];
+extern Gfx Tower_material_revert_render_settings[];

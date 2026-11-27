@@ -8,7 +8,7 @@ const Collision wf_seg7_collision_sliding_brick_platform[] = {
     COL_VERTEX(256, -50, 256),
     COL_VERTEX(-255, 0, -255),
     COL_VERTEX(-255, 0, 256),
-    COL_TRI_INIT(SURFACE_DEFAULT, 4),
+    COL_TRI_INIT(NEWTERRAIN(3, 0, 0, 0), 4),
     COL_TRI(0, 1, 2),
     COL_TRI(0, 3, 1),
     COL_TRI(0, 4, 5),

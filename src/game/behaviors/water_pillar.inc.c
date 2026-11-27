@@ -1,5 +1,7 @@
 // water_pillar.inc.c
 
+u32 IsWaterDrained = FALSE;
+u32 IsWaterDraining = FALSE;
 void water_level_pillar_undrained(void) {
     struct Object *otherWaterPillar;
 
@@ -42,14 +44,16 @@ void water_level_pillar_undrained(void) {
         case 4:
             cur_obj_play_sound_1(SOUND_ENV_WATER_DRAIN);
             if (o->oTimer < 300) {
-                gEnvironmentLevels[2] =
-                    (s32) approach_f32_symmetric(gEnvironmentLevels[2], -2450.0f, 5.0f);
-                gEnvironmentLevels[0] =
-                    (s32) approach_f32_symmetric(gEnvironmentLevels[0], -2450.0f, 5.0f);
+                gEnvironmentLevels[2] = (s32) approach_f32_symmetric(gEnvironmentLevels[2], -2450.0f, 5.0f);
+                gEnvironmentLevels[0] = (s32) approach_f32_symmetric(gEnvironmentLevels[0], -2450.0f, 5.0f);
+                IsWaterDraining = TRUE;
+                IsWaterDrained = FALSE;
 #if ENABLE_RUMBLE
                 reset_rumble_timers_vibrate(2);
 #endif
             } else {
+                IsWaterDraining = FALSE;
+                IsWaterDrained = TRUE;
                 o->oAction++;
             }
             break;
@@ -64,6 +68,8 @@ void water_level_pillar_drained(void) {
         o->oPosY -= 80.0f;
         gEnvironmentLevels[2] = -2450;
         gEnvironmentLevels[0] = -2450;
+        IsWaterDraining = FALSE;
+        IsWaterDrained = TRUE;
     }
 }
 
@@ -85,4 +91,18 @@ void bhv_water_level_pillar_loop(void) {
     }
     gEnvironmentRegions[18] = gEnvironmentLevels[2];
     gEnvironmentRegions[6] = gEnvironmentLevels[0];
+}
+
+
+void bhv_water_level_castle_inside() {
+    if (IsWaterDraining == TRUE && IsWaterDrained == FALSE) {
+        if (o->header.gfx.pos[1] >= -2450) {
+            o->header.gfx.pos[1] = o->header.gfx.pos[1] - 5.0f;
+        }
+    } else if (IsWaterDraining == FALSE && IsWaterDrained == TRUE) {
+        o->header.gfx.pos[1] = -2450;
+    }
+    if (save_file_get_flags() & SAVE_FLAG_MOAT_DRAINED) {
+        o->oPosY = -2450;
+    }
 }

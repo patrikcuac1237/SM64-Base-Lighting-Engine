@@ -20,4 +20,10 @@ extern const Collision vcutm_seg7_collision_0700AC44[];
 // script
 extern const LevelScript level_vcutm_entry[];
 
+#include "levels/vcutm/vcutm_level/geo_header.h"
+
+#include "levels/vcutm/seesaw/geo_header.h"
+
+#include "levels/vcutm/level_death_floor/geo_header.h"
+
 #endif

@@ -27,6 +27,8 @@
 #include "level_table.h"
 #include "config.h"
 #include "puppyprint.h"
+#include "config.h"
+#include "main.h"
 
 #define CBUTTON_MASK (U_CBUTTONS | D_CBUTTONS | L_CBUTTONS | R_CBUTTONS)
 
@@ -532,44 +534,36 @@ void set_camera_shake_from_hit(s16 shake) {
 /**
  * Start a shake from the environment
  */
+
+// Definimos el array con 6 columnas para cubrir todas las posibilidades
+const s16 shakeValues[][6] = {
+//  {PitchMag, PitchFreq, PitchDecay,  Yaw/RollMag, Yaw/RollFreq, Yaw/RollDecay}
+    [SHAKE_ENV_EXPLOSION]            = {0x60,  0x8,  0x4000, 0,      0,    0},
+    [SHAKE_ENV_BOWSER_THROW_BOUNCE]  = {0xC0,  0x8,  0x4000, 0,      0,    0},
+    [SHAKE_ENV_BOWSER_JUMP]          = {0x100, 0x8,  0x3000, 0,      0,    0},
+    [SHAKE_ENV_UNUSED_6]             = {0,     0,    0,      0x80,   0x10, 0x3000}, // Es ROLL
+    [SHAKE_ENV_UNUSED_7]             = {0x20,  0x8,  0x8000, 0,      0,    0},
+    [SHAKE_ENV_PYRAMID_EXPLODE]      = {0x40,  0x8,  0x8000, 0,      0,    0},
+    [SHAKE_ENV_JRB_SHIP_DRAIN]       = {0x20,  0x8,  0x8000, 0x400,  0x10, 0x100},  // Pitch + Roll
+    [SHAKE_ENV_FALLING_BITS_PLAT]    = {0x40,  0x2,  0x8000, 0,      0,    0},
+    [SHAKE_ENV_UNUSED_5]             = {0,     0,    0,      -0x200, 0x80, 0x200}, // Es YAW
+};
+
 void set_environmental_camera_shake(s16 shake) {
-    switch (shake) {
-        case SHAKE_ENV_EXPLOSION:
-            set_camera_pitch_shake(0x60, 0x8, 0x4000);
-            break;
+    // 1. Aplicar Pitch si hay valores definidos
+    if (shakeValues[shake][0] || shakeValues[shake][1]) {
+        set_camera_pitch_shake(shakeValues[shake][0], shakeValues[shake][1], shakeValues[shake][2]);
+    }
 
-        case SHAKE_ENV_BOWSER_THROW_BOUNCE:
-            set_camera_pitch_shake(0xC0, 0x8, 0x4000);
-            break;
-
-        case SHAKE_ENV_BOWSER_JUMP:
-            set_camera_pitch_shake(0x100, 0x8, 0x3000);
-            break;
-
-        case SHAKE_ENV_UNUSED_6:
-            set_camera_roll_shake(0x80, 0x10, 0x3000);
-            break;
-
-        case SHAKE_ENV_UNUSED_7:
-            set_camera_pitch_shake(0x20, 0x8, 0x8000);
-            break;
-
-        case SHAKE_ENV_PYRAMID_EXPLODE:
-            set_camera_pitch_shake(0x40, 0x8, 0x8000);
-            break;
-
-        case SHAKE_ENV_JRB_SHIP_DRAIN:
-            set_camera_pitch_shake(0x20, 0x8, 0x8000);
-            set_camera_roll_shake(0x400, 0x10, 0x100);
-            break;
-
-        case SHAKE_ENV_FALLING_BITS_PLAT:
-            set_camera_pitch_shake(0x40, 0x2, 0x8000);
-            break;
-
-        case SHAKE_ENV_UNUSED_5:
-            set_camera_yaw_shake(-0x200, 0x80, 0x200);
-            break;
+    // 2. Aplicar el segundo efecto (Yaw o Roll)
+    if (shakeValues[shake][3] || shakeValues[shake][4]) {
+        // NOTA: JRB_SHIP_DRAIN y UNUSED_6 usan ROLL. UNUSED_5 usa YAW.
+        // Si quieres que sea exacto al original, necesitas diferenciar:
+        if (shake == SHAKE_ENV_UNUSED_5) {
+            set_camera_yaw_shake(shakeValues[shake][3], shakeValues[shake][4], shakeValues[shake][5]);
+        } else {
+            set_camera_roll_shake(shakeValues[shake][3], shakeValues[shake][4], shakeValues[shake][5]);
+        }
     }
 }
 
@@ -1076,6 +1070,11 @@ void update_yaw_and_dist_from_c_up(UNUSED struct Camera *c) {
  * Handles input and updates for the radial camera mode
  */
 void mode_radial_camera(struct Camera *c) {
+    if (gConfig.ChangeCamera != 0x01) {
+        transition_to_camera_mode(gMarioState->area->camera, gMarioState->area->camera->defMode, 1);
+    } else {
+        transition_to_camera_mode(gMarioState->area->camera, CAMERA_MODE_8_DIRECTIONS, 1);
+    }
     Vec3f pos;
     s16 oldAreaYaw = sAreaYaw;
 
@@ -1121,9 +1120,9 @@ s32 snap_to_45_degrees(s16 angle) {
 void mode_8_directions_camera(struct Camera *c) {
     Vec3f pos;
     s16 oldAreaYaw = sAreaYaw;
-
+    s32 zoom;
     radial_camera_input(c);
-
+    if (gConfig.ChangeCamera != 0x01) {
     if (gPlayer1Controller->buttonPressed & R_CBUTTONS) {
         s8DirModeYawOffset += DEGREES(45);
         play_sound_cbutton_side();
@@ -1132,24 +1131,41 @@ void mode_8_directions_camera(struct Camera *c) {
         s8DirModeYawOffset -= DEGREES(45);
         play_sound_cbutton_side();
     }
-#ifdef PARALLEL_LAKITU_CAM
+    } else {
+        zoom = 400.0f;
     // extra functionality
-    else if (gPlayer1Controller->buttonPressed & U_JPAD) {
-        s8DirModeYawOffset = 0;
-        s8DirModeYawOffset = gMarioState->faceAngle[1] - 0x8000;
+     if (gPlayer1Controller->buttonPressed & R_TRIG) {
+            s8DirModeYawOffset = 0;
+            s8DirModeYawOffset = gMarioState->faceAngle[1] - 0x8000;
+            play_sound_rbutton_changed();
+        }
+        else if (gPlayer1Controller->buttonPressed & L_CBUTTONS) {
+            s8DirModeYawOffset -= DEGREES(35);
+            play_sound_cbutton_side();
+        }
+        else if (gPlayer1Controller->buttonPressed & R_CBUTTONS) {
+            s8DirModeYawOffset += DEGREES(35);
+            play_sound_cbutton_side();
+        }else if (gPlayer1Controller->buttonDown & L_JPAD) {
+            s8DirModeYawOffset -= DEGREES(2);
+        }
+        else if (gPlayer1Controller->buttonDown & R_JPAD) {
+            s8DirModeYawOffset += DEGREES(2);
+        }
+        else if (gPlayer1Controller->buttonPressed & L_TRIG) {
+            s8DirModeYawOffset = snap_to_45_degrees(s8DirModeYawOffset);
+            set_mode_c_up(c);
+        }else if (gPlayer1Controller->buttonPressed & U_JPAD) {
+            zoom += 15.0f;
+        }
     }
-    else if (gPlayer1Controller->buttonDown & L_JPAD) {
-        s8DirModeYawOffset -= DEGREES(2);
+    
+    if (gConfig.ChangeCamera != 0x01) {
+        transition_to_camera_mode(gMarioState->area->camera, gMarioState->area->camera->defMode, 1);
+    } else {
+        transition_to_camera_mode(gMarioState->area->camera, CAMERA_MODE_8_DIRECTIONS, 1);
     }
-    else if (gPlayer1Controller->buttonDown & R_JPAD) {
-        s8DirModeYawOffset += DEGREES(2);
-    }
-    else if (gPlayer1Controller->buttonPressed & D_JPAD) {
-        s8DirModeYawOffset = snap_to_45_degrees(s8DirModeYawOffset);
-    }
-#endif
-
-    lakitu_zoom(400.f, 0x900);
+    lakitu_zoom(zoom, 0x700);
     c->nextYaw = update_8_directions_camera(c, c->focus, pos);
     c->pos[0] = pos[0];
     c->pos[2] = pos[2];
@@ -1183,6 +1199,11 @@ s32 update_outward_radial_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
  * Input and updates for the outward radial mode.
  */
 void mode_outward_radial_camera(struct Camera *c) {
+    if (gConfig.ChangeCamera != 0x01) {
+        transition_to_camera_mode(gMarioState->area->camera, gMarioState->area->camera->defMode, 1);
+    } else {
+        transition_to_camera_mode(gMarioState->area->camera, CAMERA_MODE_8_DIRECTIONS, 1);
+    }
     Vec3f pos;
     s16 oldAreaYaw = sAreaYaw;
 
@@ -1617,6 +1638,11 @@ s32 unused_update_mode_5_camera(UNUSED struct Camera *c, UNUSED Vec3f focus, UNU
 
 void mode_boss_fight_camera(struct Camera *c) {
     c->nextYaw = update_boss_fight_camera(c, c->focus, c->pos);
+    if (gConfig.ChangeCamera != 0x01) {
+        transition_to_camera_mode(gMarioState->area->camera, gMarioState->area->camera->defMode, 1);
+    } else {
+        transition_to_camera_mode(gMarioState->area->camera, CAMERA_MODE_8_DIRECTIONS, 1);
+    }
 }
 
 /**
@@ -1628,12 +1654,22 @@ void mode_parallel_tracking_camera(struct Camera *c) {
     radial_camera_input(c);
     set_fov_function(CAM_FOV_DEFAULT);
     c->nextYaw = update_parallel_tracking_camera(c, c->focus, c->pos);
+    if (gConfig.ChangeCamera != 0x01) {
+        transition_to_camera_mode(gMarioState->area->camera, gMarioState->area->camera->defMode, 1);
+    } else {
+        transition_to_camera_mode(gMarioState->area->camera, CAMERA_MODE_8_DIRECTIONS, 1);
+    }
 }
 
 /**
  * Fixed camera mode, the camera rotates around a point and looks and zooms toward Mario.
  */
 void mode_fixed_camera(struct Camera *c) {
+    if (gConfig.ChangeCamera != 0x01) {
+        transition_to_camera_mode(gMarioState->area->camera, gMarioState->area->camera->defMode, 1);
+    } else {
+        transition_to_camera_mode(gMarioState->area->camera, CAMERA_MODE_8_DIRECTIONS, 1);
+    }
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     if (gCurrLevelNum == LEVEL_BBH) {
         set_fov_function(CAM_FOV_BBH);
@@ -2277,6 +2313,11 @@ void mode_default_camera(struct Camera *c) {
     set_fov_function(CAM_FOV_DEFAULT);
     c->nextYaw = update_default_camera(c);
     pan_ahead_of_player(c);
+    if (gConfig.ChangeCamera != 0x01) {
+        transition_to_camera_mode(gMarioState->area->camera, gMarioState->area->camera->defMode, 1);
+    } else {
+        transition_to_camera_mode(gMarioState->area->camera, CAMERA_MODE_8_DIRECTIONS, 1);
+    }
 }
 
 /**
@@ -2285,6 +2326,11 @@ void mode_default_camera(struct Camera *c) {
 void mode_lakitu_camera(struct Camera *c) {
     gCameraZoomDist = 800.f;
     mode_default_camera(c);
+    if (gConfig.ChangeCamera != 0x01) {
+        transition_to_camera_mode(gMarioState->area->camera, gMarioState->area->camera->defMode, 1);
+    } else {
+        transition_to_camera_mode(gMarioState->area->camera, CAMERA_MODE_8_DIRECTIONS, 1);
+    }
 }
 
 /**
@@ -2365,6 +2411,11 @@ s32 update_spiral_stairs_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
  */
 void mode_spiral_stairs_camera(struct Camera *c) {
     c->nextYaw = update_spiral_stairs_camera(c, c->focus, c->pos);
+    if (gConfig.ChangeCamera != 0x01) {
+        transition_to_camera_mode(gMarioState->area->camera, gMarioState->area->camera->defMode, 1);
+    } else {
+        transition_to_camera_mode(gMarioState->area->camera, CAMERA_MODE_8_DIRECTIONS, 1);
+    }
 }
 
 s32 update_slide_or_0f_camera(UNUSED struct Camera *c, Vec3f focus, Vec3f pos) {
@@ -2394,6 +2445,11 @@ void mode_slide_camera(struct Camera *c) {
             gCameraMovementFlags |= CAM_MOVE_C_UP_MODE;
         }
         c->nextYaw = update_slide_camera(c);
+    }
+    if (gConfig.ChangeCamera != 0x01) {
+        transition_to_camera_mode(gMarioState->area->camera, gMarioState->area->camera->defMode, 1);
+    } else {
+        transition_to_camera_mode(gMarioState->area->camera, CAMERA_MODE_8_DIRECTIONS, 1);
     }
 }
 
@@ -2883,14 +2939,18 @@ void update_camera(struct Camera *c) {
 #endif
         && gCurrentArea->camera->mode != CAMERA_MODE_INSIDE_CANNON) {
         // Only process R_TRIG if 'fixed' is not selected in the menu
-        if (cam_select_alt_mode(CAM_SELECTION_NONE) == CAM_SELECTION_MARIO) {
-            if (gPlayer1Controller->buttonPressed & R_TRIG) {
-                if (set_cam_angle(0) == CAM_ANGLE_LAKITU) {
-                    set_cam_angle(CAM_ANGLE_MARIO);
-                } else {
-                    set_cam_angle(CAM_ANGLE_LAKITU);
+        if (gConfig.ChangeCamera != 0x01) {
+            if (cam_select_alt_mode(CAM_SELECTION_NONE) == CAM_SELECTION_MARIO) {
+                if (gPlayer1Controller->buttonPressed & R_TRIG) {
+                    if (set_cam_angle(0) == CAM_ANGLE_LAKITU) {
+                        set_cam_angle(CAM_ANGLE_MARIO);
+                    } else {
+                        set_cam_angle(CAM_ANGLE_LAKITU);
+                    }
                 }
             }
+        } else {
+            set_cam_angle(CAM_ANGLE_LAKITU);
         }
         play_sound_if_cam_switched_to_lakitu_or_mario();
     }
@@ -2906,13 +2966,6 @@ void update_camera(struct Camera *c) {
 #ifdef PUPPYCAM
     if (!gPuppyCam.enabled || c->cutscene != CUTSCENE_NONE || gCurrentArea->camera->mode == CAMERA_MODE_INSIDE_CANNON) {
 #endif
-    // Store previous geometry information
-    sMarioGeometry.prevFloorHeight = sMarioGeometry.currFloorHeight;
-    sMarioGeometry.prevCeilHeight = sMarioGeometry.currCeilHeight;
-    sMarioGeometry.prevFloor = sMarioGeometry.currFloor;
-    sMarioGeometry.prevCeil = sMarioGeometry.currCeil;
-    sMarioGeometry.prevFloorType = sMarioGeometry.currFloorType;
-    sMarioGeometry.prevCeilType = sMarioGeometry.currCeilType;
 
     find_mario_floor_and_ceil(&sMarioGeometry);
     gCollisionFlags |= COLLISION_FLAG_CAMERA;
@@ -3258,19 +3311,19 @@ void init_camera(struct Camera *c) {
 
 #ifdef ENABLE_VANILLA_CAM_PROCESSING
         //! Hardcoded position checks determine which cutscene to play when Mario enters castle grounds.
-        // case LEVEL_CASTLE_GROUNDS:
-        //     if (is_within_100_units_of_mario(-1328.f, 260.f, 4664.f) != 1) {
-        //         marioOffset[0] = -400.f;
-        //         marioOffset[2] = -800.f;
-        //     }
-        //     if (is_within_100_units_of_mario(-6901.f, 2376.f, -6509.f) == 1) {
-        //         start_cutscene(c, CUTSCENE_EXIT_WATERFALL);
-        //     }
-        //     if (is_within_100_units_of_mario(5408.f, 4500.f, 3637.f) == 1) {
-        //         start_cutscene(c, CUTSCENE_EXIT_FALL_WMOTR);
-        //     }
-        //     gLakituState.mode = CAMERA_MODE_FREE_ROAM;
-        //     break;
+        case LEVEL_CASTLE_GROUNDS:
+            if (is_within_100_units_of_mario(-1328.f, 260.f, 4664.f) != 1) {
+                marioOffset[0] = -400.f;
+                marioOffset[2] = -800.f;
+            }
+            if (is_within_100_units_of_mario(-6901.f, 2376.f, -6509.f) == 1) {
+                start_cutscene(c, CUTSCENE_EXIT_WATERFALL);
+            }
+            if (is_within_100_units_of_mario(5408.f, 4500.f, 3637.f) == 1) {
+                start_cutscene(c, CUTSCENE_EXIT_FALL_WMOTR);
+            }
+            gLakituState.mode = CAMERA_MODE_FREE_ROAM;
+            break;
         case LEVEL_SA:
             marioOffset[2] = 200.f;
             break;
@@ -3281,6 +3334,10 @@ void init_camera(struct Camera *c) {
             gCameraMovementFlags |= CAM_MOVE_ZOOMED_OUT;
             break;
         case LEVEL_CASTLE:
+            if (gMarioState->marioObj->oRoom != 1)
+            {
+                gLakituState.mode = CAMERA_MODE_FREE_ROAM;
+            }
             marioOffset[2] = 150.f;
             break;
         case LEVEL_RR:
@@ -4658,25 +4715,27 @@ void radial_camera_input(struct Camera *c) {
     }
 
     // Zoom in / enter C-Up
-    if (gPlayer1Controller->buttonPressed & U_CBUTTONS) {
-        if (gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) {
-            gCameraMovementFlags &= ~CAM_MOVE_ZOOMED_OUT;
-            play_sound_cbutton_up();
-        } else {
-            set_mode_c_up(c);
+        if (gPlayer1Controller->buttonPressed & U_CBUTTONS) {
+            if (gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) {
+                gCameraMovementFlags &= ~CAM_MOVE_ZOOMED_OUT;
+                play_sound_cbutton_up();
+            } else {
+                if (gConfig.ChangeCamera != 0x01) {
+                    set_mode_c_up(c);
+                } else {}
+            }
         }
-    }
-
     // Zoom out
-    if (gPlayer1Controller->buttonPressed & D_CBUTTONS) {
-        if (gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) {
-            gCameraMovementFlags |= CAM_MOVE_ALREADY_ZOOMED_OUT;
-            play_camera_buzz_if_cdown();
-        } else {
-            gCameraMovementFlags |= CAM_MOVE_ZOOMED_OUT;
-            play_sound_cbutton_down();
+        if (gPlayer1Controller->buttonPressed & D_CBUTTONS) {
+            if (gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) {
+                gCameraMovementFlags |= CAM_MOVE_ALREADY_ZOOMED_OUT;
+                play_camera_buzz_if_cdown();
+            } else {
+                gCameraMovementFlags |= CAM_MOVE_ZOOMED_OUT;
+                play_sound_cbutton_down();
+            }
         }
-    }
+    
 }
 
 /**
@@ -5786,6 +5845,12 @@ u32 surface_type_modes(struct Camera *c) {
             modeChanged++;
             break;
     }
+        if (sMarioGeometry.currFloorType & (SPECFLAG_MEGASLIP << 8))
+        {
+            transition_to_camera_mode(c, CAMERA_MODE_CLOSE, 90);
+            modeChanged++;
+            return modeChanged;
+        }
     return modeChanged;
 }
 
@@ -5915,9 +5980,7 @@ struct CameraTrigger sCamRR[] = {
  * to free_roam when Mario is not walking up the tower.
  */
 struct CameraTrigger sCamBOB[] = {
-    {  1, cam_bob_tower, 2468, 2720, -4608, 3263, 1696, 3072, 0 },
-    { -1, cam_bob_default_free_roam, 0, 0, 0, 0, 0, 0, 0 },
-    NULL_TRIGGER
+	NULL_TRIGGER
 };
 
 /**
@@ -6070,6 +6133,12 @@ struct CameraTrigger sCamCastleGrounds[] = {
 	NULL_TRIGGER
 };
 struct CameraTrigger sCamJRB[] = {
+	NULL_TRIGGER
+};
+struct CameraTrigger sCamSA[] = {
+	NULL_TRIGGER
+};
+struct CameraTrigger sCamShowcaseLevel[] = {
 	NULL_TRIGGER
 };
 struct CameraTrigger *sCameraTriggers[LEVEL_COUNT + 1] = {
@@ -6317,7 +6386,8 @@ s16 camera_course_processing(struct Camera *c) {
 
             case AREA_BOB:
                 if (set_mode_if_not_set_by_surface(c, CAMERA_MODE_NONE) == 0) {
-                    if (sMarioGeometry.currFloorType == SURFACE_BOSS_FIGHT_CAMERA) {
+                    if (gMarioState->pos[1] > 4299) {
+                        transition_to_camera_mode(c, CAMERA_MODE_BOSS_FIGHT, 60);
                         set_camera_mode_boss_fight(c);
                     } else {
                         if (c->mode == CAMERA_MODE_CLOSE) {
@@ -10413,7 +10483,7 @@ u8 sZoomOutAreaMasks[] = {
 	ZOOMOUT_AREA_MASK(0, 0, 0, 0, 0, 0, 0, 0), // Unused         | Unused
 	ZOOMOUT_AREA_MASK(0, 0, 0, 0, 1, 0, 0, 0), // BBH            | CCM
 	ZOOMOUT_AREA_MASK(0, 0, 0, 0, 0, 0, 0, 0), // CASTLE_INSIDE  | HMC
-	ZOOMOUT_AREA_MASK(1, 0, 0, 0, 1, 0, 0, 0), // SSL            | BOB
+	ZOOMOUT_AREA_MASK(1, 0, 0, 0, 0, 0, 0, 0), // SSL            | BOB
 	ZOOMOUT_AREA_MASK(1, 0, 0, 0, 1, 0, 0, 0), // SL             | WDW
 	ZOOMOUT_AREA_MASK(0, 0, 0, 0, 1, 1, 0, 0), // JRB            | THI
 	ZOOMOUT_AREA_MASK(0, 0, 0, 0, 1, 0, 0, 0), // TTC            | RR
@@ -10428,7 +10498,7 @@ u8 sZoomOutAreaMasks[] = {
 	ZOOMOUT_AREA_MASK(0, 0, 0, 0, 1, 0, 0, 0), // Unused         | BOWSER_2
 	ZOOMOUT_AREA_MASK(1, 0, 0, 0, 0, 0, 0, 0), // BOWSER_3       | Unused
 	ZOOMOUT_AREA_MASK(1, 0, 0, 0, 0, 0, 0, 0), // TTM            | Unused
-	ZOOMOUT_AREA_MASK(0, 0, 0, 0, 0, 0, 0, 0), // Unused         | Unused
+	ZOOMOUT_AREA_MASK(0, 0, 0, 0, 1, 0, 0, 0), // Unused         | Unused
 };
 
 STATIC_ASSERT(ARRAY_COUNT(sZoomOutAreaMasks) - 1 == LEVEL_MAX / 2, "Make sure you edit sZoomOutAreaMasks when adding / removing courses.");
@@ -10954,6 +11024,8 @@ void fov_default(struct MarioState *m) {
     if (m->area->camera->cutscene == CUTSCENE_0F_UNUSED) {
         sFOVState.fov = 45.f;
     }
+    camera_approach_f32_symmetric_bool(&sFOVState.fov, 45.f, (45.f - sFOVState.fov) / 30.f);
+        sFOVState.unusedIsSleeping = 0;
 }
 
 void approach_fov_30(UNUSED struct MarioState *m) {

@@ -1,4 +1,3 @@
-// 0x0E00073C
 const GeoLayout castle_grounds_geo_00073C[] = {
    GEO_NODE_SCREEN_AREA(10, SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_CENTER_X, SCREEN_CENTER_Y),
    GEO_OPEN_NODE(),
@@ -15,20 +14,15 @@ const GeoLayout castle_grounds_geo_00073C[] = {
          GEO_OPEN_NODE(),
             GEO_CAMERA(CAMERA_MODE_FREE_ROAM, 0, 1500, 2500, 0, 1500, -12000, geo_camera_main),
             GEO_OPEN_NODE(),
-               GEO_DISPLAY_LIST(LAYER_ALPHA, castle_grounds_seg7_dl_07006D70),
-               GEO_DISPLAY_LIST(LAYER_ALPHA, castle_grounds_seg7_dl_070095F0),
-               GEO_DISPLAY_LIST(LAYER_ALPHA, castle_grounds_seg7_dl_0700A860),
-               GEO_DISPLAY_LIST(LAYER_TRANSPARENT_DECAL, castle_grounds_seg7_dl_0700B1D0),
-               GEO_DISPLAY_LIST(LAYER_ALPHA, castle_grounds_seg7_dl_0700BA20),
-               GEO_DISPLAY_LIST(LAYER_ALPHA, castle_grounds_seg7_dl_0700C430),
-               GEO_DISPLAY_LIST(LAYER_ALPHA, castle_grounds_seg7_dl_0700C210),
-               GEO_ASM(0, geo_movtex_pause_control),
-               GEO_ASM(MOVTEX_CASTLE_WATERFALL, geo_movtex_draw_nocolor),
-               GEO_ASM(CASTLE_GROUNDS_MOVTEX_WATER, geo_movtex_draw_water_regions),
+               GEO_DISPLAY_LIST(LAYER_ALPHA, test_skinned_mesh_layer_4_with_revert),
+               GEO_ASM(0, geo_exec_castle_grounds_shadows),
+               GEO_ASM(0, geo_exec_castle_grounds_water_shadows),
                GEO_RENDER_OBJ(),
                GEO_ASM(ENVFX_MODE_NONE, geo_envfx_main),
                GEO_SCENE_LIGHT(LIGHT_TYPE_DIRECTIONAL, 255, 255, 255, 0, 90, 45),
-			      GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 127, 127, 127, 0, 0, 0),
+			      GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 80, 80, 80, 0, 0, 0),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_CAMERA, 100, 100, 100, 0, 0, 0),
+               GEO_BRANCH(0, water_skybox_geo),
             GEO_CLOSE_NODE(),
          GEO_CLOSE_NODE(),
       GEO_CLOSE_NODE(),
@@ -39,3 +33,4 @@ const GeoLayout castle_grounds_geo_00073C[] = {
    GEO_CLOSE_NODE(),
    GEO_END(),
 };
+

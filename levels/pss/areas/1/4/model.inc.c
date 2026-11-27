@@ -534,6 +534,7 @@ static const Gfx pss_seg7_dl_0700CCA8[] = {
     gsSPVertex(pss_seg7_vertex_0700BC28, 15, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 3,  6,  4, 0x0,  7,  8,  9, 0x0),
+    gsSPSetGeometryMode(G_LIGHTING),
     gsSP2Triangles( 7, 10,  8, 0x0, 11, 12, 13, 0x0),
     gsSP1Triangle(11, 13, 14, 0x0),
     gsSPVertex(pss_seg7_vertex_0700BD18, 14, 0),

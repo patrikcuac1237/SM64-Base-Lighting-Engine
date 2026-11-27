@@ -12,6 +12,7 @@ const GeoLayout bobomb_buddy_geo[] = {
 	GEO_OPEN_NODE(),
 		GEO_SHADOW(1, 200, 70),
 		GEO_OPEN_NODE(),
+			GEO_ASM(0, geo_object_fix_2cycle_issue),
 			GEO_SCALE(LAYER_FORCE, 24576),
 			GEO_OPEN_NODE(),
 				GEO_ANIMATED_PART(LAYER_OPAQUE, 0, 0, 0, NULL),

@@ -43,6 +43,8 @@ static u32 sMenuSoundsExtra[] = {
     SOUND_MOVING_TERRAIN_SLIDE + (4 << 16),
     SOUND_MOVING_TERRAIN_SLIDE + (5 << 16),
     SOUND_MOVING_TERRAIN_SLIDE + (6 << 16),
+    SOUND_MOVING_TERRAIN_SLIDE + (7 << 16),
+    SOUND_MOVING_TERRAIN_SLIDE + (8 << 16),
     SOUND_MOVING_LAVA_BURN,
     SOUND_MOVING_SLIDE_DOWN_TREE,
     SOUND_MOVING_SLIDE_DOWN_POLE,
@@ -145,33 +147,44 @@ void set_sound_mode(u16 soundMode) {
     }
 }
 
+// Estructura para emparejar el Flag con su Sonido
+struct MenuSoundPair {
+    s16 flag;
+    s32 soundId;
+};
+
+// La tabla de datos optimizada
+static const struct MenuSoundPair sMenuSoundTable[] = {
+    { SOUND_MENU_FLAG_HANDAPPEAR,     SOUND_MENU_HAND_APPEAR },
+    { SOUND_MENU_FLAG_HANDISAPPEAR,   SOUND_MENU_HAND_DISAPPEAR },
+    { SOUND_MENU_FLAG_UNKNOWN1,       SOUND_MENU_UNK0C_FLAG_UNKNOWN1 },
+    { SOUND_MENU_FLAG_PINCHMARIOFACE,  SOUND_MENU_PINCH_MARIO_FACE },
+    { SOUND_MENU_FLAG_PINCHMARIOFACE2, SOUND_MENU_PINCH_MARIO_FACE },
+    { SOUND_MENU_FLAG_LETGOMARIOFACE,  SOUND_MENU_LET_GO_MARIO_FACE },
+    { SOUND_MENU_FLAG_CAMERAZOOMIN,    SOUND_MENU_CAMERA_ZOOM_IN },
+    { SOUND_MENU_FLAG_CAMERAZOOMOUT,   SOUND_MENU_CAMERA_ZOOM_OUT },
+};
+
 /**
  * Wrapper method by menu used to set the sound via flags.
  *
  * Called from threads: thread5_game_loop
  */
 void play_menu_sounds(s16 soundMenuFlags) {
-    if (soundMenuFlags & SOUND_MENU_FLAG_HANDAPPEAR) {
-        play_sound(SOUND_MENU_HAND_APPEAR, gGlobalSoundSource);
-    } else if (soundMenuFlags & SOUND_MENU_FLAG_HANDISAPPEAR) {
-        play_sound(SOUND_MENU_HAND_DISAPPEAR, gGlobalSoundSource);
-    } else if (soundMenuFlags & SOUND_MENU_FLAG_UNKNOWN1) {
-        play_sound(SOUND_MENU_UNK0C_FLAG_UNKNOWN1, gGlobalSoundSource);
-    } else if (soundMenuFlags & SOUND_MENU_FLAG_PINCHMARIOFACE) {
-        play_sound(SOUND_MENU_PINCH_MARIO_FACE, gGlobalSoundSource);
-    } else if (soundMenuFlags & SOUND_MENU_FLAG_PINCHMARIOFACE2) {
-        play_sound(SOUND_MENU_PINCH_MARIO_FACE, gGlobalSoundSource);
-    } else if (soundMenuFlags & SOUND_MENU_FLAG_LETGOMARIOFACE) {
-        play_sound(SOUND_MENU_LET_GO_MARIO_FACE, gGlobalSoundSource);
-    } else if (soundMenuFlags & SOUND_MENU_FLAG_CAMERAZOOMIN) {
-        play_sound(SOUND_MENU_CAMERA_ZOOM_IN, gGlobalSoundSource);
-    } else if (soundMenuFlags & SOUND_MENU_FLAG_CAMERAZOOMOUT) {
-        play_sound(SOUND_MENU_CAMERA_ZOOM_OUT, gGlobalSoundSource);
+    // 1. Recorremos el array para los sonidos principales
+    for (u32 i = 0; i < (sizeof(sMenuSoundTable) / sizeof(sMenuSoundTable[0])); i++) {
+        if (soundMenuFlags & sMenuSoundTable[i].flag) {
+            play_sound(sMenuSoundTable[i].soundId, gGlobalSoundSource);
+            // Si quieres que solo suene uno por llamado (como el else if original),
+            // podrías poner un "break;" aquí.
+        }
     }
 
+    // 2. Casos especiales (estos se quedan fuera porque tienen lógica extra)
     if (soundMenuFlags & SOUND_MENU_FLAG_EXTRA) {
         play_menu_sounds_extra(20, NULL);
     }
+
 #if ENABLE_RUMBLE
     if (soundMenuFlags & SOUND_MENU_FLAG_LETGOMARIOFACE) {
         queue_rumble_data(10, 60);

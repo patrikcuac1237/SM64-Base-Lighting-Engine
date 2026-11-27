@@ -1,3 +1,5 @@
+extern const GeoLayout boo_001_switch_opt1[];
+extern const GeoLayout boo_001_switch_opt2[];
 extern const GeoLayout boo_geo[];
 extern u8 boo_boo_mouth_rgba16_ci8[];
 extern u8 boo_boo_mouth_rgba16_ci8_pal_rgba16[];

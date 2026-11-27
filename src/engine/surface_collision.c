@@ -44,7 +44,7 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
     register f32 d00, d01, d11, d20, d21;
     register f32 invDenom;
     register f32 v, w;
-    register TerrainData type = SURFACE_DEFAULT;
+    register TerrainData type = 0x0000;
     s32 numCols = 0;
 
     // Max collision radius = 200
@@ -71,7 +71,7 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
             if (type == SURFACE_CAMERA_BOUNDARY) continue;
 
             // If an object can pass through a vanish cap wall, pass through.
-            if (type == SURFACE_VANISH_CAP_WALLS && o != NULL) {
+            if (type & (SPECFLAG_VANISH_CAP_WALLS << 8) && o != NULL) {
                 // If an object can pass through a vanish cap wall, pass through.
                 if (o->activeFlags & ACTIVE_FLAG_MOVE_THROUGH_GRATE) continue;
                 // If Mario has a vanish cap, pass through the vanish cap wall.
@@ -246,7 +246,14 @@ void add_ceil_margin(s32 *x, s32 *z, Vec3s target1, Vec3s target2, f32 margin) {
 }
 
 static s32 check_within_ceil_triangle_bounds(s32 x, s32 z, struct Surface *surf, f32 margin) {
-    s32 addMargin = surf->type != SURFACE_HANGABLE && !FLT_IS_NONZERO(margin);
+    // --- NUEVA LÓGICA DE DETECCIÓN ---
+    // Extraemos los 4 bits de la propiedad especial (posiciones 8-11)
+    s16 specialProp = (surf->type >> 8) & 0xF;
+    
+    // addMargin será verdadero si NO tiene la bandera de colgarse Y el margen es válido
+    s32 addMargin = (specialProp != SPECFLAG_HANGABLE) && !FLT_IS_NONZERO(margin);
+    // ---------------------------------
+
     Vec3i vx, vz;
     vx[0] = surf->vertex1[0];
     vz[0] = surf->vertex1[2];
@@ -509,7 +516,6 @@ struct Surface *find_water_floor_from_list(struct SurfaceNode *surfaceNode, s32 
     while (topSurfaceNode != NULL) {
         surf = topSurfaceNode->surface;
         topSurfaceNode = topSurfaceNode->next;
-
         // skip water tops or wall angled water bottoms
         if (surf->type == SURFACE_NEW_WATER_BOTTOM || absf(surf->normal.y) < NORMAL_FLOOR_THRESHOLD) continue;
 
@@ -529,6 +535,107 @@ struct Surface *find_water_floor_from_list(struct SurfaceNode *surfaceNode, s32 
     return floor;
 }
 
+struct Surface *find_shadow_volume_from_list(struct SurfaceNode *surfaceNode, s32 x, s32 y, s32 z, f32 *pheight) {
+    register struct Surface *surf;
+    struct Surface *floor = NULL;
+    struct SurfaceNode *topNode = surfaceNode;
+    struct SurfaceNode *bottomNode = surfaceNode;
+    f32 height = FLOOR_LOWER_LIMIT;
+    f32 bottomHeight = FLOOR_LOWER_LIMIT;
+    f32 curHeight, curBottomHeight;
+    f32 buffer = FIND_FLOOR_BUFFER;
+
+    // 1. Buscamos el FONDO (Bottom) -> light = 1
+    while (bottomNode != NULL) {
+        surf = bottomNode->surface;
+        bottomNode = bottomNode->next;
+        if (surf == NULL) break;
+
+        u32 spec  = (surf->type >> 8) & 0xF;
+        u32 light = (surf->type & 0xF);
+
+        // CONDICIÓN: Debe ser el Spec común Y tener light == 1
+        if (spec != SPECFLAG_SHADOW_VOLUME || light != 1) continue;
+        
+        if (!check_within_bounds_y_norm(x, z, surf)) continue;
+
+        curBottomHeight = get_surface_height_at_location(x, z, surf);
+        
+        if (curBottomHeight >= y + buffer) {
+            bottomHeight = curBottomHeight;
+        }
+    }
+
+    // 2. Buscamos el TECHO (Top) -> light = 0
+    while (topNode != NULL) {
+        surf = topNode->surface;
+        topNode = topNode->next;
+        if (surf == NULL) break;
+
+        u32 spec  = (surf->type >> 8) & 0xF;
+        u32 light = (surf->type & 0xF);
+
+        // CONDICIÓN: Debe ser el Spec común Y tener light == 0
+        if (spec != SPECFLAG_SHADOW_VOLUME || light != 0) continue;
+        
+        if (!check_within_bounds_y_norm(x, z, surf)) continue;
+
+        curHeight = get_surface_height_at_location(x, z, surf);
+
+        if (bottomHeight != FLOOR_LOWER_LIMIT && curHeight > bottomHeight) continue;
+
+        if (curHeight > height) {
+            height = curHeight;
+            *pheight = curHeight;
+            floor = surf;
+        }
+    }
+    return floor;
+}
+
+f32 find_shadow_level(s32 x, s32 y, s32 z, struct Surface **pfloor) {
+    f32 height = FLOOR_LOWER_LIMIT;
+    struct Surface *floor = NULL;
+    s32 cellX = GET_CELL_COORD(x);
+    s32 cellZ = GET_CELL_COORD(z);
+
+#if PUPPYPRINT_DEBUG
+    // Iniciamos el contador de tiempo para colisiones
+    OSTime first = osGetTime();
+#endif
+
+    // Verificamos límites de la celda (estándar del motor)
+    if (cellX >= 0 && cellX < NUM_CELLS && cellZ >= 0 && cellZ < NUM_CELLS) {
+        
+        // --- Partición Estática ---
+        // Acceso directo al puntero .next sin validación de rango 0x80
+        floor = find_shadow_volume_from_list(
+            gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_SHADOWS].next, x, y, z, &height
+        );
+
+        // --- Partición Dinámica (Objetos) ---
+        struct Surface *dynamicFloor = find_shadow_volume_from_list(
+            gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_SHADOWS].next, x, y, z, &height
+        );
+
+        // Si encontramos una superficie dinámica, la priorizamos
+        if (dynamicFloor != NULL) {
+            floor = dynamicFloor;
+        }
+    }
+
+    // Retornamos la superficie encontrada (si pfloor no es NULL)
+    if (pfloor != NULL) {
+        *pfloor = floor;
+    }
+
+#if PUPPYPRINT_DEBUG
+    // Sumamos el tiempo consumido al profiler de colisiones
+    collisionTime[perfIteration] += osGetTime() - first;
+#endif
+
+    return height;
+}
 /**
  * Find the height of the highest floor below a point.
  */
@@ -563,74 +670,71 @@ f32 unused_find_dynamic_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfl
 /**
  * Find the highest floor under a given position and return the height.
  */
+// Definir un umbral de movimiento (0.01f es imperceptible pero ahorra cálculos)
+#define COLLISION_THRESHOLD 0.01f
+
 f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
+    // 1. OPTIMIZACIÓN: Early Exit por límites
+    s32 x = (s32)xPos;
+    s32 y = (s32)yPos;
+    s32 z = (s32)zPos;
+
+    if (is_outside_level_bounds(x, z)) {
+        *pfloor = NULL;
+        return FLOOR_LOWER_LIMIT;
+    }
+
 #if PUPPYPRINT_DEBUG
     OSTime first = osGetTime();
 #endif
-
-    f32 height        = FLOOR_LOWER_LIMIT;
-    f32 dynamicHeight = FLOOR_LOWER_LIMIT;
-
-    //! (Parallel Universes) Because position is casted to an s16, reaching higher
-    //  float locations can return floors despite them not existing there.
-    //  (Dynamic floors will unload due to the range.)
-    s32 x = xPos;
-    s32 y = yPos;
-    s32 z = zPos;
-
-    *pfloor = NULL;
-
-    if (is_outside_level_bounds(x, z)) {
-#if PUPPYPRINT_DEBUG
-        collisionTime[perfIteration] += (osGetTime() - first);
-#endif
-        return height;
-    }
-    // Each level is split into cells to limit load, find the appropriate cell.
     s32 cellX = GET_CELL_COORD(x);
     s32 cellZ = GET_CELL_COORD(z);
-
-    struct SurfaceNode *surfaceList;
+    
+    f32 height = FLOOR_LOWER_LIMIT;
+    f32 dynamicHeight = FLOOR_LOWER_LIMIT;
     struct Surface *floor = NULL;
     struct Surface *dynamicFloor = NULL;
 
+    // 3. OPTIMIZACIÓN: Prioridad Estática vs Dinámica
+    // Kaze sugiere que si el objeto no está cerca de objetos dinámicos,
+    // no deberíamos ni mirar gDynamicSurfacePartition.
     s32 includeDynamic = !(gCollisionFlags & COLLISION_FLAG_EXCLUDE_DYNAMIC);
 
     if (includeDynamic) {
-        // Check for surfaces belonging to objects.
-        surfaceList = gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_FLOORS].next;
-        dynamicFloor = find_floor_from_list(surfaceList, x, y, z, &dynamicHeight);
-
-        // In the next check, only check for floors higher than the previous check.
-        height = dynamicHeight;
+        struct SurfaceNode *dynamicList = gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_FLOORS].next;
+        // Solo entramos si la lista no está vacía
+        if (dynamicList != NULL) {
+            dynamicFloor = find_floor_from_list(dynamicList, x, y, z, &dynamicHeight);
+            height = dynamicHeight;
+        }
     }
 
-    // Check for surfaces that are a part of level geometry.
-    surfaceList = gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_FLOORS].next;
-    floor = find_floor_from_list(surfaceList, x, y, z, &height);
+    // 4. OPTIMIZACIÓN: Static Partition Check
+    struct SurfaceNode *staticList = gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_FLOORS].next;
+    if (staticList != NULL) {
+        floor = find_floor_from_list(staticList, x, y, z, &height);
+    }
 
-    // Use the higher floor.
+    // 5. Lógica de selección de la superficie más alta
     if (includeDynamic && height <= dynamicHeight) {
-        floor  = dynamicFloor;
+        floor = dynamicFloor;
         height = dynamicHeight;
     }
 
-    // To prevent accidentally leaving the floor tangible, stop checking for it.
-    gCollisionFlags &= ~(COLLISION_FLAG_RETURN_FIRST | COLLISION_FLAG_EXCLUDE_DYNAMIC | COLLISION_FLAG_INCLUDE_INTANGIBLE);
-    // If a floor was missed, increment the debug counter.
-    if (floor == NULL) {
-        gNumFindFloorMisses++;
-    }
-
-    // Return the floor.
     *pfloor = floor;
+
+    // 6. Limpiar flags al final (Esto es importante para el motor original)
+    gCollisionFlags &= ~(COLLISION_FLAG_RETURN_FIRST | COLLISION_FLAG_EXCLUDE_DYNAMIC | COLLISION_FLAG_INCLUDE_INTANGIBLE);
+
+    if (floor == NULL) gNumFindFloorMisses++;
+
 #ifdef VANILLA_DEBUG
-    // Increment the debug tracker.
     gNumCalls.floor++;
 #endif
 #if PUPPYPRINT_DEBUG
     collisionTime[perfIteration] += (osGetTime() - first);
 #endif
+
     return height;
 }
 

@@ -1,0 +1,13 @@
+extern const GeoLayout rolling_log_geo[];
+extern u8 rolling_log__2_rgba16_rgba16[];
+extern u8 rolling_log__0_rgba16_ci8[];
+extern u8 rolling_log__0_rgba16_pal_rgba16[];
+extern Vtx rolling_log_000_displaylist_mesh_layer_1_vtx_0[28];
+extern Gfx rolling_log_000_displaylist_mesh_layer_1_tri_0[];
+extern Vtx rolling_log_000_displaylist_mesh_layer_1_vtx_1[16];
+extern Gfx rolling_log_000_displaylist_mesh_layer_1_tri_1[];
+extern Gfx mat_rolling_log__0_layer1[];
+extern Gfx mat_revert_rolling_log__0_layer1[];
+extern Gfx mat_rolling_log__1[];
+extern Gfx mat_revert_rolling_log__1[];
+extern Gfx rolling_log_000_displaylist_mesh_layer_1_with_revert[];

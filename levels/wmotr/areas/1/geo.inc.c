@@ -21,7 +21,7 @@ const GeoLayout wmotr_geo_0001F0[] = {
                GEO_RENDER_OBJ(),
                GEO_ASM(ENVFX_MODE_NONE, geo_envfx_main),
                GEO_SCENE_LIGHT(LIGHT_TYPE_DIRECTIONAL, 255, 255, 255, 0, 90, -25), 
-			      GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 127, 127, 127, 0, 0, 0),
+			      GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 80, 80, 80, 0, 0, 0),
             GEO_CLOSE_NODE(),
          GEO_CLOSE_NODE(),
       GEO_CLOSE_NODE(),

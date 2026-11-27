@@ -10,7 +10,7 @@ const Collision vcutm_seg7_collision_0700AC44[] = {
     COL_VERTEX(307, 102, -818),
     COL_VERTEX(-306, 102, -818),
     COL_VERTEX(-306, 0, -767),
-    COL_TRI_INIT(SURFACE_WOOD, 12),
+    COL_TRI_INIT(NEWTERRAIN(4, 0, 0, 0), 12),
     COL_TRI(7, 6, 5),
     COL_TRI(0, 1, 2),
     COL_TRI(0, 3, 1),

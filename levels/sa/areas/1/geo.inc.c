@@ -15,12 +15,13 @@ const GeoLayout sa_geo_000170[] = {
          GEO_OPEN_NODE(),
             GEO_CAMERA(CAMERA_MODE_RADIAL, 0, 2000, 6000, 0, 0, 0, geo_camera_main),
             GEO_OPEN_NODE(),
-               GEO_DISPLAY_LIST(LAYER_OPAQUE,      sa_seg7_dl_07002DE8),
-               GEO_DISPLAY_LIST(LAYER_TRANSPARENT, sa_seg7_dl_07002FD0),
-               GEO_SCENE_LIGHT(LIGHT_TYPE_DIRECTIONAL, 50, 50, 75, 0, 90, 0),
-               GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 15, 15, 15, 0, 0, 0),
+               GEO_DISPLAY_LIST(LAYER_OPAQUE, secret_aquarium_sa_seg7_dl_07002DE8_mesh_layer_1_with_revert),
+               GEO_DISPLAY_LIST(LAYER_TRANSPARENT, secret_aquarium_sa_seg7_dl_07002DE8_mesh_layer_5_with_revert),
                GEO_RENDER_OBJ(),
                GEO_ASM(ENVFX_SNOW_WATER, geo_envfx_main),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_VANILLA_STYLE, 50, 254, 254, 28, 28, 28), //00FEFE
+			      GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 50, 127, 0x99, 0, 0, 0), //007F99
+               GEO_SCENE_LIGHT(LIGHT_TYPE_CAMERA, 0, 0, 0, 0, 0, 0),
             GEO_CLOSE_NODE(),
          GEO_CLOSE_NODE(),
       GEO_CLOSE_NODE(),

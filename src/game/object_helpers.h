@@ -58,9 +58,11 @@ enum GeoUpdateLayerTransparencyModes {
     GEO_TRANSPARENCY_MODE_DECAL     = 20,
     GEO_TRANSPARENCY_MODE_INTER     = 30,
 };
-
+Gfx *geo_apply_primitive_color(s32 callContext, struct GraphNode *node, UNUSED void *context);
+Gfx *geo_apply_star_primitive_color(s32 callContext, struct GraphNode *node, UNUSED void *context);
 Gfx *geo_update_projectile_pos_from_parent(s32 callContext, UNUSED struct GraphNode *node, Mat4 mtx);
 Gfx *geo_update_layer_transparency(s32 callContext, struct GraphNode *node, UNUSED void *context);
+Gfx *geo_object_fix_2cycle_issue(s32 callContext, struct GraphNode *node, UNUSED Mat4 *mtx);
 Gfx *geo_switch_anim_state(s32 callContext, struct GraphNode *node, UNUSED void *context);
 Gfx *geo_switch_area(s32 callContext, struct GraphNode *node, UNUSED void *context);
 void obj_update_pos_from_parent_transformation(Mat4 mtx, struct Object *obj);
@@ -267,7 +269,13 @@ void enable_time_stop_including_mario(void);
 void disable_time_stop_including_mario(void);
 s32 cur_obj_check_interacted(void);
 void cur_obj_spawn_loot_blue_coin(void);
-
+extern void addObjectPointLight(u8 rgb[3], f32 maxDist, s32 brightness);
+extern void addLightSource(f32 maxDist, const u8 RGBMultAdd[3]);
+extern void addCurrentPointLight(s32 rgb, s16 maxDist, s16 brightness, s16 canOcclude);
+extern void AddStarLight(void);
+extern void Add1UpLight(void);
+Gfx *LightsForTheObject(s32 callContext, struct GraphNode *node, UNUSED s32 context);
 void cur_obj_spawn_star_at_y_offset(f32 targetX, f32 targetY, f32 targetZ, f32 offsetY);
-
+extern Gfx *geo_reset_object_lights(s32 callContext, struct GraphNode *node, UNUSED Mat4 *mtx);
+extern Gfx *background_translate(s32 callContext, struct GraphNode *node, UNUSED f32 b[4][4]);
 #endif // OBJECT_HELPERS_H

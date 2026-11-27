@@ -1,0 +1,14 @@
+extern const GeoLayout white_particle_small_geo[];
+extern u8 white_particle_small_small_snow_right_rgba16_ci8[];
+extern u8 white_particle_small_small_snow_right_rgba16_pal_rgba16[];
+extern u8 white_particle_small_small_snow_left_rgba16_ci8[];
+extern u8 white_particle_small_small_snow_left_rgba16_pal_rgba16[];
+extern Vtx white_particle_small_000_displaylist_mesh_layer_4_vtx_0[3];
+extern Gfx white_particle_small_000_displaylist_mesh_layer_4_tri_0[];
+extern Vtx white_particle_small_000_displaylist_mesh_layer_4_vtx_1[3];
+extern Gfx white_particle_small_000_displaylist_mesh_layer_4_tri_1[];
+extern Gfx mat_white_particle_small_right[];
+extern Gfx mat_revert_white_particle_small_right[];
+extern Gfx mat_white_particle_small_left[];
+extern Gfx mat_revert_white_particle_small_left[];
+extern Gfx white_particle_small_000_displaylist_mesh_layer_4_with_revert[];

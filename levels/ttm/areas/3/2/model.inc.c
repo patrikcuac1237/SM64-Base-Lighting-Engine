@@ -37,6 +37,7 @@ static const Gfx ttm_seg7_dl_07024C00[] = {
     gsSPVertex(ttm_seg7_vertex_07024B90, 7, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  4, 0x0),
     gsSP2Triangles( 0,  5,  1, 0x0,  4,  6,  0, 0x0),
+    gsSPSetGeometryMode(G_LIGHTING),
     gsSPEndDisplayList(),
 };
 

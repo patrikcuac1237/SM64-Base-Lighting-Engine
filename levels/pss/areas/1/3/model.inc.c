@@ -71,6 +71,7 @@ static const Gfx pss_seg7_dl_0700B340[] = {
     gsSPVertex(pss_seg7_vertex_0700B250, 15, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 6,  7,  8, 0x0,  9, 10, 11, 0x0),
+    gsSPSetGeometryMode(G_LIGHTING),
     gsSP1Triangle(12, 13, 14, 0x0),
     gsSPEndDisplayList(),
 };
@@ -81,6 +82,7 @@ const Gfx pss_seg7_dl_0700B3F0[] = {
     gsDPSetCycleType(G_CYC_2CYCLE),
     gsDPSetRenderMode(G_RM_FOG_SHADE_A, G_RM_AA_ZB_OPA_SURF2),
     gsDPSetDepthSource(G_ZS_PIXEL),
+    gsSPSetGeometryMode(G_LIGHTING),
     gsDPSetFogColor(0, 0, 0, 255),
     gsSPFogPosition(980, 1000),
     gsSPSetGeometryMode(G_FOG),

@@ -83,4 +83,6 @@ extern const Gfx tornado_seg5_dl_050145C0[];
 extern const GeoLayout tweester_geo[];
 
 
+#include "klepto/geo_header.h"
+
 #endif

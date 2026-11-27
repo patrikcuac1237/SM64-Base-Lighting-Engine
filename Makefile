@@ -99,7 +99,8 @@ TARGET := sm64
 #   l3dex2  - F3DEX2 version that only renders in wireframe
 #   f3dzex  - newer, experimental microcode used in Animal Crossing
 #   super3d - extremely experimental version of Fast3D lacking many features for speed
-GRUCODE ?= f3dzex
+#   f3d3x3  - 
+GRUCODE ?= f3dex2
 $(eval $(call validate-option,GRUCODE,f3dex f3dex2 f3dex2pl f3dzex super3d l3dex2))
 
 ifeq ($(GRUCODE),f3dex) # Fast3DEX
@@ -221,7 +222,7 @@ ifeq ($(NON_MATCHING),1)
 endif
 
 
-TARGET_STRING := sm64
+TARGET_STRING := SM64-Lost-Adventure
 
 # UNF - whether to use UNFLoader flashcart library
 #   1 - includes code in ROM

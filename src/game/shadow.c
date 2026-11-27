@@ -260,7 +260,7 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
             // Ice floors are usually transparent.
             s->isDecal = FALSE;
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
-        } else if (type == SURFACE_BURNING) {
+        } else if (type & (SPECFLAG_BURNING << 8)) {
             // Set the shadow height to the lava height in specific areas.
             correct_lava_shadow_height(&floorHeight);
 #endif

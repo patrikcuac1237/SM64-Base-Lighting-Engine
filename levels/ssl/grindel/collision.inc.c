@@ -10,7 +10,7 @@ const Collision ssl_seg7_collision_grindel[] = {
     COL_VERTEX(224, 3, 224),
     COL_VERTEX(224, 450, 224),
     COL_VERTEX(-224, 450, 224),
-    COL_TRI_INIT(SURFACE_DEFAULT, 12),
+    COL_TRI_INIT(NEWTERRAIN(0, 0, 0, 0), 12),
     COL_TRI(0, 1, 2),
     COL_TRI(0, 2, 3),
     COL_TRI(3, 2, 4),

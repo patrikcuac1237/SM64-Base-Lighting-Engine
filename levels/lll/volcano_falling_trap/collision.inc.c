@@ -12,7 +12,7 @@ const Collision lll_seg7_collision_falling_wall[] = {
     COL_VERTEX(-306, 614, 3),
     COL_VERTEX(307, 614, 3),
     COL_VERTEX(307, -101, 3),
-    COL_TRI_INIT(SURFACE_DEFAULT, 12),
+    COL_TRI_INIT(SURFACE_HARD, 12),
     COL_TRI(0, 1, 2),
     COL_TRI(2, 1, 3),
     COL_TRI(2, 3, 4),

@@ -31,6 +31,12 @@ struct Config {
 #endif
     u8 tvType;
     u8 cheats;
+    u8 cameraChange;
+    u8 ChangeCamera;
+    u8 ExitCourse;
+    u8 bWithoutCamLight;
+    u8 MovesChange;
+    u8 SlipperySurfaces;
 };
 
 struct Controller {
@@ -259,6 +265,7 @@ struct GraphNodeObject {
     /*0x4C*/ struct SpawnInfo *spawnInfo;
     /*0x50*/ Mat4 *throwMatrix; // matrix ptr
     /*0x54*/ Vec3f cameraToObject;
+    f32 appearanceScale;
 #ifdef OBJECTS_REJ
     u16 ucode;
 #endif
@@ -349,6 +356,13 @@ struct Object {
     /*0x218*/ void *collisionData;
     /*0x21C*/ Mat4 transform;
     /*0x25C*/ void *respawnInfo;
+    struct Surface *floor;
+    f32 oShadowTarget;
+    f32 oShadowLerp;
+    f32 floorHeight;
+    f32 oDeepDarknessLerp;
+    f32 oLightOpacity;
+    f32 oTimerAccumulator;
 #ifdef PUPPYLIGHTS
     struct PuppyLight puppylight;
 #endif
@@ -390,6 +404,7 @@ struct Surface {
     /*0x1C*/ struct Normal normal;
     /*0x28*/ f32 originOffset;
     /*0x2C*/ struct Object *object;
+             u32 extendedTypes;
 };
 
 #define PUNCH_STATE_TIMER_MASK          0b00111111
@@ -425,6 +440,7 @@ struct MarioState {
     /*0x10*/ u32 prevAction;
     /*0x14*/ u32 terrainSoundAddend;
     /*0x18*/ u16 actionState;
+    /*0x18*/ Bool32 bIsForward;
     /*0x1A*/ u16 actionTimer;
     /*0x1C*/ u32 actionArg;
     /*0x20*/ f32 intendedMag;
@@ -441,7 +457,6 @@ struct MarioState {
     /*0x3C*/ Vec3f pos;
     /*0x48*/ Vec3f vel;
     /*0x54*/ f32 forwardVel;
-    /*0x055*/f32 FVelocity;
     /*0x58*/ f32 slideVelX;
     /*0x5C*/ f32 slideVelZ;
     /*0x60*/ struct Surface *wall;
@@ -495,6 +510,8 @@ struct MarioState {
            Angle moveYaw;
            Angle ceilYaw;
            Angle wallYaw;
+           u16 lastStepSoundFrame; 
+           s16 alpha;
     // -- HackerSM64 MarioState fields end --
 };
 

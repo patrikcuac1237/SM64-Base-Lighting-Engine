@@ -6,12 +6,12 @@ void bhv_pound_white_puffs_init(void) {
 }
 
 static struct SpawnParticlesInfo sGlobalMistParticles = {
-    /* behParam:        */ 3,
-    /* count:           */ 20,
+    /* bhvParam:        */ 3,
+    /* count:           */ 10,
     /* model:           */ MODEL_MIST,
     /* offsetY:         */ 20,
-    /* forwardVelBase:  */ 10,
-    /* forwardVelRange: */ 5,
+    /* forwardVelBase:  */ 4,
+    /* forwardVelRange: */ 1.5,
     /* velYBase:        */ 0,
     /* velYRange:       */ 0,
     /* gravity:         */ 0,
@@ -25,7 +25,7 @@ void spawn_mist_from_global(void) {
 }
 
 static struct SpawnParticlesInfo sSandParticles = {
-    /* behParam:        */ 0,
+    /* bhvParam:        */ 0,
     /* count:           */ 5,
     /* model:           */ MODEL_SAND_DUST,
     /* offsetY:         */ 0,
@@ -44,12 +44,7 @@ void bhv_ground_sand_init(void) {
     cur_obj_spawn_particles(&sSandParticles);
 }
 
-static s16 sSmokeMovementParams[] = {
-    /* forwardVel  */  2,
-    /* velY        */ -8,
-    /* gravity     */  1,
-    /* rangeLength */  4
-};
+static s16 sSmokeMovementParams[] = { 2, -8, 1, 4 };
 
 void spawn_smoke_with_velocity(void) {
     struct Object *smoke = spawn_object_with_scale(o, MODEL_SMOKE, bhvWhitePuffSmoke2, 1.0f);
@@ -67,7 +62,7 @@ void clear_particle_flags(u32 flags) {
 }
 
 static struct SpawnParticlesInfo sSnowParticles = {
-    /* behParam:        */ 0,
+    /* bhvParam:        */ 0,
     /* count:           */ 5,
     /* model:           */ MODEL_WHITE_PARTICLE_DL,
     /* offsetY:         */ 0,
@@ -77,8 +72,8 @@ static struct SpawnParticlesInfo sSnowParticles = {
     /* velYRange:       */ 0,
     /* gravity:         */ 252,
     /* dragStrength:    */ 30,
-    /* sizeBase:        */ 2.0f,
-    /* sizeRange:       */ 2.0f,
+    /* sizeBase:        */ 3.0f,
+    /* sizeRange:       */ 3.0f,
 };
 
 void bhv_ground_snow_init(void) {

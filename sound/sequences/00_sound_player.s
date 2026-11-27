@@ -251,6 +251,7 @@ sound_ref .sound_action_jump_spooky
 sound_ref .sound_action_jump_snow
 sound_ref .sound_action_jump_ice
 sound_ref .sound_action_jump_sand
+sound_ref .sound_action_jump_wood
 sound_ref .sound_action_landing_default
 sound_ref .sound_action_landing_grass
 sound_ref .sound_action_landing_water
@@ -259,6 +260,7 @@ sound_ref .sound_action_landing_spooky
 sound_ref .sound_action_landing_snow
 sound_ref .sound_action_landing_ice
 sound_ref .sound_action_landing_sand
+sound_ref .sound_action_landing_wood
 sound_ref .sound_action_step_default
 sound_ref .sound_action_step_grass
 sound_ref .sound_action_step_water
@@ -267,6 +269,7 @@ sound_ref .sound_action_step_spooky
 sound_ref .sound_action_step_snow
 sound_ref .sound_action_step_ice
 sound_ref .sound_action_step_sand
+sound_ref .sound_action_step_wood
 sound_ref .sound_action_body_hit_ground_default
 sound_ref .sound_action_body_hit_ground_grass
 sound_ref .sound_action_body_hit_ground_water
@@ -275,6 +278,7 @@ sound_ref .sound_action_body_hit_ground_spooky
 sound_ref .sound_action_body_hit_ground_snow
 sound_ref .sound_action_body_hit_ground_ice
 sound_ref .sound_action_body_hit_ground_sand
+sound_ref .sound_action_body_hit_ground_wood
 sound_ref .sound_action_step_tiptoe_default
 sound_ref .sound_action_step_tiptoe_grass
 sound_ref .sound_action_step_tiptoe_water
@@ -283,6 +287,7 @@ sound_ref .sound_action_step_tiptoe_spooky
 sound_ref .sound_action_step_tiptoe_snow
 sound_ref .sound_action_step_tiptoe_ice
 sound_ref .sound_action_step_tiptoe_sand
+sound_ref .sound_action_step_tiptoe_wood
 sound_ref .sound_action_metal_jump
 sound_ref .sound_action_metal_landing
 sound_ref .sound_action_metal_step
@@ -323,6 +328,7 @@ sound_ref .sound_action_stuck_in_ground_default
 sound_ref .sound_action_stuck_in_ground_snow
 sound_ref .sound_action_stuck_in_ground_sand
 sound_ref .sound_action_stuck_in_ground_sand
+sound_ref .sound_action_stuck_in_ground_default
 sound_ref .sound_action_metal_jump_water
 sound_ref .sound_action_metal_land_water
 sound_ref .sound_action_metal_step_water
@@ -347,15 +353,7 @@ sound_ref .sound_action_heavy_landing_spooky
 sound_ref .sound_action_heavy_landing_snow
 sound_ref .sound_action_heavy_landing_ice
 sound_ref .sound_action_heavy_landing_sand
-sound_ref .sound_action_jump_default
-sound_ref .sound_action_jump_default
-sound_ref .sound_action_jump_default
-sound_ref .sound_action_jump_default
-sound_ref .sound_action_jump_default
-sound_ref .sound_action_jump_default
-sound_ref .sound_action_jump_default
-sound_ref .sound_action_jump_default
-
+sound_ref .sound_action_heavy_landing_wood
 .sound_action_jump_default:
 chan_setbank 1
 chan_setinstr 0
@@ -439,10 +437,17 @@ chan_setinstr 8
 chan_setlayer 0, .layer_29D
 chan_end
 
+.sound_action_jump_wood:
+chan_setbank 1
+chan_setinstr 9
+chan_setlayer 0, .layer_29D
+chan_end
+
 .layer_29D:
 layer_note0 34, 0xc, 100, 127
 layer_note0 43, 0x24, 100, 127
 layer_end
+
 
 .sound_action_landing_default:
 chan_setbank 1
@@ -527,6 +532,12 @@ chan_setinstr 8
 chan_setlayer 0, .layer_317
 chan_end
 
+.sound_action_landing_wood:
+chan_setbank 1
+chan_setinstr 9
+chan_setlayer 0, .layer_317
+chan_end
+
 .layer_317:
 layer_note0 43, 0xc, 100, 127
 layer_note0 34, 0x24, 100, 127
@@ -605,6 +616,12 @@ layer_end
 .sound_action_step_sand:
 chan_setbank 1
 chan_setinstr 8
+chan_setlayer 0, .layer_37C
+chan_end
+
+.sound_action_step_wood:
+chan_setbank 1
+chan_setinstr 9
 chan_setlayer 0, .layer_37C
 chan_end
 
@@ -695,6 +712,12 @@ chan_setinstr 8
 chan_setlayer 0, .layer_3F1
 chan_end
 
+.sound_action_body_hit_ground_wood:
+chan_setbank 1
+chan_setinstr 9
+chan_setlayer 0, .layer_3F1
+chan_end
+
 .layer_3F1:
 layer_note0 31, 0xc, 100, 127
 layer_note0 32, 0x24, 100, 127
@@ -773,6 +796,12 @@ layer_end
 .sound_action_step_tiptoe_sand:
 chan_setbank 1
 chan_setinstr 8
+chan_setlayer 0, .layer_456
+chan_end
+
+.sound_action_step_tiptoe_wood:
+chan_setbank 1
+chan_setinstr 9
 chan_setlayer 0, .layer_456
 chan_end
 
@@ -1524,6 +1553,15 @@ chan_setinstr 8
 chan_setlayer 1, .layer_3F1
 chan_end
 
+.sound_action_heavy_landing_wood:
+chan_call .heavy_landing_common
+chan_setval 1
+chan_call .delay
+chan_setbank 1
+chan_setinstr 9
+chan_setlayer 1, .layer_3F1
+chan_end
+
 .channel1_table:
 sound_ref .sound_moving_slide_default
 sound_ref .sound_moving_slide_grass
@@ -1565,8 +1603,8 @@ sound_ref .sound_moving_riding_shell_spooky
 sound_ref .sound_moving_riding_shell_snow
 sound_ref .sound_moving_riding_shell_ice
 sound_ref .sound_moving_riding_shell_sand
+sound_ref .sound_moving_riding_shell_default
 sound_ref .sound_moving_riding_shell_lava
-sound_ref .sound_moving_riding_shell_grass
 sound_ref .sound_moving_riding_shell_water
 sound_ref .sound_moving_riding_shell_stone
 sound_ref .sound_moving_riding_shell_spooky

@@ -1,0 +1,11 @@
+extern const GeoLayout jrb_skybox_geo[];
+extern u8 jrb_skybox_clouds_rgba16_rgba16[];
+extern Vtx jrb_skybox_Icosphere_mesh_layer_1_vtx_0[403];
+extern Gfx jrb_skybox_Icosphere_mesh_layer_1_tri_0[];
+extern Vtx jrb_skybox_Icosphere_mesh_layer_1_vtx_1[13];
+extern Gfx jrb_skybox_Icosphere_mesh_layer_1_tri_1[];
+extern Gfx mat_jrb_skybox_sky[];
+extern Gfx mat_revert_jrb_skybox_sky[];
+extern Gfx mat_jrb_skybox_prim[];
+extern Gfx mat_revert_jrb_skybox_prim[];
+extern Gfx jrb_skybox_Icosphere_mesh_layer_1_with_revert[];

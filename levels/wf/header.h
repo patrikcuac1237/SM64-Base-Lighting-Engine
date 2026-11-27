@@ -99,4 +99,37 @@ extern const struct MovtexQuadCollection wf_movtex_water[];
 // script
 extern const LevelScript level_wf_entry[];
 
+#include "levels/wf/WFMainLevel/geo_header.h"
+
+#include "levels/wf/tumbling_bridge_near/geo_header.h"
+
+#include "levels/wf/tumbling_bridge_far/geo_header.h"
+
+#include "levels/wf/rotating_wooden_platform/geo_header.h"
+
+#include "levels/wf/small_bomp/geo_header.h"
+
+#include "levels/wf/large_bomp/geo_header.h"
+
+#include "levels/wf/sliding_platform/geo_header.h"
+
+#include "levels/wf/breakable_wall_left/geo_header.h"
+
+#include "levels/wf/breakable_wall_right/geo_header.h"
+
+#include "levels/wf/rotating_platform/geo_header.h"
+
+#include "levels/wf/whomps_tower/geo_header.h"
+
+#include "levels/wf/tower_square/geo_header.h"
+
+#include "levels/wf/tower_door/geo_header.h"
+
+#include "levels/wf/floating_brick_platform/geo_header.h"
+
+#include "cloud_floor_skybox/geo_header.h"
+
+#include "bullet_bill_cannon/geo_header.h"
+#include "whomps_tower/collision_header.h"
+#include "bullet_bill_cannon/collision_header.h"
 #endif

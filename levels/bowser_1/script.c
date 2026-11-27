@@ -26,6 +26,7 @@ const LevelScript level_bowser_1_entry[] = {
     MARIO(/*model*/ MODEL_MARIO, /*behParam*/ 0x00000001, /*beh*/ bhvMario),
     JUMP_LINK(script_func_global_13),
     LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_03, bowser_1_yellow_sphere_geo),
+    LOAD_MODEL_FROM_GEO(MODEL_BOWSER_KEY, bowser_key_geo),  
 
     AREA(/*index*/ 1, bowser_1_geo_0000D0),
         OBJECT(/*model*/ MODEL_NONE, /*pos*/ 0, 1307, 0, /*angle*/ 0, 180, 0, /*behParam*/ 0x000A0000, /*beh*/ bhvSpinAirborneCircleWarp),

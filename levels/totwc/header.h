@@ -18,4 +18,9 @@ extern const MacroObject totwc_seg7_macro_objs[];
 // script
 extern const LevelScript level_totwc_entry[];
 
+#include "levels/totwc/totwc_levell/geo_header.h"
+
+#include "levels/totwc/cloud/geo_header.h"
+
+#include "totwc_cloud_floor_skybox/geo_header.h"
 #endif

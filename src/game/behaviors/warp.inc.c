@@ -17,6 +17,7 @@ void bhv_warp_loop(void) {
     o->oInteractStatus = INT_STATUS_NONE;
 }
 
+u8 RGBMultAdd[3] = {0x5C, 0xA0, 0xFF};
 // identical to the above function except for o->hitboxRadius
 void bhv_fading_warp_loop() {
     if (o->oTimer == 0) {
@@ -31,6 +32,6 @@ void bhv_fading_warp_loop() {
         }
         o->hitboxHeight = 50.0f;
     }
-
+    addCurrentPointLight(0x5CA0FF50, 500, 10, FALSE);
     o->oInteractStatus = INT_STATUS_NONE;
 }

@@ -5,7 +5,6 @@
 #include "math_util.h"
 #include "game/memory.h"
 #include "graph_node.h"
-
 typedef void (*GeoLayoutCommandProc)(void);
 
 GeoLayoutCommandProc GeoLayoutJumpTable[] = {
@@ -22,7 +21,6 @@ GeoLayoutCommandProc GeoLayoutJumpTable[] = {
     /*GEO_CMD_NODE_PERSPECTIVE          */ geo_layout_cmd_node_perspective,
     /*GEO_CMD_NODE_START                */ geo_layout_cmd_node_start,
     /*GEO_CMD_NODE_MASTER_LIST          */ geo_layout_cmd_node_master_list,
-    /*GEO_CMD_NODE_LEVEL_OF_DETAIL      */ geo_layout_cmd_node_level_of_detail,
     /*GEO_CMD_NODE_SWITCH_CASE          */ geo_layout_cmd_node_switch_case,
     /*GEO_CMD_NODE_CAMERA               */ geo_layout_cmd_node_camera,
     /*GEO_CMD_NODE_TRANSLATION_ROTATION */ geo_layout_cmd_node_translation_rotation,
@@ -44,6 +42,7 @@ GeoLayoutCommandProc GeoLayoutJumpTable[] = {
     /*GEO_CMD_NODE_CULLING_RADIUS       */ geo_layout_cmd_node_culling_radius,
     /*GEO_CMD_NODE_BONE                 */ geo_layout_cmd_bone,
     /*Advanced lighting engine          */ geo_layout_cmd_scene_light,
+    /*Advanced Lighting Engine          */ geo_layout_cmd_light_pos,
 };
 
 struct GraphNode gObjParentGraphNode;
@@ -218,14 +217,13 @@ void geo_layout_cmd_node_root(void) {
     graphNode->views = gGeoViews;
     graphNode->numViews = gGeoNumViews;
 
-    for (i = 0; i < gGeoNumViews; i++) {
-        gGeoViews[i] = NULL;
-    }
+    memset(gGeoViews, 0, gGeoNumViews * sizeof(struct GraphNode *));
 
     register_scene_graph_node(&graphNode->node);
 
     gGeoLayoutCommand += 0x0C << CMD_SIZE_SHIFT;
 }
+
 
 /*
   0x09: Create orthographic projection scene graph node
@@ -299,23 +297,6 @@ void geo_layout_cmd_node_master_list(void) {
     gGeoLayoutCommand += 0x04 << CMD_SIZE_SHIFT;
 }
 
-/*
-  0x0D: Create a level of detail graph node, which only renders at a certain
-  distance interval from the camera.
-   cmd+0x04: s16 minDistance
-   cmd+0x06: s16 maxDistance
-*/
-void geo_layout_cmd_node_level_of_detail(void) {
-    s16 minDistance = cur_geo_cmd_s16(0x04);
-    s16 maxDistance = cur_geo_cmd_s16(0x06);
-
-    struct GraphNodeLevelOfDetail *graphNode =
-        init_graph_node_render_range(gGraphNodePool, NULL, minDistance, maxDistance);
-
-    register_scene_graph_node(&graphNode->node);
-
-    gGeoLayoutCommand += 0x08 << CMD_SIZE_SHIFT;
-}
 
 /*
   0x0E: Create switch-case scene graph node
@@ -774,7 +755,6 @@ void geo_layout_cmd_scene_light(void) {
     a = cur_geo_cmd_u8(0x05);
     b = cur_geo_cmd_u8(0x06);
     c = cur_geo_cmd_u8(0x07);
-
     graphNode = init_graph_node_scene_light(gGraphNodePool, graphNode, lightType, color, a, b, c);
     register_scene_graph_node(&graphNode->node);
 
@@ -785,6 +765,48 @@ void geo_layout_cmd_scene_light(void) {
         /* quadratic falloff */ sizeof(u8) +
         /* linear falloff */ sizeof(u8) +
         /* unused */ sizeof(u8)) << CMD_SIZE_SHIFT;
+}
+
+void geo_layout_cmd_scene_light_new(void) {
+    struct GraphNodeSceneLight *graphNode;
+    u8 lightType, a, b, c;
+    u8 color[3];
+    Vec3f worldPos;
+
+    lightType = cur_geo_cmd_u8(0x01);
+    color[0] = cur_geo_cmd_u8(0x02);
+    color[1] = cur_geo_cmd_u8(0x03);
+    color[2] = cur_geo_cmd_u8(0x04);
+    a = cur_geo_cmd_u8(0x05);
+    b = cur_geo_cmd_u8(0x06);
+    c = cur_geo_cmd_u8(0x07);
+    worldPos[0] = cur_geo_cmd_f32(0x08);
+    worldPos[1] = cur_geo_cmd_f32(0x09);
+    worldPos[2] = cur_geo_cmd_f32(0x0A);
+
+    graphNode = init_graph_node_scene_light_new(gGraphNodePool, graphNode, lightType, color, a, b, c, worldPos);
+    register_scene_graph_node(&graphNode->node);
+
+    gGeoLayoutCommand += (
+        /* command Id */ sizeof(u8) +
+        /* light type */ sizeof(u8) +
+        /* color */ sizeof(u8) * 3 +
+        /* quadratic falloff */ sizeof(u8) +
+        /* linear falloff */ sizeof(u8) +
+        /* x position on level*/ sizeof(u8) +
+        /* y position on level*/ sizeof(u8) +
+        /* z position on level*/ sizeof(u8) +
+        /* unused */ sizeof(u8)) << CMD_SIZE_SHIFT;
+}
+
+void geo_layout_cmd_light_pos(void) {
+    struct GraphNodeLightPos *graphNode;
+    Vec3s worldPos;
+    graphNode = init_graph_node_light_pos(gGraphNodePool, graphNode, worldPos);
+    register_scene_graph_node(&graphNode->node);
+    gGeoLayoutCommand += (
+        /*command Id*/ sizeof(u8) +
+        /*worldPos*/   sizeof(u8)) << CMD_SIZE_SHIFT;
 }
 /*
   Create a scene graph node that is rotated by the object's animation + an initial rotation.

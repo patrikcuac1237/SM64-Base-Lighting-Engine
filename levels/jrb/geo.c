@@ -22,4 +22,7 @@
 #include "levels/jrb/areas/1/geo.inc.c"
 #include "levels/jrb/areas/2/geo.inc.c"
 
-#include "levels/jrb/geo.inc.c"
+#include "levels/jrb/jrbArea1/geo.inc.c"
+#include "levels/jrb/jrbarea2/geo.inc.c"
+#include "jrb_skybox/geo.inc.c"
+#include "jrbArea1_bright/geo.inc.c"

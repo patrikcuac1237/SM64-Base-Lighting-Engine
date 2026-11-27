@@ -1,0 +1,14 @@
+extern const GeoLayout snowman_head_geo[];
+extern u8 snowman_head_ccm_textures_08800_rgba16_ci8[];
+extern u8 snowman_head_ccm_textures_08800_rgba16_pal_rgba16[];
+extern u8 snowman_head__6_rgba16_ia8[];
+extern Vtx snowman_head_000_displaylist_mesh_layer_1_vtx_0[100];
+extern Gfx snowman_head_000_displaylist_mesh_layer_1_tri_0[];
+extern Vtx snowman_head_001_displaylist_mesh_layer_4_vtx_0[12];
+extern Gfx snowman_head_001_displaylist_mesh_layer_4_tri_0[];
+extern Gfx mat_snowman_head__1[];
+extern Gfx mat_revert_snowman_head__1[];
+extern Gfx mat_snowman_head__0[];
+extern Gfx mat_revert_snowman_head__0[];
+extern Gfx snowman_head_000_displaylist_mesh_layer_1_with_revert[];
+extern Gfx snowman_head_001_displaylist_mesh_layer_4_with_revert[];

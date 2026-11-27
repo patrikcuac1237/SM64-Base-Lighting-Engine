@@ -1,5 +1,3 @@
-
-
 Gfx warp_pipe_warp_pipe_side_ci8_aligner[] = {gsSPEndDisplayList()};
 u8 warp_pipe_warp_pipe_side_ci8[] = {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x01, 
@@ -236,7 +234,7 @@ Gfx warp_pipe_001_displaylist_mesh_layer_1_tri_1[] = {
 };
 
 
-Gfx mat_warp_pipe_f3dlite_material_007[] = {
+Gfx mat_warp_pipe__0[] = {
 	gsDPPipeSync(),
 	gsDPSetCombineLERP(TEXEL0, 0, SHADE, 0, 0, 0, 0, ENVIRONMENT, TEXEL0, 0, SHADE, 0, 0, 0, 0, ENVIRONMENT),
 	gsSPTexture(65535, 65535, 0, 0, 1),
@@ -255,18 +253,16 @@ Gfx mat_warp_pipe_f3dlite_material_007[] = {
 	gsDPPipeSync(),
 	gsDPSetTile(G_IM_FMT_CI, G_IM_SIZ_8b, 1, 0, 0, 0, G_TX_WRAP | G_TX_NOMIRROR, 7, 0, G_TX_WRAP | G_TX_NOMIRROR, 0, 0),
 	gsDPSetTileSize(0, 0, 0, 0, 380),
-    gsSPLightColor(LIGHT_1, 0xffffffff),
-    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
 	gsSPEndDisplayList(),
 };
 
-Gfx mat_revert_warp_pipe_f3dlite_material_007[] = {
+Gfx mat_revert_warp_pipe__0[] = {
 	gsDPPipeSync(),
 	gsDPSetTextureLUT(G_TT_NONE),
 	gsSPEndDisplayList(),
 };
 
-Gfx mat_warp_pipe_f3dlite_material_008[] = {
+Gfx mat_warp_pipe__1[] = {
 	gsDPPipeSync(),
 	gsDPSetCombineLERP(TEXEL0, 0, SHADE, 0, 0, 0, 0, ENVIRONMENT, TEXEL0, 0, SHADE, 0, 0, 0, 0, ENVIRONMENT),
 	gsSPTexture(65535, 65535, 0, 0, 1),
@@ -285,31 +281,29 @@ Gfx mat_warp_pipe_f3dlite_material_008[] = {
 	gsDPPipeSync(),
 	gsDPSetTile(G_IM_FMT_CI, G_IM_SIZ_8b, 1, 0, 0, 0, G_TX_WRAP | G_TX_NOMIRROR, 7, 0, G_TX_WRAP | G_TX_NOMIRROR, 0, 0),
 	gsDPSetTileSize(0, 0, 0, 0, 380),
-    gsSPLightColor(LIGHT_1, 0xffffffff),
-    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
 	gsSPEndDisplayList(),
 };
 
-Gfx mat_revert_warp_pipe_f3dlite_material_008[] = {
+Gfx mat_revert_warp_pipe__1[] = {
 	gsDPPipeSync(),
 	gsDPSetTextureLUT(G_TT_NONE),
 	gsSPEndDisplayList(),
 };
 
 Gfx warp_pipe_000_displaylist_mesh_layer_1[] = {
-	gsSPDisplayList(mat_warp_pipe_f3dlite_material_007),
+	gsSPDisplayList(mat_warp_pipe__0),
 	gsSPDisplayList(warp_pipe_000_displaylist_mesh_layer_1_tri_0),
-	gsSPDisplayList(mat_revert_warp_pipe_f3dlite_material_007),
+	gsSPDisplayList(mat_revert_warp_pipe__0),
 	gsSPEndDisplayList(),
 };
 
 Gfx warp_pipe_001_displaylist_mesh_layer_1[] = {
-	gsSPDisplayList(mat_warp_pipe_f3dlite_material_007),
+	gsSPDisplayList(mat_warp_pipe__0),
 	gsSPDisplayList(warp_pipe_001_displaylist_mesh_layer_1_tri_0),
-	gsSPDisplayList(mat_revert_warp_pipe_f3dlite_material_007),
-	gsSPDisplayList(mat_warp_pipe_f3dlite_material_008),
+	gsSPDisplayList(mat_revert_warp_pipe__0),
+	gsSPDisplayList(mat_warp_pipe__1),
 	gsSPDisplayList(warp_pipe_001_displaylist_mesh_layer_1_tri_1),
-	gsSPDisplayList(mat_revert_warp_pipe_f3dlite_material_008),
+	gsSPDisplayList(mat_revert_warp_pipe__1),
 	gsSPEndDisplayList(),
 };
 

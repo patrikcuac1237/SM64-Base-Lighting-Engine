@@ -1,0 +1,12 @@
+extern u64 moving_pyramid_wall_bob_textures_00800_rgba16_ci8[];
+extern u64 moving_pyramid_wall_bob_textures_00800_rgba16_pal_rgba16[];
+extern u64 moving_pyramid_wall_bob_textures_0A800_rgba16_rgba16[];
+extern Vtx moving_pyramid_wall_ssl_seg7_dl_07022CF8_mesh_vtx_0[24];
+extern Gfx moving_pyramid_wall_ssl_seg7_dl_07022CF8_mesh_tri_0[];
+extern Vtx moving_pyramid_wall_ssl_seg7_dl_07022CF8_mesh_vtx_1[12];
+extern Gfx moving_pyramid_wall_ssl_seg7_dl_07022CF8_mesh_tri_1[];
+extern Gfx mat_moving_pyramid_wall_f3dlite_material_001[];
+extern Gfx mat_revert_moving_pyramid_wall_f3dlite_material_001[];
+extern Gfx mat_moving_pyramid_wall_f3dlite_material_002[];
+extern Gfx mat_revert_moving_pyramid_wall_f3dlite_material_002[];
+extern Gfx moving_pyramid_wall_ssl_seg7_dl_07022CF8_mesh[];

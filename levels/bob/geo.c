@@ -17,3 +17,8 @@
 #include "levels/bob/seesaw_platform/geo.inc.c"
 #include "levels/bob/grate_door/geo.inc.c"
 #include "levels/bob/areas/1/geo.inc.c"
+
+#include "BOB/geo.inc.c"
+#include "star_zone/geo.inc.c"
+#include "star_zone_bright/geo.inc.c"
+#include "bob_water_skybox/geo.inc.c"

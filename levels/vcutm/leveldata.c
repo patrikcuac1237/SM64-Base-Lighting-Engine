@@ -17,3 +17,6 @@
 #include "levels/vcutm/areas/1/collision.inc.c"
 #include "levels/vcutm/areas/1/macro.inc.c"
 #include "levels/vcutm/seesaw/collision.inc.c"
+
+#include "levels/vcutm/vcutm_level/model.inc.c"
+#include "levels/vcutm/level_death_floor/model.inc.c"

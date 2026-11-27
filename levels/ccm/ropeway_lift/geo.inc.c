@@ -1,9 +1,15 @@
-// 0x0E0003D0
+#include "src/game/envfx_snow.h"
+
 const GeoLayout ccm_geo_0003D0[] = {
-   GEO_CULLING_RADIUS(500),
-   GEO_OPEN_NODE(),
-      GEO_DISPLAY_LIST(LAYER_ALPHA, ccm_seg7_dl_07010F28),
-      GEO_DISPLAY_LIST(LAYER_OPAQUE, ccm_seg7_dl_070118B0),
-   GEO_CLOSE_NODE(),
-   GEO_END(),
+	GEO_NODE_START(),
+	GEO_OPEN_NODE(),
+		GEO_CULLING_RADIUS(500),
+		GEO_OPEN_NODE(),
+			GEO_DISPLAY_LIST(LAYER_ALPHA, ropeway_lift_000_displaylist_mesh_layer_4),
+			GEO_DISPLAY_LIST(LAYER_OPAQUE, ropeway_lift_001_displaylist_mesh_layer_1),
+		GEO_CLOSE_NODE(),
+		GEO_DISPLAY_LIST(LAYER_OPAQUE, ropeway_lift_material_revert_render_settings),
+		GEO_DISPLAY_LIST(LAYER_ALPHA, ropeway_lift_material_revert_render_settings),
+	GEO_CLOSE_NODE(),
+	GEO_END(),
 };

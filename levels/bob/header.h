@@ -31,4 +31,11 @@ extern const Trajectory bob_seg7_trajectory_koopa[];
 // script
 extern const LevelScript level_bob_entry[];
 
+#include "levels/bob/area_1/geo_header.h"
+
+#include "levels/bob/seesaw_platform/geo_header.h"
+#include "BOB/geo_header.h"
+#include "star_zone/geo_header.h"
+#include "star_zone_bright/geo_header.h"
+#include "bob_water_skybox/geo_header.h"
 #endif

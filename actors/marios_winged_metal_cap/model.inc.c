@@ -1520,8 +1520,8 @@ Gfx mat_marios_winged_metal_cap_metal_v3_001[] = {
 	gsDPPipeSync(),
 	gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 16, 0, 0, 0, G_TX_WRAP | G_TX_NOMIRROR, 5, 0, G_TX_WRAP | G_TX_NOMIRROR, 6, 0),
 	gsDPSetTileSize(0, 0, 0, 252, 124),
-    gsSPLightColor(LIGHT_1, 0xffffffff),
-    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
+    //1, 0xffffffff),
+    //2, 0x7f7f7fff),
 	gsSPEndDisplayList(),
 };
 
@@ -1543,8 +1543,8 @@ Gfx mat_marios_winged_metal_cap_f3dlite_material_001[] = {
 	gsDPPipeSync(),
 	gsDPSetTile(G_IM_FMT_IA, G_IM_SIZ_8b, 4, 0, 0, 0, G_TX_CLAMP | G_TX_NOMIRROR, 6, 0, G_TX_CLAMP | G_TX_NOMIRROR, 5, 0),
 	gsDPSetTileSize(0, 0, 0, 124, 252),
-    gsSPLightColor(LIGHT_1, 0x5c5c5cff),
-    gsSPLightColor(LIGHT_2, 0x2c2c2cff),
+    //1, 0x5c5c5cff),
+    //2, 0x2c2c2cff),
 	gsSPEndDisplayList(),
 };
 

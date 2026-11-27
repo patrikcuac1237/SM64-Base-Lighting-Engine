@@ -31,7 +31,7 @@ const GeoLayout penguin_armature_004_switch_option[] = {
 const GeoLayout penguin_000_switch_opt5[] = {
 	GEO_NODE_START(),
 	GEO_OPEN_NODE(),
-		GEO_ANIMATED_PART(LAYER_OPAQUE, 0, 0, 0, penguin_000_offset_006_mesh_layer_1_mat_override_f3dlite_material_0),
+		GEO_ANIMATED_PART(LAYER_OPAQUE, 0, 0, 0, penguin_000_offset_006_mesh_layer_1_mat_override_eye_open_0),
 	GEO_CLOSE_NODE(),
 	GEO_RETURN(),
 };
@@ -78,7 +78,6 @@ const GeoLayout penguin_geo[] = {
 				GEO_CLOSE_NODE(),
 			GEO_CLOSE_NODE(),
 		GEO_CLOSE_NODE(),
-		GEO_DISPLAY_LIST(LAYER_OPAQUE, penguin_material_revert_render_settings),
 	GEO_CLOSE_NODE(),
 	GEO_END(),
 };

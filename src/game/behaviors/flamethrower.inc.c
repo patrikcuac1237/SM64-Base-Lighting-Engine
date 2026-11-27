@@ -4,17 +4,43 @@ void bhv_flamethrower_flame_loop(void) {
     f32 scale;
     s32 remainingTime;
 
+    // Inicialización al nacer
     if (o->oTimer == 0) {
         o->oAnimState = (s32)(random_float() * 10.0f);
         obj_translate_xyz_random(o, 10.0f);
     }
 
+    // Calcular la escala de la flama (crece con el tiempo)
     if (o->oBehParams2ndByte == FLAMETHROWER_BP_SLOW) {
         scale = o->oTimer * (o->oForwardVel - 6.0f) / 100.0f + 2.0f;
     } else {
         scale = o->oTimer * (o->oForwardVel - 20.0f) / 100.0f + 1.0f;
     }
 
+    // =========================================================
+    // LÓGICA DE LA LUZ DINÁMICA (EN EL MEDIO)
+    // =========================================================
+    // Hacemos que solo las flamas que tengan entre 7 y 9 frames de vida emitan luz.
+    // Esto asegura que siempre haya luz en el chorro pero sin saturar el motor.
+    if (o->oTimer >= 7 && o->oTimer <= 9) {
+        o->oFlags |= OBJ_FLAG_EMIT_LIGHT; // Activa tu flag de luz
+        
+        // Configurar el color según el tipo de flama (Azul o Roja)
+        if (o->oBehParams2ndByte == FLAMETHROWER_BP_BLUE) {
+            o->oLightColor = 0x0078FF00; // Azul (RGBA)
+        } else {
+            o->oLightColor = 0xFF320000; // Naranja/Rojo (RGBA)
+        }
+        
+        o->oLightMaxDist = 1200.0f;   // Qué tan lejos llega la luz
+        o->oLightBrightness = 10;    // Intensidad
+    } else {
+        // Apagar la luz para las flamas que están naciendo o muriendo
+        o->oFlags &= ~OBJ_FLAG_EMIT_LIGHT;
+    }
+    // =========================================================
+
+    // Determinar cuánto tiempo vive la flama
     if (o->oBehParams2ndByte == FLAMETHROWER_BP_TALL_HITBOX) {
         o->hitboxHeight = 200.0f;
         o->hitboxDownOffset = 150.0f;
@@ -32,14 +58,16 @@ void bhv_flamethrower_flame_loop(void) {
         remainingTime = o->parentObj->oFlameThowerTimeRemaining;
     }
 
+    // Aplicar escala y movimiento
     cur_obj_scale(scale);
 
     if (o->oBehParams2ndByte == FLAMETHROWER_BP_UPWARDS) {
-        o->oPosY += o->oForwardVel; // weird?
+        o->oPosY += o->oForwardVel;
     } else {
         cur_obj_move_using_fvel_and_gravity();
     }
 
+    // Morir cuando pase el tiempo
     if (o->oTimer > remainingTime) {
         obj_mark_for_deletion(o);
     }

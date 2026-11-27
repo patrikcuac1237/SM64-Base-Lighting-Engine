@@ -1,8 +1,11 @@
-// 0x0E000458
+#include "src/game/envfx_snow.h"
+
 const GeoLayout bob_geo_000458[] = {
-   GEO_CULLING_RADIUS(1200),
-   GEO_OPEN_NODE(),
-      GEO_DISPLAY_LIST(LAYER_OPAQUE, bob_seg7_dl_0700E768),
-   GEO_CLOSE_NODE(),
-   GEO_END(),
+	GEO_CULLING_RADIUS(1200),
+	GEO_OPEN_NODE(),
+		GEO_OPEN_NODE(),
+			GEO_DISPLAY_LIST(LAYER_OPAQUE, seesaw_platform_000_displaylist_mesh_layer_1),
+		GEO_CLOSE_NODE(),
+	GEO_CLOSE_NODE(),
+	GEO_END(),
 };

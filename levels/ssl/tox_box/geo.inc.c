@@ -1,8 +1,9 @@
-// 0x0E000630
-const GeoLayout ssl_geo_000630[] = {
-   GEO_CULLING_RADIUS(4000),
-   GEO_OPEN_NODE(),
-      GEO_DISPLAY_LIST(LAYER_OPAQUE, ssl_seg7_dl_0700FCE0),
-   GEO_CLOSE_NODE(),
-   GEO_END(),
+#include "src/game/envfx_snow.h"
+
+const GeoLayout tox_box_geo[] = {
+   	GEO_CULLING_RADIUS(4000),
+	GEO_OPEN_NODE(),
+		GEO_DISPLAY_LIST(LAYER_OPAQUE, tox_box_ssl_seg7_dl_0700FCE0_mesh_layer_1_with_revert),
+	GEO_CLOSE_NODE(),
+	GEO_END(),
 };

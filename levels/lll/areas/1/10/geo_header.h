@@ -1,0 +1,12 @@
+extern const GeoLayout lll_geo_000A78[];
+extern u8 _10__11_rgba16_ia4[];
+extern u8 _10_lll_textures_07800_rgba16_rgba16[];
+extern Vtx _10_000_displaylist_mesh_layer_1_vtx_0[6];
+extern Gfx _10_000_displaylist_mesh_layer_1_tri_0[];
+extern Vtx _10_000_displaylist_mesh_layer_1_vtx_1[24];
+extern Gfx _10_000_displaylist_mesh_layer_1_tri_1[];
+extern Gfx mat_10__0_layer1[];
+extern Gfx mat_revert_10__0_layer1[];
+extern Gfx mat_10__1_layer1[];
+extern Gfx mat_revert_10__1_layer1[];
+extern Gfx _10_000_displaylist_mesh_layer_1_with_revert[];

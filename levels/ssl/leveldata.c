@@ -12,28 +12,15 @@
 #include "types.h"
 
 #include "make_const_nonconst.h"
-// LEVEL DATA
-#include "levels/ssl/texture.inc.c"
 // This is an oddity, but it is assumed this because of the likelyhood SSL's
 // course used to be smaller in a prototype build and that moving areas around
 // caused this discrepency. (See the 3 Star Course theory)
-#include "levels/ssl/areas/2/4/model.inc.c"
-#include "levels/ssl/areas/1/1/model.inc.c"
-#include "levels/ssl/areas/1/2/model.inc.c"
-#include "levels/ssl/areas/1/3/model.inc.c"
-#include "levels/ssl/areas/1/4/model.inc.c"
 #include "levels/ssl/pyramid_top/model.inc.c"
 #include "levels/ssl/tox_box/model.inc.c"
 #include "levels/ssl/areas/1/collision.inc.c"
 #include "levels/ssl/areas/1/macro.inc.c"
 #include "levels/ssl/pyramid_top/collision.inc.c"
 #include "levels/ssl/tox_box/collision.inc.c"
-#include "levels/ssl/areas/1/movtext.inc.c"
-#include "levels/ssl/areas/2/1/model.inc.c"
-#include "levels/ssl/areas/2/2/model.inc.c"
-#include "levels/ssl/areas/2/3/model.inc.c"
-#include "levels/ssl/areas/3/1/model.inc.c"
-#include "levels/ssl/areas/3/2/model.inc.c"
 #include "levels/ssl/grindel/model.inc.c"
 #include "levels/ssl/spindel/model.inc.c"
 #include "levels/ssl/moving_pyramid_wall/model.inc.c"
@@ -48,4 +35,8 @@
 #include "levels/ssl/moving_pyramid_wall/collision.inc.c"
 #include "levels/ssl/pyramid_elevator/collision.inc.c"
 #include "levels/ssl/eyerok_col/collision.inc.c"
-#include "levels/ssl/areas/2/movtext.inc.c"
+#include "sslArea1/model.inc.c"
+#include "ssl_sky/model.inc.c"
+#include "sslArea2/model.inc.c"
+#include "sslArea3/model.inc.c"
+#include "ssl_area2_skybox/model.inc.c"

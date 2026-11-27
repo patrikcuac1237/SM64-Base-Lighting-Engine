@@ -4,7 +4,7 @@
 #include <PR/ultratypes.h>
 
 #include "engine/graph_node.h"
-
+extern float current_aspect_ratio;
 extern struct GraphNodeRoot        *gCurGraphNodeRoot;
 extern struct GraphNodeMasterList  *gCurGraphNodeMasterList;
 extern struct GraphNodePerspective *gCurGraphNodeCamFrustum;
@@ -83,8 +83,10 @@ enum AnimType {
 #endif
 
 #define RENDER_PHASE_FIRST 0
-
+extern Lights1 currWorldLight;
 void geo_process_node_and_siblings(struct GraphNode *firstNode);
 void geo_process_root(struct GraphNodeRoot *node, Vp *b, Vp *c, s32 clearColor);
+Gfx* createPointLightsDl(struct Object *gCurObj);
+Gfx *geo_update_point_lights(s32 callContext, struct GraphNode *node, UNUSED Mat4 mtx);
 
 #endif // RENDERING_GRAPH_NODE_H

@@ -1,5 +1,5 @@
 // mushroom_1up.inc.c
-
+u8 MCol[3];
 void bhv_1up_interact(void) {
     if (obj_check_if_collided_with_object(o, gMarioObject)) {
         play_sound(SOUND_GENERAL_COLLECT_1UP, gGlobalSoundSource);
@@ -28,6 +28,9 @@ void bhv_1up_common_init(void) {
 }
 
 void bhv_1up_init(void) {
+    MCol[0] = 127;
+    MCol[1] = 240;
+    MCol[2] = 200;
     bhv_1up_common_init();
 #ifndef UNLOCK_ALL
     if (o->oBehParams2ndByte == MUSHROOM_BP_REQUIRES_BOWSER_1) {
@@ -85,7 +88,9 @@ void one_up_move_away_from_mario(s16 collisionFlags) {
 
 void bhv_1up_walking_loop(void) {
     object_step();
-
+    if (o->header.gfx.node.flags & GRAPH_RENDER_ACTIVE) {
+        Add1UpLight();
+    }
     switch (o->oAction) {
         case MUSHROOM_ACT_INIT:
             if (o->oTimer > 17) {
@@ -118,13 +123,13 @@ void bhv_1up_walking_loop(void) {
             bhv_1up_interact();
             break;
     }
-
-    set_object_visibility(o, 3000);
 }
 
 void bhv_1up_running_away_loop(void) {
     s16 collisionFlags = object_step();
-
+    if (o->header.gfx.node.flags != GRAPH_RENDER_INVISIBLE) {
+        Add1UpLight();
+    }
     switch (o->oAction) {
         case MUSHROOM_ACT_INIT:
             if (o->oTimer > 17) {
@@ -154,8 +159,6 @@ void bhv_1up_running_away_loop(void) {
             bhv_1up_interact();
             break;
     }
-
-    set_object_visibility(o, 3000);
 }
 
 void sliding_1up_move(void) {
@@ -195,12 +198,17 @@ void bhv_1up_sliding_loop(void) {
             bhv_1up_interact();
             break;
     }
-
+    if (o->header.gfx.node.flags != GRAPH_RENDER_INVISIBLE) {
+        Add1UpLight();
+    }
     bhv_1up_interact();
     spawn_object(o, MODEL_NONE, bhvSparkleSpawn);
 }
 
 void bhv_1up_loop(void) {
+    if (o->header.gfx.node.flags != GRAPH_RENDER_INVISIBLE) {
+        Add1UpLight();
+    }
     bhv_1up_interact();
     set_object_visibility(o, 3000);
 }

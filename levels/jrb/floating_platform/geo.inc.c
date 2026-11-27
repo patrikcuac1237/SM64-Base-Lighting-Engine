@@ -1,8 +1,12 @@
-// 0x0E000948
+#include "src/game/envfx_snow.h"
+
 const GeoLayout jrb_geo_000948[] = {
-   GEO_CULLING_RADIUS(900),
-   GEO_OPEN_NODE(),
-      GEO_DISPLAY_LIST(LAYER_OPAQUE, jrb_seg7_dl_07007DC8),
-   GEO_CLOSE_NODE(),
-   GEO_END(),
+	GEO_CULLING_RADIUS(900),
+	GEO_OPEN_NODE(),
+		GEO_OPEN_NODE(),
+			GEO_DISPLAY_LIST(LAYER_OPAQUE, floating_platform_000_displaylist_mesh_layer_1),
+		GEO_CLOSE_NODE(),
+		GEO_DISPLAY_LIST(LAYER_OPAQUE, floating_platform_material_revert_render_settings),
+	GEO_CLOSE_NODE(),
+	GEO_END(),
 };

@@ -64,6 +64,8 @@ static const LevelScript script_func_local_5[] = {
 
 static const LevelScript script_func_local_6[] = {
     OBJECT(/*model*/ MODEL_NONE, /*pos*/ 0, -1534, -3693, /*angle*/ 0, 0, 0, /*behParam*/ 0x03000000, /*beh*/ bhvEyerokBoss),
+    OBJECT(/*model*/ MODEL_NONE, /*pos*/ 0, -259, -2921, /*angle*/ 0, 0, 0, /*behParam*/ 0x03000000, /*beh*/ bhvCastleLight),
+    OBJECT(/*model*/ MODEL_NONE, /*pos*/ 0, -259, -2921, /*angle*/ 0, 0, 0, /*behParam*/ 0x03000000, /*beh*/ bhvCastleLight),
     RETURN(),
 };
 
@@ -81,14 +83,12 @@ const LevelScript level_ssl_entry[] = {
     JUMP_LINK(script_func_global_1),
     JUMP_LINK(script_func_global_6),
     LOAD_MODEL_FROM_GEO(MODEL_SSL_PALM_TREE,           palm_tree_geo),
-    LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_03,       ssl_geo_0005C0),
-    LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_04,       ssl_geo_0005D8),
     LOAD_MODEL_FROM_GEO(MODEL_SSL_PYRAMID_TOP,         ssl_geo_000618),
     LOAD_MODEL_FROM_GEO(MODEL_SSL_GRINDEL,             ssl_geo_000734),
     LOAD_MODEL_FROM_GEO(MODEL_SSL_SPINDEL,             ssl_geo_000764),
     LOAD_MODEL_FROM_GEO(MODEL_SSL_MOVING_PYRAMID_WALL, ssl_geo_000794),
     LOAD_MODEL_FROM_GEO(MODEL_SSL_PYRAMID_ELEVATOR,    ssl_geo_0007AC),
-    LOAD_MODEL_FROM_GEO(MODEL_SSL_TOX_BOX,             ssl_geo_000630),
+    LOAD_MODEL_FROM_GEO(MODEL_SSL_TOX_BOX,             tox_box_geo),
 
     AREA(/*index*/ 1, ssl_geo_000648),
         OBJECT(/*model*/ MODEL_NONE, /*pos*/   653, 1038,  6566, /*angle*/ 0,  90, 0, /*behParam*/ 0x000A0000, /*beh*/ bhvSpinAirborneWarp),
@@ -117,6 +117,8 @@ const LevelScript level_ssl_entry[] = {
         OBJECT(/*model*/ MODEL_NONE, /*pos*/    0, 5500,   256, /*angle*/ 0, 180, 0, /*behParam*/ 0x00140000, /*beh*/ bhvAirborneWarp),
         OBJECT(/*model*/ MODEL_NONE, /*pos*/ 3070, 1280,  2900, /*angle*/ 0, 180, 0, /*behParam*/ 0x00150000, /*beh*/ bhvFadingWarp),
         OBJECT(/*model*/ MODEL_NONE, /*pos*/ 2546, 1150, -2647, /*angle*/ 0,  78, 0, /*behParam*/ 0x00160000, /*beh*/ bhvFadingWarp),
+        OBJECT(/*model*/ MODEL_NONE,     /*pos*/     0, 5500, 256, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/  bhvPointLight),
+        OBJECT(/*model*/ MODEL_NONE,     /*pos*/     0, 5500, 256, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/  bhvPointLight),
         WARP_NODE(/*id*/ 0x0A, /*destLevel*/ LEVEL_SSL, /*destArea*/ 0x02, /*destNode*/ 0x0A, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0x14, /*destLevel*/ LEVEL_SSL, /*destArea*/ 0x02, /*destNode*/ 0x14, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0x15, /*destLevel*/ LEVEL_SSL, /*destArea*/ 0x02, /*destNode*/ 0x16, /*flags*/ WARP_NO_CHECKPOINT),

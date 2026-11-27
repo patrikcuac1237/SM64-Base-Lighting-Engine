@@ -90,4 +90,32 @@ extern const struct MovtexQuadCollection hmc_movtex_toxic_maze_mist[];
 // script
 extern const LevelScript level_hmc_entry[];
 
+#include "levels/hmc/hmc_room/geo_header.h"
+
+#include "levels/hmc/hmc_room1/geo_header.h"
+
+#include "levels/hmc/hmc_room2/geo_header.h"
+
+#include "levels/hmc/hmc_room3/geo_header.h"
+
+#include "levels/hmc/hmc_room4/geo_header.h"
+
+#include "levels/hmc/hmc_room5/geo_header.h"
+
+#include "levels/hmc/hmc_room6/geo_header.h"
+
+#include "levels/hmc/hmc_room7/geo_header.h"
+
+#include "levels/hmc/elevator_platform/geo_header.h"
+
+#include "levels/hmc/grill_door/geo_header.h"
+
+#include "levels/hmc/arrow_platform/geo_header.h"
+
+#include "levels/hmc/arrow_platform_button/geo_header.h"
+
+#include "levels/hmc/hmc_water/geo_header.h"
+
+#include "levels/hmc/hmc_toxic_mat/geo_header.h"
+#include "levels/hmc/dark_background/geo_header.h"
 #endif

@@ -1,0 +1,13 @@
+extern const GeoLayout blue_coin_switch_geo[];
+extern u8 blue_coin_switch_blue_coin_switch_top_rgba16_rgba16[];
+extern u8 blue_coin_switch_blue_coin_switch_side_rgba16_ci8[];
+extern u8 blue_coin_switch_blue_coin_switch_side_rgba16_pal_rgba16[];
+extern Vtx blue_coin_switch_000_displaylist_mesh_layer_1_vtx_0[4];
+extern Gfx blue_coin_switch_000_displaylist_mesh_layer_1_tri_0[];
+extern Vtx blue_coin_switch_000_displaylist_mesh_layer_1_vtx_1[16];
+extern Gfx blue_coin_switch_000_displaylist_mesh_layer_1_tri_1[];
+extern Gfx mat_blue_coin_switch__0[];
+extern Gfx mat_revert_blue_coin_switch__0[];
+extern Gfx mat_blue_coin_switch__1[];
+extern Gfx mat_revert_blue_coin_switch__1[];
+extern Gfx blue_coin_switch_000_displaylist_mesh_layer_1_with_revert[];

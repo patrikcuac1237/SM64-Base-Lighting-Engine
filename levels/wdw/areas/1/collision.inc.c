@@ -1124,7 +1124,7 @@ const Collision wdw_seg7_area_1_collision[] = {
     COL_TRI(16, 505, 9),
     COL_TRI(146, 505, 150),
     COL_TRI(146, 150, 78),
-    COL_TRI_INIT(SURFACE_NOT_SLIPPERY, 14),
+    COL_TRI_INIT(SURFACE_HARD, 14),
     COL_TRI(356, 359, 357),
     COL_TRI(262, 423, 265),
     COL_TRI(262, 425, 423),

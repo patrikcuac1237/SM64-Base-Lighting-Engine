@@ -9,10 +9,12 @@
 
 #include "config.h"
 
+#define TEST_LEVEL LEVEL_SSL
+
 extern const LevelScript level_main_scripts_entry[];
 const LevelScript level_script_entry[] = {
     INIT_LEVEL(),
-    SLEEP(/*frames*/ 2),
+    SLEEP(/*frames*/ 1),
     BLACKOUT(/*active*/ FALSE),
 #ifdef TEST_LEVEL
     SET_REG(/*value*/ TEST_LEVEL),

@@ -1,0 +1,13 @@
+extern const GeoLayout small_bomp_geo[];
+extern u8 small_bomp_wf_textures_08000_rgba16_ci8[];
+extern u8 small_bomp_wf_textures_08000_rgba16_pal_rgba16[];
+extern u8 small_bomp__4_rgba16_rgba16[];
+extern Vtx small_bomp_000_displaylist_mesh_layer_1_vtx_0[54];
+extern Gfx small_bomp_000_displaylist_mesh_layer_1_tri_0[];
+extern Vtx small_bomp_000_displaylist_mesh_layer_1_vtx_1[4];
+extern Gfx small_bomp_000_displaylist_mesh_layer_1_tri_1[];
+extern Gfx mat_small_bomp__0[];
+extern Gfx mat_revert_small_bomp__0[];
+extern Gfx mat_small_bomp__1[];
+extern Gfx mat_revert_small_bomp__1[];
+extern Gfx small_bomp_000_displaylist_mesh_layer_1_with_revert[];

@@ -90,4 +90,6 @@ extern const struct Animation *const toad_seg6_anims_0600FB58[];
 
 #include "boo_castle/geo_header.h"
 
+#include "mips/geo_header.h"
+
 #endif

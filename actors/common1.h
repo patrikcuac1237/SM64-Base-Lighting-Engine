@@ -294,13 +294,7 @@ extern const Gfx wooden_signpost_seg3_dl_0302DCD0[];
 extern const Gfx wooden_signpost_seg3_dl_0302DD08[];
 extern const Collision wooden_signpost_seg3_collision_0302DD80[];
 
-#include "marios_metal_cap/geo_header.h"
-
 #include "mario_cap/geo_header.h"
-
-#include "marios_wing_cap/geo_header.h"
-
-#include "marios_winged_metal_cap/geo_header.h"
 
 #include "star/geo_header.h"
 
@@ -309,5 +303,33 @@ extern const Collision wooden_signpost_seg3_collision_0302DD80[];
 #include "wooden_signpost/geo_header.h"
 
 #include "warp_pipe/geo_header.h"
+
+#include "bowser_key/geo_header.h"
+
+#include "bubbly_tree/geo_header.h"
+
+#include "mist/geo_header.h"
+
+#include "sand/geo_header.h"
+
+#include "tree/geo_header.h"
+
+#include "spiky_tree/geo_header.h"
+
+#include "snow_tree/geo_header.h"
+
+#include "white_particle/geo_header.h"
+
+#include "leaves/geo_header.h"
+
+#include "marios_metal_cap/geo_header.h"
+
+#include "marios_wing_cap/geo_header.h"
+
+#include "cartoon_star/geo_header.h"
+
+#include "mushroom_1up/geo_header.h"
+
+#include "dirt/geo_header.h"
 
 #endif

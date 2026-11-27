@@ -1,0 +1,2 @@
+extern void scroll_sts_mat_water_level_water_water_mat();
+extern void scroll_castle_inside_level_geo_water_level_water();

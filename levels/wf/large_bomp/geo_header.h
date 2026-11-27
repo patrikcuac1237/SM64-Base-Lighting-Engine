@@ -1,0 +1,14 @@
+extern const GeoLayout large_bomp_geo[];
+extern u8 large_bomp_wf_textures_08000_rgba16_ci8[];
+extern u8 large_bomp_wf_textures_08000_rgba16_pal_rgba16[];
+extern u8 large_bomp__4_rgba16_ci8[];
+extern u8 large_bomp__4_rgba16_pal_rgba16[];
+extern Vtx large_bomp_000_displaylist_mesh_layer_1_vtx_0[36];
+extern Gfx large_bomp_000_displaylist_mesh_layer_1_tri_0[];
+extern Vtx large_bomp_000_displaylist_mesh_layer_1_vtx_1[4];
+extern Gfx large_bomp_000_displaylist_mesh_layer_1_tri_1[];
+extern Gfx mat_large_bomp__0[];
+extern Gfx mat_revert_large_bomp__0[];
+extern Gfx mat_large_bomp__1[];
+extern Gfx mat_revert_large_bomp__1[];
+extern Gfx large_bomp_000_displaylist_mesh_layer_1_with_revert[];

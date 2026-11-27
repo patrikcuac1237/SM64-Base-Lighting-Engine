@@ -1417,17 +1417,14 @@ void bowser_act_tilt_lava_platform(void) {
  * Check if Bowser is offstage from a large distance or landed on a lethal floor
  */
 s32 bowser_check_fallen_off_stage(void) {
+    u32 prop = GET_SURFACE_PROP(o->floor);
     if (o->oAction != BOWSER_ACT_JUMP_ONTO_STAGE && o->oAction != BOWSER_ACT_TILT_LAVA_PLATFORM) {
         if (o->oPosY < o->oHomeY - 1000.0f) {
             return TRUE;
         }
         if (o->oMoveFlags & OBJ_MOVE_LANDED) {
             // Check for Fire Sea
-            if (o->oFloorType == SURFACE_BURNING) {
-                return TRUE;
-            }
-            // Check for Dark World - Sky
-            if (o->oFloorType == SURFACE_DEATH_PLANE) {
+            if (prop == SPECFLAG_BURNING || prop == SPECFLAG_DEATH_PLANE) {
                 return TRUE;
             }
         }

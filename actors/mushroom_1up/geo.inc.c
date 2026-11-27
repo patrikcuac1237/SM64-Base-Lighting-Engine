@@ -1,8 +1,12 @@
-// 0x16000E84
+#include "src/game/envfx_snow.h"
+
 const GeoLayout mushroom_1up_geo[] = {
-   GEO_SHADOW(SHADOW_CIRCLE_4_VERTS, 0xB4, 80),
-   GEO_OPEN_NODE(),
-      GEO_DISPLAY_LIST(LAYER_OCCLUDE_SILHOUETTE_ALPHA, mushroom_1up_seg3_dl_0302A660),
-   GEO_CLOSE_NODE(),
-   GEO_END(),
+	GEO_NODE_START(),
+	GEO_OPEN_NODE(),
+		GEO_SHADOW(1, 180, 80),
+		GEO_OPEN_NODE(),
+			GEO_DISPLAY_LIST(LAYER_ALPHA, mushroom_1up_000_displaylist_mesh_layer_4_with_revert),
+		GEO_CLOSE_NODE(),
+	GEO_CLOSE_NODE(),
+	GEO_END(),
 };

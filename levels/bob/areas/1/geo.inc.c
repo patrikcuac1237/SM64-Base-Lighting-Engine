@@ -1,3 +1,5 @@
+#include "src/game/rendering_graph_node.h"
+
 // 0x0E000488
 const GeoLayout bob_geo_000488[] = {
    GEO_NODE_SCREEN_AREA(10, SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_CENTER_X, SCREEN_CENTER_Y),
@@ -15,16 +17,18 @@ const GeoLayout bob_geo_000488[] = {
          GEO_OPEN_NODE(),
             GEO_CAMERA(CAMERA_MODE_RADIAL, 0, 2000, 6000, 3072, 0, -4608, geo_camera_main),
             GEO_OPEN_NODE(),
-               GEO_DISPLAY_LIST(LAYER_OPAQUE, bob_seg7_dl_07004390),
-               GEO_DISPLAY_LIST(LAYER_OPAQUE, bob_seg7_dl_07009D80),
-               GEO_DISPLAY_LIST(LAYER_TRANSPARENT_DECAL, bob_seg7_dl_0700A470),
-               GEO_DISPLAY_LIST(LAYER_ALPHA, bob_seg7_dl_0700A920),
-               GEO_DISPLAY_LIST(LAYER_OPAQUE, bob_seg7_dl_0700DD18),
-               GEO_DISPLAY_LIST(LAYER_OPAQUE, bob_seg7_dl_0700E338),
+               GEO_OPEN_NODE(),
+                  GEO_ASM(0, geo_object_fix_2cycle_issue),
+               GEO_CLOSE_NODE(),
+               GEO_DISPLAY_LIST(LAYER_OPAQUE, BOB_bob_seg7_level_mesh_layer_1_with_revert),
+               GEO_DISPLAY_LIST(LAYER_ALPHA, BOB_bob_seg7_level_mesh_layer_4_with_revert),
+               GEO_DISPLAY_LIST(LAYER_TRANSPARENT, BOB_bob_seg7_level_mesh_layer_5_with_revert),
                GEO_RENDER_OBJ(),
                GEO_ASM(ENVFX_MODE_NONE, geo_envfx_main),
                GEO_SCENE_LIGHT(LIGHT_TYPE_DIRECTIONAL, 255, 255, 255, 0, 90, 45),
-               GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 125, 125, 125, 1, 0, 8),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_AMBIENT, 80, 80, 80, 0, 0, 0),
+               GEO_SCENE_LIGHT(LIGHT_TYPE_CAMERA, 75, 75, 75, 0, 0, 0),
+               GEO_BRANCH(0, bob_water_skybox_geo),
             GEO_CLOSE_NODE(),
          GEO_CLOSE_NODE(),
       GEO_CLOSE_NODE(),

@@ -66,7 +66,9 @@ struct MainMenuSaveData {
     u8 soundMode: 2;
 #ifdef WIDE
     u8 wideMode: 1;
-#endif
+
+    #endif
+    u8 MovesChange: 1;
 
 #if MULTILANG
     u8 language: 2;
@@ -137,6 +139,9 @@ enum SaveProgressFlags {
     SAVE_FLAG_COLLECTED_TOAD_STAR_3  = (1 << 26), /* 0x04000000 */
     SAVE_FLAG_COLLECTED_MIPS_STAR_1  = (1 << 27), /* 0x08000000 */
     SAVE_FLAG_COLLECTED_MIPS_STAR_2  = (1 << 28), /* 0x10000000 */
+    SAVE_FLAG_UNLOCKED_4_COURSE_STAR = (1 << 29), /* 0xA1000000 */
+    SAVE_FLAG_15_STARS_COLLECTED     = (1 << 30), /* 0xA2000000 */
+    SAVE_FLAG_30_STARS_COLLECTED     = (1 >> 31), /* 0xA3000000 */
 };
 
 enum StarFlags {
@@ -188,7 +193,7 @@ void save_file_set_star_flags(s32 fileIndex, s32 courseIndex, u32 starFlags);
 s32 save_file_get_course_coin_score(s32 fileIndex, s32 courseIndex);
 s32 save_file_is_cannon_unlocked(void);
 void save_file_set_cannon_unlocked(void);
-void save_file_set_cap_pos(s16 x, s16 y, s16 z);
+void save_file_set_cap_pos(Vec3f capPos);
 s32 save_file_get_cap_pos(Vec3s capPos);
 #ifdef SAVE_NUM_LIVES
 s32 save_file_get_num_lives(void);
@@ -200,6 +205,8 @@ u32 save_file_get_sound_mode(void);
 u32 save_file_get_widescreen_mode(void);
 void save_file_set_widescreen_mode(u8 mode);
 #endif
+u32 save_file_get__moves_change(void);
+void save_file_set_moves_change(u8 mode);
 void save_file_move_cap_to_default_location(void);
 
 void disable_warp_checkpoint(void);

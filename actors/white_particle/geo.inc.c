@@ -1,8 +1,12 @@
-// 0x16000F98
+#include "src/game/envfx_snow.h"
+
 const GeoLayout white_particle_geo[] = {
-   GEO_SHADOW(SHADOW_CIRCLE_4_VERTS, 0xB4, 50),
-   GEO_OPEN_NODE(),
-      GEO_DISPLAY_LIST(LAYER_OCCLUDE_SILHOUETTE_ALPHA, white_particle_dl),
-   GEO_CLOSE_NODE(),
-   GEO_END(),
+	GEO_NODE_START(),
+	GEO_OPEN_NODE(),
+		GEO_SHADOW(1, 180, 50),
+		GEO_OPEN_NODE(),
+			GEO_DISPLAY_LIST(LAYER_ALPHA, white_particle_000_displaylist_mesh_layer_4_with_revert),
+		GEO_CLOSE_NODE(),
+	GEO_CLOSE_NODE(),
+	GEO_END(),
 };

@@ -1,0 +1,9 @@
+extern const GeoLayout geo_bbh_0005F8[];
+extern u8 tumbling_platform_near_bbh_textures_04800_rgba16_ci8[];
+extern u8 tumbling_platform_near_bbh_textures_04800_rgba16_ci8_pal_rgba16[];
+extern Vtx tumbling_platform_near_000_displaylist_mesh_layer_1_vtx_0[24];
+extern Gfx tumbling_platform_near_000_displaylist_mesh_layer_1_tri_0[];
+extern Gfx mat_tumbling_platform_near__0[];
+extern Gfx mat_revert_tumbling_platform_near__0[];
+extern Gfx tumbling_platform_near_000_displaylist_mesh_layer_1[];
+extern Gfx tumbling_platform_near_material_revert_render_settings[];

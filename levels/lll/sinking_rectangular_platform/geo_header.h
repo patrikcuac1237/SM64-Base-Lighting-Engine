@@ -1,0 +1,13 @@
+extern const GeoLayout sinking_rectangular_platform_geo[];
+extern u8 sinking_rectangular_platform_lll_textures_04000_rgba16_ci4[];
+extern u8 sinking_rectangular_platform_lll_textures_04000_rgba16_pal_rgba16[];
+extern u8 sinking_rectangular_platform_lll_textures_06000_rgba16_ia16[];
+extern Vtx sinking_rectangular_platform_000_displaylist_mesh_layer_1_vtx_0[8];
+extern Gfx sinking_rectangular_platform_000_displaylist_mesh_layer_1_tri_0[];
+extern Vtx sinking_rectangular_platform_000_displaylist_mesh_layer_1_vtx_1[6];
+extern Gfx sinking_rectangular_platform_000_displaylist_mesh_layer_1_tri_1[];
+extern Gfx mat_sinking_rectangular_platform__0_layer1[];
+extern Gfx mat_revert_sinking_rectangular_platform__0_layer1[];
+extern Gfx mat_sinking_rectangular_platform__1_layer1[];
+extern Gfx mat_revert_sinking_rectangular_platform__1_layer1[];
+extern Gfx sinking_rectangular_platform_000_displaylist_mesh_layer_1_with_revert[];

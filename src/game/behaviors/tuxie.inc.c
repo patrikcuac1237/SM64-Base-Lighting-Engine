@@ -134,7 +134,7 @@ void bhv_tuxies_mother_loop(void) {
 }
 
 void small_penguin_dive_with_mario(void) {
-    if (mario_is_dive_sliding()) {
+    if (gMarioStates[0].action == ACT_DIVE_SLIDE) {
         o->oSmallPenguinStoredAction = o->oAction;
         o->oAction = SMALL_PENGUIN_ACT_DIVE_SLIDING;
     }

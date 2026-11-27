@@ -43,7 +43,9 @@ s8 gRedCoinsCollected;
 u8 textCurrRatio43[] = { TEXT_HUD_CURRENT_RATIO_43 };
 u8 textCurrRatio169[] = { TEXT_HUD_CURRENT_RATIO_169 };
 u8 textPressL[] = { TEXT_HUD_PRESS_L };
-u8 textPressB[] = { TEXT_HUD_PRESS_B };
+u8 textExtraMovesOff[] = { TEXT_HUD_CURRENT_MOVES_OFF };
+u8 textExtraMovesOn[] = { TEXT_HUD_CURRENT_MOVES_ON };
+u8 textPressR[] = { TEXT_HUD_PRESS_R };
 #endif
 
 #if MULTILANG
@@ -209,7 +211,7 @@ void create_dl_scale_matrix(s8 pushOp, f32 x, f32 y, f32 z) {
         gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH);
     }
 }
-
+extern float current_aspect_ratio;
 void create_dl_ortho_matrix(void) {
     Mtx *matrix = (Mtx *) alloc_display_list(sizeof(Mtx));
 
@@ -218,8 +220,13 @@ void create_dl_ortho_matrix(void) {
     }
 
     create_dl_identity_matrix();
-
-    guOrtho(matrix, 0.0f, SCREEN_WIDTH, 0.0f, SCREEN_HEIGHT, -10.0f, 10.0f, 1.0f);
+    if (gConfig.widescreen)
+    {
+        guOrtho(matrix, -65.0f, SCREEN_WIDTH*1.2, 0.0f, SCREEN_HEIGHT, -10.0f, 10.0f, 1.0f);
+    } else 
+    {
+        guOrtho(matrix, 0, SCREEN_WIDTH, 0.0f, SCREEN_HEIGHT, -10.0f, 10.0f, 1.0f);
+    }
 
     // Should produce G_RDPHALF_1 in Fast3D
     gSPPerspNormalize(gDisplayListHead++, 0xFFFF);
@@ -470,15 +477,17 @@ void print_hud_lut_string(s8 hudLUT, s16 x, s16 y, const u8 *str) {
     s32 strPos = 0;
     void **hudLUT1 = segmented_to_virtual(menu_hud_lut); // Japanese Menu HUD Color font
     void **hudLUT2 = segmented_to_virtual(main_hud_lut); // 0-9 A-Z HUD Color Font
+    // --- NUEVO: Cargamos la tabla de la cámara ---
+    void **hudLUT3 = segmented_to_virtual(main_hud_camera_lut); 
+    
     u32 curX = x;
     u32 curY = y;
 
-    u32 xStride; // X separation
-
-    if (hudLUT == HUD_LUT_JPMENU) {
-        xStride = 16;
-    } else { // HUD_LUT_GLOBAL
-        xStride = 12; //? Shindou uses this.
+    u32 xStride; 
+    if (gConfig.widescreen) {
+        xStride = 8; 
+    } else {
+        xStride = 12;
     }
 
     while (str[strPos] != GLOBAR_CHAR_TERMINATOR) {
@@ -489,17 +498,29 @@ void print_hud_lut_string(s8 hudLUT, s16 x, s16 y, const u8 *str) {
             default:
                 gDPPipeSync(gDisplayListHead++);
 
-                if (hudLUT == HUD_LUT_JPMENU) {
-                    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, hudLUT1[str[strPos]]);
-                }
+                // --- LÓGICA DE INTERCEPCIÓN ---
+                // Si el glifo es >= 100, es de la cámara, sin importar qué hudLUT se pidió
+                if (str[strPos] >= 100) {
+                    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, hudLUT3[str[strPos] - 100]);
+                } else {
+                    // Lógica normal para el resto de glifos
+                    if (hudLUT == HUD_LUT_JPMENU) {
+                        gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, hudLUT1[str[strPos]]);
+                    }
 
-                if (hudLUT == HUD_LUT_GLOBAL) {
-                    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, hudLUT2[str[strPos]]);
+                    if (hudLUT == HUD_LUT_GLOBAL) {
+                        gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, hudLUT2[str[strPos]]);
+                    }
                 }
 
                 gSPDisplayList(gDisplayListHead++, dl_rgba16_load_tex_block);
-                gSPTextureRectangle(gDisplayListHead++, curX << 2, curY << 2, (curX + 16) << 2,
-                                    (curY + 16) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
+                
+                if (gConfig.widescreen) {
+                    // Nota: curX + 18 es el offset que ya tienes para corregir la posición en Wide
+                    gSPTextureRectangle(gDisplayListHead++, (curX + 18) << 2, curY << 2, ((curX + 30) << 2), ((curY + 16)) << 2, G_TX_RENDERTILE, 0, 0, (((1 << 10) * 4) / 3)*2, (1 << 10)*4);
+                } else {
+                    gSPTextureRectangle(gDisplayListHead++, curX << 2, curY << 2, (curX + 16) << 2, (curY + 16) << 2, G_TX_RENDERTILE, 0, 0, ((1 << 10)*2), (1 << 10)*4);
+                }
 
                 curX += xStride;
         }
@@ -524,14 +545,13 @@ void print_menu_generic_string(s16 x, s16 y, const u8 *str) {
                 mark = DIALOG_MARK_HANDAKUTEN;
                 break;
             case DIALOG_CHAR_SPACE:
-                curX += 4;
+                curX += gConfig.widescreen ? 2: 4;
                 break;
             default:
                 gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_8b, 1, fontLUT[str[strPos]]);
                 gDPLoadSync(gDisplayListHead++);
                 gDPLoadBlock(gDisplayListHead++, G_TX_LOADTILE, 0, 0, 8 * 8 - 1, CALC_DXT(8, G_IM_SIZ_8b_BYTES));
-                gSPTextureRectangle(gDisplayListHead++, curX << 2, curY << 2, (curX + 8) << 2,
-                                    (curY + 8) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
+                gSPTextureRectangle(gDisplayListHead++, curX << 2, curY << 2, (curX + 8) << 2, (curY + 8) << 2, G_TX_RENDERTILE, 0, 0, gConfig.widescreen ? ((((1 << 10)) * 4) / 3) : ((1 << 10)), 1 << 10);
 
                 if (mark != DIALOG_MARK_NONE) {
                     gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_8b, 1, fontLUT[DIALOG_CHAR_MARK_START + mark]);
@@ -542,7 +562,12 @@ void print_menu_generic_string(s16 x, s16 y, const u8 *str) {
 
                     mark = DIALOG_MARK_NONE;
                 }
-                curX += gDialogCharWidths[str[strPos]];
+                if (gConfig.widescreen)
+                {
+                    curX += (gDialogCharWidths[str[strPos]])/1.25;
+                } else {
+                    curX += gDialogCharWidths[str[strPos]];
+                }
         }
         strPos++;
     }
@@ -584,11 +609,11 @@ void handle_menu_scrolling(s8 scrollDirection, s8 *currentIndex, s8 minIndex, s8
     u8 index = 0;
 
     if (scrollDirection == MENU_SCROLL_VERTICAL) {
-        if ((gPlayer3Controller->rawStickY >  60) || (gPlayer3Controller->buttonDown & (U_CBUTTONS | U_JPAD))) index++;
-        if ((gPlayer3Controller->rawStickY < -60) || (gPlayer3Controller->buttonDown & (D_CBUTTONS | D_JPAD))) index += 2;
+        if ((gPlayer3Controller->rawStickY >  60)) index++;
+        if ((gPlayer3Controller->rawStickY < -60)) index += 2;
     } else if (scrollDirection == MENU_SCROLL_HORIZONTAL) {
-        if ((gPlayer3Controller->rawStickX >  60) || (gPlayer3Controller->buttonDown & (R_CBUTTONS | R_JPAD))) index += 2;
-        if ((gPlayer3Controller->rawStickX < -60) || (gPlayer3Controller->buttonDown & (L_CBUTTONS | L_JPAD))) index++;
+        if ((gPlayer3Controller->rawStickX >  60)) index += 2;
+        if ((gPlayer3Controller->rawStickX < -60)) index++;
     }
 
     if (((index ^ gMenuHoldKeyIndex) & index) == 2) {
@@ -657,10 +682,18 @@ void print_hud_my_score_coins(s32 useCourseCoinScore, s8 fileIndex, s8 courseInd
     }
 
     if (numCoins != 0) {
-        print_hud_lut_string(HUD_LUT_GLOBAL, x +  0, y, gHudSymCoin);
-        print_hud_lut_string(HUD_LUT_GLOBAL, x + 16, y, gHudSymX);
-        int_to_str(numCoins, strNumCoins);
-        print_hud_lut_string(HUD_LUT_GLOBAL, x + 32, y, strNumCoins);
+        if (gConfig.widescreen)
+        {
+            print_hud_lut_string(HUD_LUT_GLOBAL, x -  7, y, gHudSymCoin);
+            print_hud_lut_string(HUD_LUT_GLOBAL, x + 5, y, gHudSymX);
+            int_to_str(numCoins, strNumCoins);
+            print_hud_lut_string(HUD_LUT_GLOBAL, x + 17, y, strNumCoins);
+        } else {
+            print_hud_lut_string(HUD_LUT_GLOBAL, x +  0, y, gHudSymCoin);
+            print_hud_lut_string(HUD_LUT_GLOBAL, x + 16, y, gHudSymX);
+            int_to_str(numCoins, strNumCoins);
+            print_hud_lut_string(HUD_LUT_GLOBAL, x + 32, y, strNumCoins);
+        }
     }
 }
 
@@ -672,10 +705,18 @@ void print_hud_my_score_stars(s8 fileIndex, s8 courseIndex, s16 x, s16 y) {
     s16 starCount = save_file_get_course_star_count(fileIndex, courseIndex);
 
     if (starCount != 0) {
-        print_hud_lut_string(HUD_LUT_GLOBAL, x +  0, y, textSymStar);
-        print_hud_lut_string(HUD_LUT_GLOBAL, x + 16, y, textSymX);
-        int_to_str(starCount, strStarCount);
-        print_hud_lut_string(HUD_LUT_GLOBAL, x + 32, y, strStarCount);
+        if (gConfig.widescreen)
+        {       
+            print_hud_lut_string(HUD_LUT_GLOBAL, x - 7, y, textSymStar);
+            print_hud_lut_string(HUD_LUT_GLOBAL, x + 5, y, textSymX);
+            int_to_str(starCount, strStarCount);
+            print_hud_lut_string(HUD_LUT_GLOBAL, x + 17, y, strStarCount);
+        } else {
+            print_hud_lut_string(HUD_LUT_GLOBAL, x -  0, y, textSymStar);
+            print_hud_lut_string(HUD_LUT_GLOBAL, x + 16, y, textSymX);
+            int_to_str(starCount, strStarCount);
+            print_hud_lut_string(HUD_LUT_GLOBAL, x + 32, y, strStarCount);
+        }
     }
 }
 
@@ -1465,16 +1506,16 @@ void change_dialog_camera_angle(void) {
 }
 
 void shade_screen(void) {
-    create_dl_translation_matrix(MENU_MTX_PUSH, GFX_DIMENSIONS_FROM_LEFT_EDGE(0), SCREEN_HEIGHT, 0);
-
-    // This is a bit weird. It reuses the dialog text box (width 130, height -80),
-    // so scale to at least fit the screen.
-#ifdef WIDESCREEN
-    create_dl_scale_matrix(MENU_MTX_NOPUSH,
-                           GFX_DIMENSIONS_ASPECT_RATIO * SCREEN_HEIGHT / 130.0f, 3.0f, 1.0f);
-#else
-    create_dl_scale_matrix(MENU_MTX_NOPUSH, 2.6f, 3.4f, 1.0f);
-#endif
+    if (gConfig.widescreen)
+    {
+        create_dl_translation_matrix(MENU_MTX_PUSH, GFX_DIMENSIONS_FROM_LEFT_EDGE(-70), SCREEN_HEIGHT, 0);
+        create_dl_scale_matrix(MENU_MTX_NOPUSH, (SCREEN_HEIGHT * 2.6) / 130.0f, 3.0f, 1.0f);
+    }
+    else
+    {
+        create_dl_translation_matrix(MENU_MTX_PUSH, GFX_DIMENSIONS_FROM_LEFT_EDGE(0), SCREEN_HEIGHT, 0);
+        create_dl_scale_matrix(MENU_MTX_NOPUSH, GFX_DIMENSIONS_ASPECT_RATIO * SCREEN_HEIGHT * 1.1 / 130.0f, 3.0f, 1.0f);
+    }
 
     gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, 110);
     gSPDisplayList(gDisplayListHead++, dl_draw_text_bg_box);
@@ -1516,7 +1557,7 @@ void render_pause_red_coins(void) {
     s8 x;
 
     for (x = 0; x < gRedCoinsCollected; x++) {
-        print_animated_red_coin(GFX_DIMENSIONS_FROM_RIGHT_EDGE(30) - x * 20, 16);
+        print_animated_red_coin(GFX_DIMENSIONS_FROM_RIGHT_EDGE(gConfig.widescreen ? -30 : 30) - x * 20, 16);
     }
 }
 
@@ -1529,19 +1570,45 @@ void render_widescreen_setting(void) {
     if (!gConfig.widescreen) {
         print_generic_string(10, 20, textCurrRatio43);
         print_generic_string(10,  7, textPressL);
-        print_generic_string(200,  7, textPressB);
+        print_generic_string(10, 50, gConfig.MovesChange ? textExtraMovesOn : textExtraMovesOff);
+        print_generic_string(10, 37, textPressR);
     } else {
-        print_generic_string(10, 20, textCurrRatio169);
-        print_generic_string(10,  7, textPressL);
-        print_generic_string(200,  7, textPressB);
+        print_generic_string(-50, 20, textCurrRatio169);
+        print_generic_string(-50,  7, textPressL);
+        print_generic_string(-50, 50, gConfig.MovesChange ? textExtraMovesOn : textExtraMovesOff);
+        print_generic_string(-50, 37, textPressR);
     }
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
     if (gPlayer1Controller->buttonPressed & L_TRIG){
         gConfig.widescreen ^= 1;
         save_file_set_widescreen_mode(gConfig.widescreen);
     }
-    if (gPlayer1Controller->buttonPressed & R_TRIG){
+    if (gPlayer1Controller->buttonPressed & U_JPAD){
         gConfig.cheats ^= 1;
+    }
+
+    if (gPlayer1Controller->buttonPressed & D_JPAD){
+        gConfig.cameraChange ^= 1;
+    }
+    if (gPlayer1Controller->buttonPressed & R_JPAD){
+        gConfig.ChangeCamera ^= 1;
+    }
+    if (gPlayer1Controller->buttonPressed & L_JPAD) {
+        gConfig.ExitCourse ^= 1;
+    }
+    if (gPlayer1Controller->buttonPressed & B_BUTTON) {
+        gConfig.bWithoutCamLight ^= 1;
+    }
+    if ((gPlayer1Controller->buttonDown & Z_TRIG)) {
+        
+        if (gPlayer1Controller->buttonPressed & B_BUTTON) gConfig.bWithoutCamLight -= 1;
+    }
+    if (gPlayer1Controller->buttonPressed & R_TRIG) {
+        gConfig.MovesChange ^= 1;
+        save_file_set_moves_change(gConfig.MovesChange);
+    }
+    if (gPlayer1Controller->buttonPressed & Z_TRIG) {
+            gConfig.SlipperySurfaces ^= 1;
     }
 }
 #endif
@@ -1588,7 +1655,7 @@ void render_pause_my_score_coins(void) {
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
     if (courseIndex <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)) {
-        print_hud_my_score_coins(1, gCurrSaveFileNum - 1, courseIndex, 178, 103);
+        print_hud_my_score_coins(1, gCurrSaveFileNum - 1, courseIndex, gConfig.widescreen ? 162 : 178, 103);
         print_hud_my_score_stars(gCurrSaveFileNum - 1, courseIndex, 118, 103);
     }
 
@@ -1735,8 +1802,7 @@ void print_hud_pause_colorful_str(void) {
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
-    print_hud_lut_string(HUD_LUT_GLOBAL, 123, 81, textPause);
-
+    print_hud_lut_string(HUD_LUT_GLOBAL, gConfig.widescreen ? 119 : 123, 81, textPause);
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 }
 
@@ -1907,11 +1973,10 @@ s32 render_pause_courses_and_castle(void) {
 
         case DIALOG_STATE_HORIZONTAL:
             shade_screen();
-            print_hud_pause_colorful_str();
             render_pause_castle_menu_box(160, 143);
             render_pause_castle_main_strings(104, 60);
 
-            if (gPlayer3Controller->buttonPressed & (A_BUTTON | START_BUTTON | Z_TRIG)) {
+            if (gPlayer3Controller->buttonPressed & (A_BUTTON | START_BUTTON)) {
                 level_set_transition(0, NULL);
                 play_sound(SOUND_MENU_PAUSE_CLOSE, gGlobalSoundSource);
                 gMenuMode = MENU_MODE_NONE;
@@ -1919,6 +1984,7 @@ s32 render_pause_courses_and_castle(void) {
 
                 return MENU_OPT_DEFAULT;
             }
+            print_hud_pause_colorful_str();
             break;
     }
 #if defined(WIDE) && !defined(PUPPYCAM)
@@ -1974,11 +2040,11 @@ void print_hud_course_complete_coins(s16 x, s16 y) {
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
 
-    print_hud_lut_string(HUD_LUT_GLOBAL, x +  0, y, hudTextSymCoin);
-    print_hud_lut_string(HUD_LUT_GLOBAL, x + 16, y, hudTextSymX);
+    print_hud_lut_string(HUD_LUT_GLOBAL, x, y, hudTextSymCoin);
+    print_hud_lut_string(HUD_LUT_GLOBAL, !gConfig.widescreen ? (x + 16) : (x + 12), y, hudTextSymX);
 
     int_to_str(gCourseCompleteCoins, courseCompleteCoinsStr);
-    print_hud_lut_string(HUD_LUT_GLOBAL, x + 32, y, courseCompleteCoinsStr);
+    print_hud_lut_string(HUD_LUT_GLOBAL, !gConfig.widescreen ? (x + 32) : (x + 24), y, courseCompleteCoinsStr);
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 
@@ -2087,7 +2153,7 @@ void render_course_complete_lvl_info_and_hud_str(void) {
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
 
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
-    print_hud_lut_string(HUD_LUT_GLOBAL, 55, 77, textSymStar);
+    print_hud_lut_string(HUD_LUT_GLOBAL, gConfig.widescreen ? 67 : 55, 77, textSymStar);
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 

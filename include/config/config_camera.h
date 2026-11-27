@@ -13,7 +13,7 @@
 
 // Changes hardcoded camera mode reverting to instead use the area's default mode (defMode)
 // If you're using a FORCED_CAMERA_MODE, this must be on for it to work
-#define USE_COURSE_DEFAULT_MODE
+//#define USE_COURSE_DEFAULT_MODE
 
 /***** Movement specific camera modes: *****/
 // Camera mode when Mario is < 400 units away from the water surface (default is CAMERA_MODE_WATER_SURFACE)
@@ -25,10 +25,10 @@
 /*******************************************/
 
 // Makes the camera approach Mario's height much more quickly
-#define FAST_VERTICAL_CAMERA_MOVEMENT
+//#define FAST_VERTICAL_CAMERA_MOVEMENT
 
 // Enables "parallel lakitu camera" or "aglab cam" which lets you move the camera smoothly with the dpad
-#define PARALLEL_LAKITU_CAM
+//#define PARALLEL_LAKITU_CAM
 
 // Enables Puppy Camera 2, a rewritten camera that can be freely configured and modified.
 // #define PUPPYCAM

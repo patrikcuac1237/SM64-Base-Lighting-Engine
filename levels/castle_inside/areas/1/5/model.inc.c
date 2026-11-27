@@ -46,6 +46,6 @@ const Gfx dl_castle_lobby_wing_cap_light[] = {
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF),
     gsDPPipeSync(),
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
-    gsSPSetGeometryMode(G_LIGHTING | G_CULL_BACK),
+    gsSPSetGeometryMode(G_CULL_BACK),
     gsSPEndDisplayList(),
 };

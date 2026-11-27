@@ -1,8 +1,12 @@
-// 0x0E000A40
-const GeoLayout wf_geo_000A40[] = {
-   GEO_CULLING_RADIUS(700),
-   GEO_OPEN_NODE(),
-      GEO_DISPLAY_LIST(LAYER_OPAQUE, wf_seg7_dl_0700DE20),
-   GEO_CLOSE_NODE(),
-   GEO_END(),
+#include "src/game/envfx_snow.h"
+
+const GeoLayout large_bomp_geo[] = {
+	GEO_NODE_START(),
+	GEO_OPEN_NODE(),
+		GEO_CULLING_RADIUS(700),
+		GEO_OPEN_NODE(),
+			GEO_DISPLAY_LIST(LAYER_OPAQUE, large_bomp_000_displaylist_mesh_layer_1_with_revert),
+		GEO_CLOSE_NODE(),
+	GEO_CLOSE_NODE(),
+	GEO_END(),
 };

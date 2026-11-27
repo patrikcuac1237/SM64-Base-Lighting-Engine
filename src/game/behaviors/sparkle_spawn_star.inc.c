@@ -1,5 +1,4 @@
 // sparkle_spawn_star.inc.c
-
 struct ObjectHitbox sSparkleSpawnStarHitbox = {
     /* interactType:      */ INTERACT_STAR_OR_KEY,
     /* downOffset:        */ 0,
@@ -19,6 +18,7 @@ void bhv_spawned_star_init(void) {
     s32 param = GET_BPARAM1(o->oBehParams);
     if ((1 << param) & save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(gCurrCourseNum))) {
         cur_obj_set_model(MODEL_TRANSPARENT_STAR);
+        o->oOpacity = 175;
     }
 
     cur_obj_play_sound_2(SOUND_GENERAL2_STAR_APPEARS);
@@ -101,10 +101,10 @@ void bhv_spawned_star_loop(void) {
         set_sparkle_spawn_star_hitbox();
         slow_star_rotation();
     }
-
     cur_obj_move_using_fvel_and_gravity();
     o->oFaceAngleYaw += o->oAngleVelYaw;
     o->oInteractStatus = INT_STATUS_NONE;
+    AddStarLight();
 }
 
 void bhv_spawn_star_no_level_exit(u32 params) {

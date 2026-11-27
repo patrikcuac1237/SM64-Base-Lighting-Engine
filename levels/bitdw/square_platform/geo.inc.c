@@ -1,8 +1,12 @@
-// 0x0E000558
-const GeoLayout geo_bitdw_000558[] = {
-   GEO_CULLING_RADIUS(600),
-   GEO_OPEN_NODE(),
-      GEO_DISPLAY_LIST(LAYER_OPAQUE, bitdw_seg7_dl_0700B480),
-   GEO_CLOSE_NODE(),
-   GEO_END(),
+#include "src/game/envfx_snow.h"
+
+const GeoLayout square_platform_geo[] = {
+	GEO_NODE_START(),
+	GEO_OPEN_NODE(),
+		GEO_CULLING_RADIUS(600),
+		GEO_OPEN_NODE(),
+			GEO_DISPLAY_LIST(LAYER_OPAQUE, square_platform_000_displaylist_mesh_layer_1_with_revert),
+		GEO_CLOSE_NODE(),
+	GEO_CLOSE_NODE(),
+	GEO_END(),
 };

@@ -5,10 +5,9 @@
 #include "game/moving_texture.h"
 
 // geo
-extern const GeoLayout ssl_geo_0005C0[];
 extern const GeoLayout ssl_geo_0005D8[];
 extern const GeoLayout ssl_geo_000618[];
-extern const GeoLayout ssl_geo_000630[];
+extern const GeoLayout tox_box_geo[];
 extern const GeoLayout ssl_geo_000648[];
 extern const GeoLayout ssl_geo_000734[];
 extern const GeoLayout ssl_geo_000764[];
@@ -85,4 +84,11 @@ extern const Gfx ssl_dl_pyramid_sand_pathway_side_end[];
 // script
 extern const LevelScript level_ssl_entry[];
 
+#include "sslArea1/geo_header.h"
+#include "ssl_sky/geo_header.h"
+#include "levels/ssl/pyramid_top/geo_header.h"
+#include "tox_box/geo_header.h"
+#include "sslArea2/geo_header.h"
+#include "sslArea3/geo_header.h"
+#include "ssl_area2_skybox/geo_header.h"
 #endif

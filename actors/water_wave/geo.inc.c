@@ -2,6 +2,7 @@
 const GeoLayout idle_water_wave_geo[] = {
    GEO_SWITCH_CASE(6, geo_switch_anim_state),
    GEO_OPEN_NODE(),
+      GEO_ASM(4, geo_object_fix_2cycle_issue),
       GEO_DISPLAY_LIST(LAYER_TRANSPARENT, water_wave_seg4_dl_040273F0),
       GEO_DISPLAY_LIST(LAYER_TRANSPARENT, water_wave_seg4_dl_04027408),
       GEO_DISPLAY_LIST(LAYER_TRANSPARENT, water_wave_seg4_dl_04027420),
@@ -16,6 +17,7 @@ const GeoLayout idle_water_wave_geo[] = {
 const GeoLayout wave_trail_geo[] = {
    GEO_SWITCH_CASE(8, geo_switch_anim_state),
    GEO_OPEN_NODE(),
+      GEO_ASM(4, geo_object_fix_2cycle_issue),
       GEO_DISPLAY_LIST(LAYER_TRANSPARENT, water_wave_seg4_dl_040273F0),
       GEO_DISPLAY_LIST(LAYER_TRANSPARENT, water_wave_seg4_dl_04027408),
       GEO_DISPLAY_LIST(LAYER_TRANSPARENT, water_wave_seg4_dl_04027420),

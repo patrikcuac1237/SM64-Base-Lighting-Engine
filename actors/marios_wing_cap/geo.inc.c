@@ -1,12 +1,12 @@
 #include "src/game/envfx_snow.h"
 
-const GeoLayout marios_wing_cap_001_switch_opt1[] = {
+const GeoLayout marios_wing_cap_geo_opt_1[] = {
 	GEO_NODE_START(),
 	GEO_OPEN_NODE(),
 		GEO_NODE_START(),
 		GEO_OPEN_NODE(),
 			GEO_DISPLAY_LIST(LAYER_TRANSPARENT, marios_wing_cap_000_displaylist_mesh_layer_1),
-			GEO_DISPLAY_LIST(LAYER_TRANSPARENT, marios_wing_cap_001_displaylist_mesh_layer_4),
+			GEO_DISPLAY_LIST(LAYER_TRANSPARENT, marios_wing_cap_001_displaylist_mesh_layer_4_opt_1_with_layer_5_revert),
 		GEO_CLOSE_NODE(),
 	GEO_CLOSE_NODE(),
 	GEO_RETURN(),
@@ -23,19 +23,17 @@ const GeoLayout marios_wing_cap_geo[] = {
 				GEO_OPEN_NODE(),
 					GEO_NODE_START(),
 					GEO_OPEN_NODE(),
+					GEO_ASM(0, geo_object_fix_2cycle_issue),
 						GEO_NODE_START(),
 						GEO_OPEN_NODE(),
-							GEO_DISPLAY_LIST(LAYER_OPAQUE, marios_wing_cap_000_displaylist_mesh_layer_1),
-							GEO_DISPLAY_LIST(LAYER_ALPHA, marios_wing_cap_001_displaylist_mesh_layer_4),
+							GEO_DISPLAY_LIST(LAYER_OPAQUE, marios_wing_cap_000_displaylist_mesh_layer_1_with_layer_1_revert),
+							GEO_DISPLAY_LIST(LAYER_ALPHA, marios_wing_cap_001_displaylist_mesh_layer_4_with_layer_4_revert),
 						GEO_CLOSE_NODE(),
 					GEO_CLOSE_NODE(),
-					GEO_BRANCH(1, marios_wing_cap_001_switch_opt1),
+					GEO_BRANCH(1, marios_wing_cap_geo_opt_1),
 				GEO_CLOSE_NODE(),
 			GEO_CLOSE_NODE(),
 		GEO_CLOSE_NODE(),
-		GEO_DISPLAY_LIST(LAYER_OPAQUE, marios_wing_cap_material_revert_render_settings),
-		GEO_DISPLAY_LIST(LAYER_ALPHA, marios_wing_cap_material_revert_render_settings),
-		GEO_DISPLAY_LIST(LAYER_TRANSPARENT, marios_wing_cap_material_revert_render_settings),
 	GEO_CLOSE_NODE(),
 	GEO_END(),
 };

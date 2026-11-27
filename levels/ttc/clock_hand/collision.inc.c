@@ -16,7 +16,7 @@ const Collision ttc_seg7_collision_clock_main_rotation[] = {
     COL_VERTEX(0, 0, 1577),
     COL_VERTEX(-180, 0, 1295),
     COL_VERTEX(181, 0, 1295),
-    COL_TRI_INIT(SURFACE_DEFAULT, 24),
+    COL_TRI_INIT(NEWTERRAIN(4, 0, 0, 0), 24),
     COL_TRI(0, 1, 2),
     COL_TRI(2, 3, 4),
     COL_TRI(2, 1, 3),

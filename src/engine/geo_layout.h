@@ -63,7 +63,6 @@ void geo_layout_cmd_node_perspective(void);
 void geo_layout_cmd_node_start(void);
 void geo_layout_cmd_nop3(void);
 void geo_layout_cmd_node_master_list(void);
-void geo_layout_cmd_node_level_of_detail(void);
 void geo_layout_cmd_node_switch_case(void);
 void geo_layout_cmd_node_camera(void);
 void geo_layout_cmd_node_translation_rotation(void);
@@ -83,6 +82,7 @@ void geo_layout_cmd_copy_view(void);
 void geo_layout_cmd_node_held_obj(void);
 void geo_layout_cmd_node_culling_radius(void);
 void geo_layout_cmd_scene_light(void); // Advanced lighting engine
+void geo_layout_cmd_light_pos(void);
 void geo_layout_cmd_bone(void);
 
 struct GraphNode *process_geo_layout(struct AllocOnlyPool *pool, void *segptr);

@@ -155,3 +155,4 @@ const GeoLayout intro_geo_debug_level_select[] = {
    GEO_END(),
 };
 
+#include "intro_sm64_logo/geo.inc.c"

@@ -1,0 +1,9 @@
+extern const GeoLayout wf_geo_000A58[];
+extern u8 rotating_wooden_platform_wf_textures_06800_rgba16_ci8[];
+extern u8 rotating_wooden_platform_wf_textures_06800_rgba16_ci8_pal_rgba16[];
+extern Vtx rotating_wooden_platform_000_displaylist_mesh_layer_1_vtx_0[39];
+extern Gfx rotating_wooden_platform_000_displaylist_mesh_layer_1_tri_0[];
+extern Gfx mat_rotating_wooden_platform__0[];
+extern Gfx mat_revert_rotating_wooden_platform__0[];
+extern Gfx rotating_wooden_platform_000_displaylist_mesh_layer_1[];
+extern Gfx rotating_wooden_platform_material_revert_render_settings[];

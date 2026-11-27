@@ -128,8 +128,6 @@ float gPaintingMarioYEntry = 0.0f;
 /// Variable to ensure the initial Wet-Dry World water level is set only once
 s32 gWdwWaterLevelSet = FALSE;
 
-extern Texture ssl_quicksand[];
-extern Texture ssl_pyramid_sand[];
 extern Texture ttc_yellow_triangle[];
 
 /**
@@ -138,12 +136,10 @@ extern Texture ttc_yellow_triangle[];
  */
 Texture *gMovtexIdToTexture[] = { texture_waterbox_water,     texture_waterbox_mist,
                                   texture_waterbox_jrb_water, texture_waterbox_unknown_water,
-                                  texture_waterbox_lava,      ssl_quicksand,
-                                  ssl_pyramid_sand,           ttc_yellow_triangle };
+                                  texture_waterbox_lava, ttc_yellow_triangle };
 
 extern Gfx    castle_grounds_dl_waterfall[];
 extern Movtex castle_grounds_movtex_tris_waterfall[];
-extern Movtex ssl_movtex_tris_pyramid_sand_pathway_front[];
 extern Gfx    ssl_dl_pyramid_sand_pathway_begin[];
 extern Gfx    ssl_dl_pyramid_sand_pathway_end[];
 extern Gfx    ssl_dl_pyramid_sand_pathway_front_end[];
@@ -177,9 +173,7 @@ extern Movtex ssl_movtex_tris_pyramid_quicksand[];
 extern Gfx    ssl_dl_quicksand_begin[];
 extern Gfx    ssl_dl_quicksand_end[];
 extern Gfx    ssl_dl_pyramid_quicksand[];
-extern Movtex ssl_movtex_tris_pyramid_corners_quicksand[];
 extern Gfx    ssl_dl_pyramid_corners_quicksand[];
-extern Movtex ssl_movtex_tris_sides_quicksand[];
 extern Gfx    ssl_dl_sides_quicksand[];
 extern Movtex ttc_movtex_tris_big_surface_treadmill[];
 extern Gfx    ttc_dl_surface_treadmill_begin[];
@@ -199,11 +193,6 @@ extern Gfx    ssl_dl_pyramid_quicksand_pit_end[];
  * as a whole can have a blend color).
  */
 struct MovtexObject gMovtexNonColored[] = {
-    // Inside the pyramid there is a sand pathway with the 5 secrets on it.
-    // pathway_front is the highest 'sand fall', pathway_floor is the horizontal sand stream and pathway_side is the lower 'sand fall'.
-    { MOVTEX_PYRAMID_SAND_PATHWAY_FRONT, TEX_PYRAMID_SAND_SSL,  8, ssl_movtex_tris_pyramid_sand_pathway_front, ssl_dl_pyramid_sand_pathway_begin,       ssl_dl_pyramid_sand_pathway_end,       ssl_dl_pyramid_sand_pathway_front_end, 0xff, 0xff, 0xff, 0xff, LAYER_TRANSPARENT_INTER },
-    { MOVTEX_PYRAMID_SAND_PATHWAY_FLOOR, TEX_PYRAMID_SAND_SSL,  8, ssl_movtex_tris_pyramid_sand_pathway_floor, ssl_dl_pyramid_sand_pathway_floor_begin, ssl_dl_pyramid_sand_pathway_floor_end, ssl_dl_pyramid_sand_pathway_front_end, 0xff, 0xff, 0xff, 0xff, LAYER_OPAQUE_INTER      },
-    { MOVTEX_PYRAMID_SAND_PATHWAY_SIDE,  TEX_PYRAMID_SAND_SSL,  6, ssl_movtex_tris_pyramid_sand_pathway_side,  ssl_dl_pyramid_sand_pathway_begin,       ssl_dl_pyramid_sand_pathway_end,       ssl_dl_pyramid_sand_pathway_side_end,  0xff, 0xff, 0xff, 0xff, LAYER_TRANSPARENT_INTER },
     // The waterfall outside the castle
     { MOVTEX_CASTLE_WATERFALL,           TEXTURE_WATER,        15, castle_grounds_movtex_tris_waterfall,       dl_waterbox_rgba16_begin,                dl_waterbox_end,                       castle_grounds_dl_waterfall,           0xff, 0xff, 0xff, 0xb4, LAYER_TRANSPARENT_INTER },
     // Bowser in the Fire Sea has lava at 3 heights, lava_floor is the lowest and lava_second_section is the highest
@@ -231,9 +220,6 @@ struct MovtexObject gMovtexNonColored[] = {
  * MovtexObjects that have color attributes per vertex.
  */
 struct MovtexObject gMovtexColored[] = {
-    { MOVTEX_SSL_PYRAMID_SIDE,           TEX_QUICKSAND_SSL,    12, ssl_movtex_tris_pyramid_quicksand,          ssl_dl_quicksand_begin,                  ssl_dl_quicksand_end,                  ssl_dl_pyramid_quicksand,              0xff, 0xff, 0xff, 0xff, LAYER_OPAQUE            },
-    { MOVTEX_SSL_PYRAMID_CORNER,         TEX_QUICKSAND_SSL,    16, ssl_movtex_tris_pyramid_corners_quicksand,  ssl_dl_quicksand_begin,                  ssl_dl_quicksand_end,                  ssl_dl_pyramid_corners_quicksand,      0xff, 0xff, 0xff, 0xff, LAYER_OPAQUE            },
-    { MOVTEX_SSL_COURSE_EDGE,            TEX_QUICKSAND_SSL,    15, ssl_movtex_tris_sides_quicksand,            ssl_dl_quicksand_begin,                  ssl_dl_quicksand_end,                  ssl_dl_sides_quicksand,                0xff, 0xff, 0xff, 0xff, LAYER_OPAQUE            },
     { MOVTEX_TREADMILL_BIG,              TEX_YELLOW_TRI_TTC,   12, ttc_movtex_tris_big_surface_treadmill,      ttc_dl_surface_treadmill_begin,          ttc_dl_surface_treadmill_end,          ttc_dl_surface_treadmill,              0xff, 0xff, 0xff, 0xff, LAYER_OPAQUE            },
     { MOVTEX_TREADMILL_SMALL,            TEX_YELLOW_TRI_TTC,   12, ttc_movtex_tris_small_surface_treadmill,    ttc_dl_surface_treadmill_begin,          ttc_dl_surface_treadmill_end,          ttc_dl_surface_treadmill,              0xff, 0xff, 0xff, 0xff, LAYER_OPAQUE            },
     { 0x00000000,                        TEXTURE_WATER,         0, NULL,                                       NULL,                                    NULL,                                  NULL,                                  0x00, 0x00, 0x00, 0x00, LAYER_FORCE             },
@@ -243,8 +229,7 @@ struct MovtexObject gMovtexColored[] = {
  * Treated identically to gMovtexColored.
  */
 struct MovtexObject gMovtexColored2[] = {
-    { MOVTEX_SSL_SAND_PIT_OUTSIDE,       TEX_QUICKSAND_SSL,     8, ssl_movtex_tris_quicksand_pit,              ssl_dl_quicksand_pit_begin,              ssl_dl_quicksand_pit_end,              ssl_dl_quicksand_pit,                  0xff, 0xff, 0xff, 0xff, LAYER_OPAQUE            },
-    { MOVTEX_SSL_SAND_PIT_PYRAMID,       TEX_PYRAMID_SAND_SSL,  8, ssl_movtex_tris_pyramid_quicksand_pit,      ssl_dl_pyramid_quicksand_pit_begin,      ssl_dl_pyramid_quicksand_pit_end,      ssl_dl_quicksand_pit,                  0xff, 0xff, 0xff, 0xff, LAYER_OPAQUE            },
+    { MOVTEX_SSL_SAND_PIT_OUTSIDE,       TEX_QUICKSAND_SSL,     8, ssl_movtex_tris_quicksand_pit,              ssl_dl_quicksand_pit_begin,              ssl_dl_quicksand_pit_end,              ssl_dl_quicksand_pit,                  0x00, 0x00, 0x00, 0xff, LAYER_OPAQUE            },
     { 0x00000000,                        TEXTURE_WATER,         0, NULL,                                       NULL,                                    NULL,                                  NULL,                                  0x00, 0x00, 0x00, 0x00, LAYER_FORCE             },
 };
 
@@ -505,10 +490,6 @@ void *get_quad_collection_from_id(u32 id) {
             return hmc_movtex_dorrie_pool_water;
         case HMC_MOVTEX_TOXIC_MAZE_MIST:
             return hmc_movtex_toxic_maze_mist;
-        case SSL_MOVTEX_PUDDLE_WATER:
-            return ssl_movtex_puddle_water;
-        case SSL_MOVTEX_TOXBOX_QUICKSAND_MIST:
-            return ssl_movtex_toxbox_quicksand_mist;
         case SL_MOVTEX_WATER:
             return sl_movtex_water;
         case WDW_MOVTEX_AREA1_WATER:
@@ -533,8 +514,6 @@ void *get_quad_collection_from_id(u32 id) {
             return ddd_movtex_area1_water;
         case DDD_MOVTEX_AREA2_WATER:
             return ddd_movtex_area2_water;
-        case WF_MOVTEX_WATER:
-            return wf_movtex_water;
         case CASTLE_COURTYARD_MOVTEX_STAR_STATUE_WATER:
             return castle_courtyard_movtex_star_statue_water;
         case TTM_MOVTEX_PUDDLE:
@@ -873,12 +852,6 @@ Gfx *geo_movtex_update_horizontal(s32 callContext, struct GraphNode *node, UNUSE
         struct GraphNodeGenerated *asGenerated = (struct GraphNodeGenerated *) node;
 
         switch (asGenerated->parameter) {
-            case MOVTEX_SSL_SAND_PIT_OUTSIDE:
-                movtexVerts = segmented_to_virtual(ssl_movtex_tris_quicksand_pit);
-                break;
-            case MOVTEX_SSL_SAND_PIT_PYRAMID:
-                movtexVerts = segmented_to_virtual(ssl_movtex_tris_pyramid_quicksand_pit);
-                break;
             case MOVTEX_TREADMILL_BIG:
                 movtexVerts = segmented_to_virtual(ttc_movtex_tris_big_surface_treadmill);
                 break;

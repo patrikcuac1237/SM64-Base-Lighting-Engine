@@ -137,6 +137,7 @@ void mario_retrieve_cap(void);
 struct Object *mario_get_collided_object(struct MarioState *m, u32 interactType);
 u32  mario_check_object_grab(struct MarioState *m);
 u32  get_door_save_file_flag(struct Object *door);
+u32 get_stars_save_flag(struct Object *door, s16 requiredNumStars);
 void mario_process_interactions(struct MarioState *m);
 void mario_handle_special_floors(struct MarioState *m);
 

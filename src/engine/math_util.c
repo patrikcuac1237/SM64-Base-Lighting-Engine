@@ -109,7 +109,14 @@ void min_max_3s(s16 a, s16 b, s16 c, s16 *min, s16 *max) { min_max_3_func(a, b, 
     ((destFmt *) dest)[1] = y;                       \
     ((destFmt *) dest)[2] = z;                       \
 }
-void vec3f_copy    (Vec3f dest, const Vec3f src) { vec3_copy_bits(f32, dest, f32, src); } // 32 -> 32
+void *vec3f_copy (Vec3f dest, const Vec3f src) { 
+    register x = ((u32 *) src)[0];
+    register y = ((u32 *) src)[1];
+    register z = ((u32 *) src)[2];
+    ((u32 *)dest)[0] = x;
+    ((u32 *)dest)[1] = y;
+    ((u32 *)dest)[2] = z;
+}
 void vec3i_copy    (Vec3i dest, const Vec3i src) { vec3_copy_bits(s32, dest, s32, src); } // 32 -> 32
 void vec3s_copy    (Vec3s dest, const Vec3s src) { vec3_copy_bits(s16, dest, s16, src); } // 16 -> 16
 void vec3s_to_vec3i(Vec3i dest, const Vec3s src) { vec3_copy_bits(s32, dest, s16, src); } // 16 -> 32
@@ -151,7 +158,12 @@ void vec3f_copy_y_off(Vec3f dest, Vec3f src, f32 yOff) { vec3_copy_y_off_func(f3
 #undef vec3_copy_y_off_func
 
 /// Set vector 'dest' to (x, y, z)
-inline void vec3f_set(Vec3f dest, const f32 x, const f32 y, const f32 z) { vec3_set(dest, x, y, z); }
+void *vec3f_set(Vec3f dest, f32 x, f32 y, f32 z) {
+    dest[0] = x;
+    dest[1] = y;
+    dest[2] = z;
+    return &dest;
+}
 inline void vec3i_set(Vec3i dest, const s32 x, const s32 y, const s32 z) { vec3_set(dest, x, y, z); }
 inline void vec3s_set(Vec3s dest, const s16 x, const s16 y, const s16 z) { vec3_set(dest, x, y, z); }
 
@@ -543,41 +555,46 @@ void mtxf_lookat(Mat4 mtx, Vec3f from, Vec3f to, s32 roll) {
  * 'scale' is the scale of the object.
  * 'angle' rotates the object while still facing the camera.
  */
+#include <math.h> // Para funciones matemáticas estándar como cosf y sinf, si coss y sins no son intrínsecas o están definidas en otro lugar.
+
+// Asumiendo que Mat4 es un float[4][4] y Vec3f es un float[3] o float[4] con el último componente como 1.0f para puntos.
+// Si son estructuras, se necesitarán operadores o funciones de acceso.
+
+// Prototipos de funciones de utilidad (si no están ya enlazadas)
+// Si `coss` y `sins` son funciones específicas de tu entorno (ej. punto fijo o fast math), mantenlas.
+// De lo contrario, usa `cosf` y `sinf` de <math.h>.
+// float coss(s32 angle);
+// float sins(s32 angle);
+// void vec3f_copy(Vec3f dest, Vec3f src);
+// void vec3f_add(Vec3f dest, Vec3f src);
+
+
 void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, Vec3f scale, s32 angle) {
-    register s32 i;
-    register f32 sx = scale[0];
-    register f32 sy = scale[1];
-    register f32 sz = scale[2];
-    Mat4* cameraMat = &gCameraTransform;
-    for (i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
-            dest[i][j] = (*cameraMat)[j][i];
-        }
-        dest[i][3] = 0.0f;
-    }
-    if (angle != 0x0) {
-        float m00 = dest[0][0];
-        float m01 = dest[0][1];
-        float m02 = dest[0][2];
-        float m10 = dest[1][0];
-        float m11 = dest[1][1];
-        float m12 = dest[1][2];
+    float sx = scale[0];
+    float sy = scale[1];
+    float sz = scale[2];
+
+    dest[0][0] = gCameraTransform[0][0]; dest[0][1] = gCameraTransform[1][0]; dest[0][2] = gCameraTransform[2][0]; dest[0][3] = 0.0f;
+    dest[1][0] = gCameraTransform[0][1]; dest[1][1] = gCameraTransform[1][1]; dest[1][2] = gCameraTransform[2][1]; dest[1][3] = 0.0f;
+    dest[2][0] = gCameraTransform[0][2]; dest[2][1] = gCameraTransform[1][2]; dest[2][2] = gCameraTransform[2][2]; dest[2][3] = 0.0f;
+
+    if (angle != 0) {
         float cosa = coss(angle);
         float sina = sins(angle);
-        dest[0][0] = cosa * m00 + sina * m10; 
-        dest[0][1] = cosa * m01 + sina * m11; 
-        dest[0][2] = cosa * m02 + sina * m12;
-        dest[1][0] = -sina * m00 + cosa * m10;
-        dest[1][1] = -sina * m01 + cosa * m11;
-        dest[1][2] = -sina * m02 + cosa * m12;
-    }
-    for (i = 0; i < 3; i++) {
-        dest[0][i] *= sx;
-        dest[1][i] *= sy;
-        dest[2][i] *= sz;
-    }
 
-    // Translation = input translation + position
+        float d00 = dest[0][0], d01 = dest[0][1], d02 = dest[0][2];
+        float d10 = dest[1][0], d11 = dest[1][1], d12 = dest[1][2];
+
+        dest[0][0] = cosa * d00 + sina * d10;
+        dest[0][1] = cosa * d01 + sina * d11;
+        dest[0][2] = cosa * d02 + sina * d12;
+        dest[1][0] = -sina * d00 + cosa * d10;
+        dest[1][1] = -sina * d01 + cosa * d11;
+        dest[1][2] = -sina * d02 + cosa * d12;
+    }
+    dest[0][0] *= sx; dest[0][1] *= sx; dest[0][2] *= sx;
+    dest[1][0] *= sy; dest[1][1] *= sy; dest[1][2] *= sy;
+    dest[2][0] *= sz; dest[2][1] *= sz; dest[2][2] *= sz;
     vec3f_copy(dest[3], position);
     vec3f_add(dest[3], mtx[3]);
     dest[3][3] = 1.0f;
@@ -804,7 +821,9 @@ void mtxf_rotate_xy(Mtx *mtx, s32 angle) {
 void vec3f_get_lateral_dist(Vec3f from, Vec3f to, f32 *lateralDist) {
     register f32 dx = (to[0] - from[0]);
     register f32 dz = (to[2] - from[2]);
-    *lateralDist = sqrtf(sqr(dx) + sqr(dz));
+
+    f32 sq = sqr(dx) + sqr(dz);
+    *lateralDist = (sq > 0.0f && sq == sq) ? sqrtf(sq) : 0.0f;
 }
 
 /// Finds the squared horizontal distance between two vectors. Avoids a sqrtf call.

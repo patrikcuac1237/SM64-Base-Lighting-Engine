@@ -60,8 +60,8 @@ s32 find_water_level(s32 x, s32 z);
 s32 find_poison_gas_level(s32 x, s32 z);
 #ifdef VANILLA_DEBUG
 void debug_surface_list_info(f32 xPos, f32 zPos);
-#endif
-
+#endif// Al final de src/engine/surface_collision.h
+f32 find_shadow_level(s32 xPos, s32 yPos, s32 zPos, struct Surface **pfloor);
 f32 ray_surf_intersect(Vec3f rayStart, Vec3f rayDir, f32 rayDist, Vec3f intersectionOut, struct Surface* surf);
 f32 raycast(Vec3f rayStart, Vec3f rayDir, f32 rayDist, Vec3f intersection, struct Surface** surfHit);
 

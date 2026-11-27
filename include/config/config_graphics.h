@@ -5,7 +5,7 @@
  *********************/
 
 // Size of how large the master display list (gDisplayListHead) can be. 6400 is vanilla
-#define GFX_POOL_SIZE 10000
+#define GFX_POOL_SIZE 100000
 
 // Show a watermark in the title screen that reads "Made with HackerSM64", instead of the copyright message
 #define INTRO_CREDIT
@@ -31,10 +31,10 @@
 // #define PUPPYPRINT
 
 // Disable AA (Improves console performance but causes visible seams between unconnected geometry).
-// #define DISABLE_AA
+#define DISABLE_AA
 
 // Makes the coins ia8 64x64 instead of ia16 32x32. Uses new ia8 textures so that vanilla coins look better.
-#define IA8_COINS
+//#define IA8_COINS
 
 // Similar to the above, but 30 FPS (Textures by InTheBeef, cleaned up by Arceveti)
 #define IA8_30FPS_COINS
@@ -52,7 +52,7 @@
  * Also, this also disables anti-aliasing on Mario.
  * NOTE: Regarding performance, silhouette seems to lose 1-2 frames on console.
  */
-// #define SILHOUETTE 127
+//#define SILHOUETTE 127
 
 // Use 64x64 quarter shadow textures (Vanilla are 16x16).
 #define HD_SHADOWS
@@ -73,7 +73,7 @@
 // Uses the correct "up" vector for the guLookAtReflect call in geo_process_master_list_sub.
 // It is sideways in vanilla, and since vanilla's environment map textures are sideways too, they will appear as sideways in-game if this is enabled.
 // Make sure your custom environment map textures are the correct orientation.
-// #define FIX_REFLECT_MTX
+//#define FIX_REFLECT_MTX
 
 // This improves performance a bit, and does not seem to break anything.
 #define DISABLE_GRAPH_NODE_TYPE_FUNCTIONAL

@@ -1,6 +1,6 @@
 // 0x16000B10
 const GeoLayout red_flame_shadow_geo[] = {
-   GEO_SHADOW(SHADOW_CIRCLE_4_VERTS, 0x50, 20),
+   GEO_NODE_START(),
    GEO_OPEN_NODE(),
       GEO_BRANCH_AND_LINK(red_flame_geo),
    GEO_CLOSE_NODE(),
